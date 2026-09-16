@@ -101,7 +101,13 @@ class InMemoryRepository:
         # Standalone persistent database file path
         self.db_path = db_path or os.environ.get("TELEDRIVE_DB_PATH")
         if not self.db_path and "PYTEST_CURRENT_TEST" not in os.environ:
-            if os.path.isdir("data") or os.environ.get("TELEDRIVE_ENV") == "production":
+            if os.path.isdir("/app/data"):
+                self.db_path = "/app/data/teledrive_db.json"
+            elif os.path.isdir("data") or os.environ.get("TELEDRIVE_ENV") == "production":
+                self.db_path = "data/teledrive_db.json"
+            elif os.path.isdir("../data"):
+                self.db_path = "../data/teledrive_db.json"
+            else:
                 self.db_path = "data/teledrive_db.json"
 
         self._load_state()

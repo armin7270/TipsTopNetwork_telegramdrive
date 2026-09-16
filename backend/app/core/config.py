@@ -246,9 +246,11 @@ class Settings:
             sentry_dsn=os.environ.get("SENTRY_DSN", ""),
             cors_origins=_corsenv("CORS_ORIGINS"),
             use_in_memory_backends=use_memory,
-            use_fake_telegram=os.environ.get("TELEDRIVE_FAKE_TELEGRAM", "").lower()
-            in {"1", "true", "yes"}
-            or use_memory,
+            use_fake_telegram=(
+                False
+                if os.environ.get("TELEDRIVE_FAKE_TELEGRAM", "").lower() in {"0", "false", "no"}
+                else (os.environ.get("TELEDRIVE_FAKE_TELEGRAM", "").lower() in {"1", "true", "yes"} or use_memory)
+            ),
         )
 
 
