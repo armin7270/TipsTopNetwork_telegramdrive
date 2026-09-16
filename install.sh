@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# TeleDrive 1-Line Automated Installer for Ubuntu
+# TeleDrive 1-Line Automated Installer for Ubuntu (Fingilish / English for SSH)
 # ==============================================================================
 
 set -e
@@ -20,11 +20,11 @@ echo "   | |/ -_) / -_)| |) | '_| \ V / -_)   "
 echo "   |_|\___|_\___||___/|_| |_|\_/\___|   "
 echo "  Liquid Glass MTProto Cloud Storage    "
 echo -e "${NC}"
-echo -e "${YELLOW}>>> در حال شروع نصب و راه‌اندازی خودکار TeleDrive روی اوبونتو...${NC}\n"
+echo -e "${YELLOW}>>> Dar hale shorooe nasb va rah-andazi khodkare TeleDrive rooye Ubuntu...${NC}\n"
 
 # 1. Check Root Privileges
 if [ "$EUID" -ne 0 ]; then
-  echo -e "${RED}[خطا] لطفاً این دستور را با دسترسی root یا sudo اجرا کنید:${NC}"
+  echo -e "${RED}[ERROR] Lotfan in dastoor ra ba dastresi root ya sudo ejra konid:${NC}"
   echo -e "${YELLOW}sudo bash $0${NC}"
   exit 1
 fi
@@ -33,7 +33,7 @@ fi
 APP_DIR="/opt/telegram-drive"
 
 # 3. Update System Packages & Install Core Tools
-echo -e "${CYAN}[۱/۵] به‌روزرسانی پکیج‌های سیستم و نصب ابزارهای مورد نیاز...${NC}"
+echo -e "${CYAN}[1/5] Be-rooz-resani package-ha va nasbe abzare morede niaz...${NC}"
 apt-get update -y
 apt-get install -y --no-install-recommends \
     curl \
@@ -46,20 +46,21 @@ apt-get install -y --no-install-recommends \
 
 # Clone project if running standalone installer
 if [ ! -f "Dockerfile" ]; then
-    echo -e "${YELLOW}در حال دریافت سورس‌کد پروژه از گیت‌هاب...${NC}"
+    echo -e "${YELLOW}Dar hale daryafte source-code project az GitHub...${NC}"
+    mkdir -p "$APP_DIR"
     if [ ! -d "$APP_DIR/.git" ]; then
         git clone https://github.com/armin7270/TipsTopNetwork_telegramdrive.git "$APP_DIR"
     else
-        echo -e "${GREEN}✓ مخزن از قبل موجود است. در حال به‌روزرسانی...${NC}"
+        echo -e "${GREEN}✓ Makhzan az ghabl mojood ast. Dar hale update kardan...${NC}"
         git -C "$APP_DIR" pull origin main || true
     fi
     cd "$APP_DIR"
 fi
 
 # 4. Install Docker & Docker Compose if missing
-echo -e "\n${CYAN}[۲/۵] بررسی و نصب موتور داکر (Docker Engine)...${NC}"
+echo -e "\n${CYAN}[2/5] Barresi va nasbe Docker Engine...${NC}"
 if ! command -v docker &> /dev/null; then
-    echo -e "${YELLOW}داکر یافت نشد. در حال نصب رسمی داکر...${NC}"
+    echo -e "${YELLOW}Docker yaft nashod. Dar hale nasbe rasmi Docker...${NC}"
     mkdir -p /etc/apt/keyrings
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg --yes
     echo \
@@ -69,40 +70,40 @@ if ! command -v docker &> /dev/null; then
     apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     systemctl enable docker
     systemctl start docker
-    echo -e "${GREEN}✓ داکر با موفقیت نصب و فعال شد.${NC}"
+    echo -e "${GREEN}✓ Docker ba movafaghiat nasb va faal shod.${NC}"
 else
-    echo -e "${GREEN}✓ داکر از قبل نصب است.${NC}"
+    echo -e "${GREEN}✓ Docker az ghabl nasb ast.${NC}"
 fi
 
 # 5. Open Firewall Ports
-echo -e "\n${CYAN}[۳/۵] تنظیم پورت‌های فایروال (UFW)...${NC}"
+echo -e "\n${CYAN}[3/5] Tanzim port-haye firewall (UFW)...${NC}"
 if ufw status | grep -q "Status: active"; then
     ufw allow 80/tcp comment 'TeleDrive HTTP' || true
     ufw allow 443/tcp comment 'TeleDrive HTTPS' || true
     ufw allow 8000/tcp comment 'TeleDrive Direct' || true
-    echo -e "${GREEN}✓ پورت‌های 80، 443 و 8000 باز شدند.${NC}"
+    echo -e "${GREEN}✓ Port-haye 80, 443 va 8000 baz shodand.${NC}"
 else
-    echo -e "${YELLOW}- فایروال غیرفعال است (رد شد).${NC}"
+    echo -e "${YELLOW}- Firewall gheyr-faal ast (rad shod).${NC}"
 fi
 
 # 6. Configure Environment (.env)
-echo -e "\n${CYAN}[۴/۵] تنظیم اطلاعات ربات و کانال تلگرام...${NC}"
+echo -e "\n${CYAN}[4/5] Tanzime ettelaate Bot va Channel Telegram...${NC}"
 
 # Read inputs safely from TTY (works even with curl | bash)
 BOT_TOKEN=""
 CHANNEL_ID=""
 
 if [ -t 0 ]; then
-    read -r -p "لطفاً توکن ربات تلگرام خود را وارد کنید (اختیاری - اینتر برای بعد): " BOT_TOKEN
-    read -r -p "لطفاً شناسه کانال ذخیره‌سازی تلگرام را وارد کنید (مثال: -1004351791022): " CHANNEL_ID
+    read -r -p "[?] Lotfan Token Bot Telegram ra vared konid (Ekhtiari - Enter baraye badeh): " BOT_TOKEN
+    read -r -p "[?] Lotfan Shenase Channel Storage ra vared konid (Mesal: -1004351791022 - ya Enter baraye badeh): " CHANNEL_ID
 elif [ -e /dev/tty ]; then
-    read -r -p "لطفاً توکن ربات تلگرام خود را وارد کنید (اختیاری - اینتر برای بعد): " BOT_TOKEN < /dev/tty || true
-    read -r -p "لطفاً شناسه کانال ذخیره‌سازی تلگرام را وارد کنید (مثال: -1004351791022): " CHANNEL_ID < /dev/tty || true
+    read -r -p "[?] Lotfan Token Bot Telegram ra vared konid (Ekhtiari - Enter baraye badeh): " BOT_TOKEN < /dev/tty || true
+    read -r -p "[?] Lotfan Shenase Channel Storage ra vared konid (Mesal: -1004351791022 - ya Enter baraye badeh): " CHANNEL_ID < /dev/tty || true
 fi
 
 # Keep existing or fallback
 if [ -f .env ]; then
-    echo -e "${GREEN}✓ فایل .env از قبل موجود است و حفظ می‌شود.${NC}"
+    echo -e "${GREEN}✓ File .env az ghabl mojood ast va hefz mishavad.${NC}"
     if [ -n "$BOT_TOKEN" ]; then
         sed -i "s|^TELEGRAM_BOT_TOKEN=.*|TELEGRAM_BOT_TOKEN=$BOT_TOKEN|" .env
     fi
@@ -129,11 +130,11 @@ MAX_CONCURRENT_DOWNLOADS=8
 LOG_LEVEL=INFO
 CORS_ORIGINS=*
 EOF
-    echo -e "${GREEN}✓ فایل تنظیمات امنیتی .env تولید شد.${NC}"
+    echo -e "${GREEN}✓ File tanzimate amniati .env sakhte shod.${NC}"
 fi
 
 # 7. Start Containers
-echo -e "\n${CYAN}[۵/۵] در حال بیلد و اجرای کانتینر درایو...${NC}"
+echo -e "\n${CYAN}[5/5] Dar hale build va ejraye container TeleDrive...${NC}"
 mkdir -p data
 docker compose down 2>/dev/null || true
 docker compose up -d --build
@@ -141,11 +142,11 @@ docker compose up -d --build
 SERVER_IP=$(curl -s -4 ifconfig.me || hostname -I | awk '{print $1}')
 
 echo -e "\n${GREEN}${BOLD}====================================================${NC}"
-echo -e "${GREEN}${BOLD}       🎉 درایو ابری TeleDrive با موفقیت راه‌اندازی شد!       ${NC}"
+echo -e "${GREEN}${BOLD}   🎉 TeleDrive Cloud Storage Ba Movafaghiat Nasb Shod!   ${NC}"
 echo -e "${GREEN}${BOLD}====================================================${NC}"
-echo -e "آدرس وب‌اپلیکیشن شیشه‌ای: ${CYAN}${BOLD}http://${SERVER_IP}:8000/${NC}"
-echo -e "مستندات تعاملی API:       ${CYAN}http://${SERVER_IP}:8000/docs${NC}"
-echo -e "بررسی وضعیت سرور:         ${CYAN}http://${SERVER_IP}:8000/readyz${NC}"
-echo -e "\nدستور مشاهده زنده لاگ‌ها:  ${YELLOW}docker compose logs -f${NC}"
-echo -e "دستور ریستارت سرویس:       ${YELLOW}docker compose restart${NC}"
+echo -e "Address Web App (Liquid Glass): ${CYAN}${BOLD}http://${SERVER_IP}:8000/${NC}"
+echo -e "Mostanadate API (Swagger):       ${CYAN}http://${SERVER_IP}:8000/docs${NC}"
+echo -e "Barresi Vaziate Server (Health): ${CYAN}http://${SERVER_IP}:8000/readyz${NC}"
+echo -e "\nDastoore moshahedeye live log-ha:  ${YELLOW}docker compose logs -f${NC}"
+echo -e "Dastoore restart kardane service:  ${YELLOW}docker compose restart${NC}"
 echo -e "${GREEN}====================================================${NC}\n"
