@@ -41,7 +41,16 @@ router = APIRouter(prefix="/uploads", tags=["uploads"])
 
 
 def get_uploads(request: Request) -> UploadService:
-    return request.app.state.upload_service
+    service = getattr(request.app.state, "upload_service", None)
+    if service is None:
+        service = UploadService(
+            repository=request.app.state.repo,
+            pool=getattr(request.app.state, "pool", None),
+            backend=getattr(request.app.state, "backend", None),
+            settings=request.app.state.settings,
+        )
+        request.app.state.upload_service = service
+    return service
 
 
 def get_vfs(request: Request) -> VFSService:

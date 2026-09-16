@@ -379,27 +379,44 @@ async def _enroll_live_session(request: Request, *, client: Any, session_string:
     if not isinstance(backend, TelethonStore):
         real_store = TelethonStore()
         request.app.state.backend = real_store
-        if pool:
-            pool.backend = real_store
         backend = real_store
 
-    # Update upload and download services with the real backend
-    if hasattr(request.app.state, "upload_service") and request.app.state.upload_service:
-        request.app.state.upload_service.backend = backend
-    if hasattr(request.app.state, "download_service") and request.app.state.download_service:
-        request.app.state.download_service.backend = backend
+    # Ensure SessionPool is initialized and running
+    if pool is None:
+        from app.telegram.pool import SessionPool
+        pool = SessionPool(backend=backend, settings=settings)
+        await pool.start()
+        request.app.state.pool = pool
+    else:
+        pool.backend = backend
 
     # Purge fake sessions from pool so requests are dispatched only to real Telegram clients
-    if pool:
-        fake_ids = [sid for sid in list(pool._sessions.keys()) if sid.startswith("fake-")]
-        for fid in fake_ids:
-            try:
-                await pool.remove_session(fid)
-            except Exception:
-                pass
+    fake_ids = [sid for sid in list(pool._sessions.keys()) if sid.startswith("fake-")]
+    for fid in fake_ids:
+        try:
+            await pool.remove_session(fid)
+        except Exception:
+            pass
 
     session_id = uuid.uuid4().hex[:12]
     await pool.add_session(session_id=session_id, label=label, client=client)
+
+    # Wire upload and download services with the live pool and backend
+    from app.services.upload import UploadService
+    from app.services.download import DownloadService
+
+    request.app.state.upload_service = UploadService(
+        repository=repo,
+        pool=pool,
+        backend=backend,
+        settings=settings,
+    )
+    request.app.state.download_service = DownloadService(
+        repository=repo,
+        pool=pool,
+        backend=backend,
+        settings=settings,
+    )
 
     # Persist in repo if postgres/memory
     if repo and hasattr(repo, "register_telegram_session"):

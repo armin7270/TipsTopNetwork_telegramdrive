@@ -399,47 +399,49 @@
 
     /* Floating Liquid Header */
     .app-header {
-      min-height: var(--header-height);
-      height: auto;
+      height: var(--header-height);
       position: sticky;
       top: 0;
       z-index: 1000;
-      padding: 10px clamp(14px, 3vw, 36px);
+      padding: 0 clamp(14px, 2.5vw, 32px);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      flex-wrap: wrap;
+      gap: 12px;
+      flex-wrap: nowrap;
       background: var(--glass-surface);
       backdrop-filter: blur(32px) saturate(200%);
       -webkit-backdrop-filter: blur(32px) saturate(200%);
       border-bottom: 1px solid var(--glass-border);
-      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+      white-space: nowrap;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
       text-decoration: none;
       color: var(--text-main);
       font-weight: 800;
-      font-size: clamp(1.05rem, 2vw, 1.35rem);
-      letter-spacing: -0.4px;
+      font-size: clamp(1rem, 1.8vw, 1.25rem);
+      letter-spacing: -0.3px;
+      flex-shrink: 0;
     }
 
     .brand-logo {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
       background: var(--grad-primary);
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
-      box-shadow: 0 8px 20px rgba(0, 198, 255, 0.4);
+      box-shadow: 0 6px 18px rgba(0, 198, 255, 0.4);
       position: relative;
       overflow: hidden;
+      flex-shrink: 0;
     }
 
     .brand-logo::after {
@@ -447,20 +449,58 @@
       position: absolute;
       top: 0; left: 0; right: 0; height: 50%;
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), transparent);
-      border-radius: 14px 14px 0 0;
+      border-radius: 12px 12px 0 0;
     }
 
     .header-actions {
       display: flex;
       align-items: center;
       gap: 8px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       justify-content: flex-end;
+      flex-shrink: 0;
     }
 
-    .header-actions .btn-glass {
-      padding: 7px 14px;
-      font-size: 0.83rem;
+    .header-icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-card);
+      color: var(--text-main);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.05rem;
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: var(--glass-shadow-sm);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      flex-shrink: 0;
+    }
+
+    .header-icon-btn:hover {
+      background: var(--glass-surface-hover);
+      border-color: var(--glass-border-light);
+      transform: translateY(-2px) scale(1.08);
+      box-shadow: 0 0 14px rgba(0, 198, 255, 0.35);
+      color: var(--accent-cyan);
+    }
+
+    .header-icon-btn:active {
+      transform: scale(0.95);
+    }
+
+    .header-lang-btn {
+      width: auto;
+      min-width: 48px;
+      border-radius: var(--radius-full);
+      padding: 0 10px;
+      gap: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-family: var(--font-mono), var(--font-family);
     }
 
     /* Main Responsive Workspace */
@@ -653,28 +693,35 @@
 
     /* Stage Header & Breadcrumb Toolbar */
     .stage-toolbar {
-      padding: 16px 22px;
+      padding: 14px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-wrap: wrap;
       gap: 14px;
+      flex-wrap: wrap;
     }
 
     .breadcrumb-trail {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 8px;
-      font-size: 0.95rem;
+      gap: 6px;
+      font-size: 0.92rem;
       font-weight: 700;
-      flex-wrap: wrap;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
     }
 
     .breadcrumb-node {
       cursor: pointer;
-      padding: 4px 10px;
-      border-radius: 8px;
-      transition: background 0.2s;
+      padding: 3px 8px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .breadcrumb-node:hover {
@@ -685,13 +732,15 @@
     .breadcrumb-sep {
       color: var(--text-muted);
       opacity: 0.6;
+      font-size: 0.8rem;
     }
 
     .toolbar-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
+      margin-inline-start: auto;
     }
 
     /* ==========================================================================
@@ -1271,45 +1320,43 @@
     <header class="app-header">
       <div class="brand">
         <div class="brand-logo" title="TeleDrive">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
           </svg>
         </div>
         <span class="brand-title" data-i18n="appTitle">TeleDrive — درایو ابری تلگرام</span>
         <span class="liquid-badge badge-demo" id="telegram-status-badge" onclick="openTelegramSetupModal()" style="cursor: pointer;" title="کلیک برای تنظیمات تلگرام">
-          حالت دمو (Demo)
+          حالت آزمایشی (دمو)
         </span>
       </div>
 
       <div class="header-actions">
         <!-- PWA Install Button -->
-        <button class="btn-glass btn-glass-primary" id="btn-pwa-install" style="display: none;" onclick="triggerPwaInstall()">
+        <button class="btn-glass btn-glass-primary" id="btn-pwa-install" style="display: none;" onclick="triggerPwaInstall()" title="نصب اپلیکیشن PWA">
           <span>📲</span>
           <span data-i18n="installPwaBtn">نصب PWA</span>
         </button>
 
         <!-- Telegram Connection Setup Modal Trigger -->
-        <button class="btn-glass btn-glass-primary" onclick="openTelegramSetupModal()">
+        <button class="btn-glass btn-glass-primary" id="btn-telegram-setup" onclick="openTelegramSetupModal()" title="اتصال به تلگرام یا ربات">
           <span>✈️</span>
-          <span data-i18n="telegramSetupBtn">اتصال به تلگرام واقعی</span>
-        </button>
-
-        <!-- Theme Toggle -->
-        <button class="btn-glass" id="btn-theme-toggle" title="تغییر تم / Toggle Theme">
-          <span id="theme-icon">☀️</span>
-          <span id="theme-text" data-i18n="themeLight">تم روشن</span>
-        </button>
-
-        <!-- Language Toggle -->
-        <button class="btn-glass" id="btn-lang-toggle" title="تغییر زبان / Switch Language">
-          <span>🌐</span>
-          <span id="lang-text">English</span>
+          <span data-i18n="telegramSetupBtn">اتصال به تلگرام</span>
         </button>
 
         <!-- Adaptive Device Preview Toggle -->
-        <button class="btn-glass" id="btn-toggle-device-mockup" title="تغییر نمای دستگاه / Device View">
+        <button class="header-icon-btn" id="btn-toggle-device-mockup" title="شبیه‌ساز موبایل / دسکتاپ">
           <span id="device-view-icon">📱</span>
-          <span id="device-view-text">شبیه‌ساز موبایل</span>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button class="header-icon-btn" id="btn-theme-toggle" title="تغییر تم (روشن / تاریک)">
+          <span id="theme-icon">☀️</span>
+        </button>
+
+        <!-- Language Toggle -->
+        <button class="header-icon-btn header-lang-btn" id="btn-lang-toggle" title="Switch Language / تغییر زبان">
+          <span>🌐</span>
+          <span id="lang-text">EN</span>
         </button>
       </div>
     </header>
@@ -1622,7 +1669,7 @@
       fa: {
         appTitle: 'TeleDrive — درایو ابری تلگرام',
         installPwaBtn: 'نصب PWA',
-        telegramSetupBtn: 'اتصال به تلگرام واقعی',
+        telegramSetupBtn: 'اتصال به تلگرام',
         themeLight: 'تم روشن',
         themeDark: 'تم تاریک',
         myFilesTab: 'فایل‌های من',
@@ -1631,11 +1678,11 @@
         uploadFileBtn: 'آپلود فایل جدید',
         newFolderBtn: 'پوشه جدید',
         sampleFilesBtn: 'فایل‌های نمونه',
-        rootCrumb: 'درایو اصلی',
+        rootCrumb: 'درایو من',
         emptyFolder: 'این پوشه خالی است',
         emptyFolderHint: 'می‌توانید فایل‌های خود را در این بخش درگ کنید یا دکمه آپلود را بزنید.',
         emptyTrash: 'سطل بازیافت خالی است',
-        loading: 'در حال بارگذاری...',
+        loading: 'در حال بارگذاری فایل‌ها...',
         loadingTrash: 'در حال خواندن زباله‌دان...',
         folderLabel: 'پوشه',
         restoreBtn: 'بازیابی',
@@ -1646,7 +1693,7 @@
         previewBtn: 'پیش‌نمایش',
         modalCreateFolderTitle: 'ایجاد پوشه جدید',
         folderNameLabel: 'نام پوشه:',
-        folderNamePlaceholder: 'مثال: اسناد پروژه',
+        folderNamePlaceholder: 'مثال: اسناد و پروژه‌ها',
         createBtn: 'ایجاد پوشه',
         cancelBtn: 'انصراف',
         modalRenameTitle: 'تغییر نام فایل / پوشه',
@@ -1661,20 +1708,20 @@
         filePurged: 'فایل برای همیشه حذف گردید',
         promptDeletePermanent: 'آیا از حذف دائمی و غیرقابل بازگشت این آیتم اطمینان دارید؟',
         usedPrefix: 'مصرف‌شده:',
-        totalPrefix: 'کل:',
+        totalPrefix: 'کل فضا:',
         trafficTitle: 'ترافیک زنده MTProto / API',
         defaultChannel: 'کانال ذخیره‌سازی پیش‌فرض',
         changeBtn: 'تغییر',
-        demoBadge: 'حالت دمو (Demo)',
+        demoBadge: 'حالت آزمایشی (دمو)',
         realBadge: 'متصل به تلگرام واقعی',
         mobileMockup: 'شبیه‌ساز موبایل',
         desktopView: 'نمای کامل دسکتاپ',
-        welcomeGuest: 'کاربر گرامی',
+        welcomeGuest: 'کاربر تله‌درایو',
       },
       en: {
         appTitle: 'TeleDrive — Cloud Drive',
         installPwaBtn: 'Install PWA',
-        telegramSetupBtn: 'Connect Real Telegram',
+        telegramSetupBtn: 'Connect Telegram',
         themeLight: 'Light Theme',
         themeDark: 'Dark Theme',
         myFilesTab: 'My Files',
@@ -1721,7 +1768,7 @@
         realBadge: 'Connected to Telegram',
         mobileMockup: 'Mobile Mockup',
         desktopView: 'Desktop View',
-        welcomeGuest: 'Guest User',
+        welcomeGuest: 'TeleDrive User',
       }
     };
 
@@ -1743,11 +1790,11 @@
 
       const langBtn = document.getElementById('btn-lang-toggle');
       if (langBtn) {
-        langBtn.title = isRtl ? 'Switch to English (تغییر زبان به انگلیسی)' : 'تغییر زبان به فارسی (Switch to Persian)';
+        langBtn.title = isRtl ? 'تغییر زبان به انگلیسی (Switch to English)' : 'Switch to Persian (تغییر زبان به فارسی)';
       }
       const langText = document.getElementById('lang-text');
       if (langText) {
-        langText.innerText = isRtl ? 'English' : 'فارسی';
+        langText.innerText = isRtl ? 'EN' : 'FA';
       }
 
       const badge = document.getElementById('telegram-status-badge');
@@ -1756,9 +1803,14 @@
         badge.innerText = isReal ? t('realBadge') : t('demoBadge');
       }
 
-      const deviceBtn = document.getElementById('device-view-text');
+      const deviceBtn = document.getElementById('btn-toggle-device-mockup');
       if (deviceBtn) {
-        deviceBtn.innerText = isDeviceMockup ? t('desktopView') : t('mobileMockup');
+        deviceBtn.title = isDeviceMockup ? t('desktopView') : t('mobileMockup');
+      }
+
+      const themeBtn = document.getElementById('btn-theme-toggle');
+      if (themeBtn) {
+        themeBtn.title = currentTheme === 'light' ? t('themeDark') : t('themeLight');
       }
 
       updateBreadcrumbUI();
@@ -1774,14 +1826,16 @@
     }
 
     function applyTheme() {
+      const themeIcon = document.getElementById('theme-icon');
+      const themeBtn = document.getElementById('btn-theme-toggle');
       if (currentTheme === 'light') {
         document.body.classList.add('light-theme');
-        document.getElementById('theme-icon').innerText = '🌙';
-        document.getElementById('theme-text').innerText = currentLang === 'fa' ? 'تم تاریک' : 'Dark Theme';
+        if (themeIcon) themeIcon.innerText = '🌙';
+        if (themeBtn) themeBtn.title = t('themeDark');
       } else {
         document.body.classList.remove('light-theme');
-        document.getElementById('theme-icon').innerText = '☀️';
-        document.getElementById('theme-text').innerText = currentLang === 'fa' ? 'تم روشن' : 'Light Theme';
+        if (themeIcon) themeIcon.innerText = '☀️';
+        if (themeBtn) themeBtn.title = t('themeLight');
       }
     }
 
@@ -1792,14 +1846,16 @@
     }
 
     function applyDeviceMockupMode() {
+      const deviceIcon = document.getElementById('device-view-icon');
+      const deviceBtn = document.getElementById('btn-toggle-device-mockup');
       if (isDeviceMockup) {
         document.body.classList.add('device-mockup-mode');
-        document.getElementById('device-view-icon').innerText = '🖥️';
-        document.getElementById('device-view-text').innerText = currentLang === 'fa' ? 'نمای کامل دسکتاپ' : 'Desktop View';
+        if (deviceIcon) deviceIcon.innerText = '🖥️';
+        if (deviceBtn) deviceBtn.title = t('desktopView');
       } else {
         document.body.classList.remove('device-mockup-mode');
-        document.getElementById('device-view-icon').innerText = '📱';
-        document.getElementById('device-view-text').innerText = currentLang === 'fa' ? 'شبیه‌ساز موبایل' : 'Mobile Mockup';
+        if (deviceIcon) deviceIcon.innerText = '📱';
+        if (deviceBtn) deviceBtn.title = t('mobileMockup');
       }
     }
 
@@ -1884,13 +1940,20 @@
         const data = await resp.json();
         const badge = document.getElementById('telegram-status-badge');
         const channelLabel = document.getElementById('storage-channel-status-label');
+        const setupBtn = document.getElementById('btn-telegram-setup');
 
         if (data.is_real_telegram) {
           badge.className = 'liquid-badge badge-real';
           badge.innerText = currentLang === 'fa' ? 'متصل به تلگرام واقعی' : 'Connected to Telegram';
+          if (setupBtn) {
+            setupBtn.innerHTML = `<span>✈️</span><span>${currentLang === 'fa' ? 'تنظیمات تلگرام' : 'Telegram Settings'}</span>`;
+          }
         } else {
           badge.className = 'liquid-badge badge-demo';
-          badge.innerText = currentLang === 'fa' ? 'حالت دمو (Demo)' : 'Demo Mode';
+          badge.innerText = currentLang === 'fa' ? 'حالت آزمایشی (دمو)' : 'Demo Mode';
+          if (setupBtn) {
+            setupBtn.innerHTML = `<span>✈️</span><span>${t('telegramSetupBtn')}</span>`;
+          }
         }
 
         if (data.storage_pools && data.storage_pools.length > 0) {
@@ -1919,7 +1982,7 @@
       try {
         const email = 'user@teledrive.dev';
         const password = 'Password123!';
-        const name = 'TeleDrive User';
+        const name = currentLang === 'fa' ? 'کاربر تله‌درایو' : 'TeleDrive User';
 
         let resp = await apiRequest('/api/v1/auth/login', {
           method: 'POST',
@@ -1949,9 +2012,12 @@
     }
 
     async function setupDriveWorkspace() {
-      document.getElementById('user-display-name').innerText = currentUser.display_name || 'کاربر گرامی';
-      document.getElementById('user-email-text').innerText = currentUser.email;
-      document.getElementById('user-avatar-initials').innerText = (currentUser.display_name || currentUser.email)[0].toUpperCase();
+      const rawName = (currentUser && currentUser.display_name) || '';
+      const isGeneric = !rawName || rawName === 'TeleDrive User' || rawName === 'کاربر مهمان' || rawName === 'کاربر گرامی' || rawName === 'کاربر تله‌درایو';
+      const displayName = isGeneric ? (currentLang === 'fa' ? 'کاربر تله‌درایو' : 'TeleDrive User') : rawName;
+      document.getElementById('user-display-name').innerText = displayName;
+      document.getElementById('user-email-text').innerText = (currentUser && currentUser.email) || 'guest@teledrive.dev';
+      document.getElementById('user-avatar-initials').innerText = (displayName || 'T')[0].toUpperCase();
       document.getElementById('btn-logout').style.display = 'inline-flex';
 
       const rootResp = await apiRequest('/api/v1/nodes/root');
@@ -2001,7 +2067,8 @@
       currentPath.forEach((crumb, idx) => {
         const span = document.createElement('span');
         span.className = 'breadcrumb-node';
-        span.innerText = idx === 0 ? t('rootCrumb') : crumb.name;
+        const icon = idx === 0 ? '📁' : '📂';
+        span.innerHTML = `<span>${icon}</span><span>${idx === 0 ? t('rootCrumb') : crumb.name}</span>`;
         span.onclick = () => {
           currentPath = currentPath.slice(0, idx + 1);
           currentFolderId = crumb.id;

@@ -84,9 +84,15 @@ def _build_repository(settings: Settings) -> Any:
         )
         return InMemoryRepository()
 
-    from app.db.postgres import PostgresRepository
+    try:
+        from app.db.postgres import PostgresRepository
 
-    return PostgresRepository(settings)
+        return PostgresRepository(settings)
+    except (ImportError, ModuleNotFoundError):
+        from app.db.memory import InMemoryRepository
+
+        log.warning("PostgresRepository not available, falling back to InMemoryRepository")
+        return InMemoryRepository()
 
 
 def _build_backend(settings: Settings) -> Any:
@@ -128,12 +134,30 @@ async def _provision_sessions(
 
     store: TelethonStore = backend
     rows = await repo.list_telegram_sessions(active_only=True)
-    if not rows:
+
+    if not rows and settings.telegram_bot_token:
+        try:
+            from telethon import TelegramClient
+            from telethon.sessions import StringSession
+
+            api_id = settings.telegram_api_id or 6
+            api_hash = settings.telegram_api_hash or "eb06d4abfb49dc3eeb1aeb98ae0f581e"
+            bot_client = TelegramClient(StringSession(), api_id, api_hash)
+            await bot_client.start(bot_token=settings.telegram_bot_token)
+            me = await bot_client.get_me()
+            session_id = uuid.uuid4().hex[:12]
+            await pool.add_session(
+                session_id=session_id, label=f"bot-{me.id}", client=bot_client
+            )
+            log.info("auto-enrolled Telegram bot session at startup: @%s", me.username)
+        except Exception:
+            log.exception("failed to auto-enroll bot from TELEGRAM_BOT_TOKEN")
+
+    if not rows and pool.healthy_count() == 0:
         log.warning(
             "no active Telegram sessions in the database; run the session "
             "enrolment tool before serving uploads"
         )
-        return
 
     from app.core.crypto import decrypt_session_string
 
@@ -149,6 +173,9 @@ async def _provision_sessions(
             )
         except Exception:  # noqa: BLE001 - one bad session must not stop the rest
             log.exception("failed to load Telegram session %s", row.get("label"))
+
+    # Always ensure storage pools are provisioned so uploads find an active channel
+    await _provision_in_memory_pools(repo, backend, settings)
 
 
 async def _provision_in_memory_pools(repo: Any, store: Any, settings: Settings) -> None:
@@ -191,46 +218,35 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # The session pool is optional at boot. A deployment that has not yet added
     # any Telegram sessions can still start and serve management endpoints, which
     # is what an operator needs while bringing the service up for the first time.
-    app.state.pool = None
-    app.state.backend = None
     backend = _build_backend(settings)
-    if backend is not None:
-        from app.telegram.pool import SessionPool
+    if backend is None:
+        if settings.use_fake_telegram:
+            from app.telegram.fake_store import InMemoryStore
+            backend = InMemoryStore()
+        else:
+            from app.telegram.telethon_store import TelethonStore
+            backend = TelethonStore()
 
-        pool = SessionPool(backend=backend, settings=settings)
-        await _provision_sessions(pool, backend, settings, repo=app.state.repo)
-        await pool.start()
-        app.state.pool = pool
-        app.state.backend = backend
-        log.info("session pool started with %d session(s)", pool.healthy_count())
-    elif not settings.use_in_memory_backends:
-        log.info(
-            "no Telegram session pool started; register sessions via the operator "
-            "CLI before accepting uploads"
-        )
+    from app.telegram.pool import SessionPool
 
-    # A pool that has no sessions cannot serve storage traffic, so the services
-    # are only wired up when the pool can actually carry a request. Endpoints that
-    # need them then fail with a clear 503 rather than an AttributeError.
-    app.state.upload_service = (
-        UploadService(
-            repository=app.state.repo,
-            pool=app.state.pool,
-            backend=app.state.backend,
-            settings=settings,
-        )
-        if app.state.pool is not None
-        else None
+    pool = SessionPool(backend=backend, settings=settings)
+    await _provision_sessions(pool, backend, settings, repo=app.state.repo)
+    await pool.start()
+    app.state.pool = pool
+    app.state.backend = backend
+    log.info("session pool started with %d session(s)", pool.healthy_count())
+
+    app.state.upload_service = UploadService(
+        repository=app.state.repo,
+        pool=app.state.pool,
+        backend=app.state.backend,
+        settings=settings,
     )
-    app.state.download_service = (
-        DownloadService(
-            repository=app.state.repo,
-            pool=app.state.pool,
-            backend=app.state.backend,
-            settings=settings,
-        )
-        if app.state.pool is not None
-        else None
+    app.state.download_service = DownloadService(
+        repository=app.state.repo,
+        pool=app.state.pool,
+        backend=app.state.backend,
+        settings=settings,
     )
 
     from app.telegram.bot_service import TelegramBotService
