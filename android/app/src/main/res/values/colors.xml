@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Liquid Glass Dark Theme -->
+    <color name="bg_dark">#080D19</color>
+    <color name="bg_surface">#0F172A</color>
+    <color name="glass_card">#1E293B</color>
+    <color name="glass_card_stroke">#334155</color>
+    <color name="glass_card_light">#1E293B</color>
+
+    <!-- Neon Accents -->
+    <color name="cyan_glow">#00C6FF</color>
+    <color name="blue_electric">#0072FF</color>
+    <color name="purple_neon">#7209B7</color>
+    <color name="pink_neon">#F72585</color>
+    <color name="emerald_glow">#10B981</color>
+    <color name="amber_glow">#F59E0B</color>
+    <color name="red_glow">#EF4444</color>
+
+    <!-- Typography -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#94A3B8</color>
+    <color name="text_muted">#64748B</color>
+</resources>

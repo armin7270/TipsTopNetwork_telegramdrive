@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">TeleDrive</string>
+    <string name="tagline">درایو ابری نامحدود و رمزنگاری‌شده تلگرام</string>
+
+    <!-- Auth -->
+    <string name="login_title">ورود به حساب</string>
+    <string name="register_title">ثبت‌نام حساب جدید</string>
+    <string name="email_hint">آدرس ایمیل</string>
+    <string name="password_hint">رمز عبور</string>
+    <string name="display_name_hint">نام نمایشی (اختیاری)</string>
+    <string name="btn_login">ورود امن</string>
+    <string name="btn_register">ساخت حساب کاربری</string>
+    <string name="server_url_hint">آدرس سرور (مثال: http://vps-ip:8000)</string>
+    <string name="save_server">تنظیم و ذخیره سرور</string>
+
+    <!-- Main Explorer -->
+    <string name="files_title">فایل‌ها و پوشه‌ها</string>
+    <string name="search_hint">جستجو در فایل‌ها...</string>
+    <string name="quota_used">مصرف دیسک</string>
+    <string name="upload_file">آپلود فایل جدید</string>
+    <string name="new_folder">پوشه جدید</string>
+    <string name="folder_name_hint">نام پوشه</string>
+    <string name="create">ایجاد</string>
+    <string name="cancel">انصراف</string>
+    <string name="rename">تغییر نام</string>
+    <string name="delete">حذف</string>
+    <string name="download">دانلود</string>
+    <string name="play">پخش آنلاین</string>
+
+    <!-- Upload Progress -->
+    <string name="uploading_title">در حال آپلود قطعه‌ای به تلگرام...</string>
+    <string name="chunk_progress">ارسال چانک %1$d از %2$d</string>
+    <string name="upload_complete">آپلود با موفقیت تکمیل شد!</string>
+    <string name="upload_failed">خطا در ارسال چانک</string>
+</resources>

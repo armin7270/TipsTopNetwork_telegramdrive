@@ -1,0 +1,16 @@
+[Unit]
+Description=TeleDrive MTProto Cloud Storage Service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/telegram-drive/backend
+EnvironmentFile=/opt/telegram-drive/.env
+ExecStart=/opt/telegram-drive/.venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=5
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

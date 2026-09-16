@@ -1,0 +1,49 @@
+# Python
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Environment Secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Local Data and SQLite
+data/*.json
+backend/data/*.json
+data/temp/
+data/blobs/
+temp_chunks/
+*.db
+*.sqlite3
+
+# Android & Gradle
+.gradle/
+build/
+android/build/
+android/app/build/
+android/.gradle/
+android/local.properties
+.idea/
+*.iml
+*.apk
+*.aab
+.cxx/
+captures/
+.externalNativeBuild/
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log

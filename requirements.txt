@@ -1,0 +1,23 @@
+# Core Web Framework & ASGI Server
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+starlette>=0.38.0
+pydantic>=2.7.0
+email-validator>=2.1.0
+
+# Cryptography & Security
+cryptography>=42.0.0
+PyJWT>=2.8.0
+
+# Telegram MTProto Protocol
+telethon>=1.35.0
+pyaes>=1.6.1
+rsa>=4.9
+
+# Networking & HTTP Client & WebSockets
+httpx>=0.27.0
+websockets>=12.0
+PySocks>=1.7.1
+
+# Environment & Config
+python-dotenv>=1.0.0

@@ -1,0 +1,2682 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>TeleDrive — درایو ابری مدرن تلگرام</title>
+  
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0d1527">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="TeleDrive">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="icon" type="image/png" href="/icons/icon-192.png">
+
+  <!-- Google Fonts: Vazirmatn (Farsi) & Plus Jakarta Sans / JetBrains Mono (English/Code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       1. LIQUID GLASS DESIGN SYSTEM & THEME TOKENS
+       ========================================================================== */
+    :root {
+      /* Liquid Glass Dark Mode (Default) */
+      --bg-base: #070b14;
+      --bg-ambient-1: rgba(0, 198, 255, 0.15);
+      --bg-ambient-2: rgba(138, 35, 135, 0.18);
+      --bg-ambient-3: rgba(0, 114, 255, 0.12);
+      
+      /* Glass Surfaces */
+      --glass-surface: rgba(18, 26, 43, 0.65);
+      --glass-surface-hover: rgba(28, 40, 65, 0.75);
+      --glass-surface-active: rgba(38, 54, 88, 0.85);
+      --glass-card: rgba(255, 255, 255, 0.05);
+      --glass-card-hover: rgba(255, 255, 255, 0.09);
+      
+      /* Glass Highlights & Borders */
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --glass-border-light: rgba(255, 255, 255, 0.22);
+      --glass-border-glow: rgba(0, 198, 255, 0.4);
+      --glass-blur: 28px;
+      --glass-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5), inset 0 1px 1px 0 rgba(255, 255, 255, 0.2);
+      --glass-shadow-sm: 0 8px 24px -6px rgba(0, 0, 0, 0.4), inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+      --glass-shadow-glow: 0 0 35px -5px rgba(0, 198, 255, 0.35);
+
+      /* Typography */
+      --text-main: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --text-inverse: #0f172a;
+      
+      /* Cheerful Vibrant Accent Gradients */
+      --accent-cyan: #00f2fe;
+      --accent-blue: #4facfe;
+      --grad-primary: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+      --grad-secondary: linear-gradient(135deg, #f72585 0%, #7209b7 100%);
+      --grad-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      --grad-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      --grad-danger: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+      --grad-aurora: linear-gradient(135deg, #8A2387 0%, #E94057 50%, #F27121 100%);
+      --grad-emerald: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      
+      --radius-sm: 12px;
+      --radius-md: 18px;
+      --radius-lg: 26px;
+      --radius-full: 9999px;
+      
+      --font-family: 'Vazirmatn', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      /* Layout Defaults */
+      --header-height: 72px;
+      --sidebar-width: 300px;
+    }
+
+    body.light-theme {
+      --bg-base: #f1f5f9;
+      --bg-ambient-1: rgba(0, 198, 255, 0.22);
+      --bg-ambient-2: rgba(247, 37, 133, 0.15);
+      --bg-ambient-3: rgba(0, 114, 255, 0.18);
+      
+      --glass-surface: rgba(255, 255, 255, 0.72);
+      --glass-surface-hover: rgba(255, 255, 255, 0.88);
+      --glass-surface-active: rgba(255, 255, 255, 0.96);
+      --glass-card: rgba(255, 255, 255, 0.62);
+      --glass-card-hover: rgba(255, 255, 255, 0.85);
+      
+      --glass-border: rgba(255, 255, 255, 0.7);
+      --glass-border-light: rgba(255, 255, 255, 0.95);
+      --glass-border-glow: rgba(0, 198, 255, 0.5);
+      --glass-shadow: 0 20px 45px -10px rgba(71, 85, 105, 0.12), inset 0 1px 2px 0 rgba(255, 255, 255, 0.95);
+      --glass-shadow-sm: 0 8px 24px -6px rgba(71, 85, 105, 0.08), inset 0 1px 2px 0 rgba(255, 255, 255, 0.9);
+      --glass-shadow-glow: 0 0 35px -5px rgba(0, 114, 255, 0.22);
+
+      --text-main: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --text-inverse: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      transition: background-color 0.35s ease, color 0.35s ease;
+    }
+
+    /* Ambient Liquid Mesh Background */
+    .liquid-mesh-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.85;
+      animation: floatOrbs 24s ease-in-out infinite alternate;
+      will-change: transform;
+    }
+
+    .orb-1 {
+      width: min(70vw, 650px);
+      height: min(70vw, 650px);
+      top: -15%;
+      right: -10%;
+      background: radial-gradient(circle, var(--bg-ambient-1) 0%, transparent 70%);
+      animation-duration: 22s;
+    }
+
+    .orb-2 {
+      width: min(75vw, 750px);
+      height: min(75vw, 750px);
+      bottom: -20%;
+      left: -15%;
+      background: radial-gradient(circle, var(--bg-ambient-2) 0%, transparent 70%);
+      animation-duration: 28s;
+      animation-delay: -5s;
+    }
+
+    .orb-3 {
+      width: min(60vw, 550px);
+      height: min(60vw, 550px);
+      top: 40%;
+      left: 30%;
+      background: radial-gradient(circle, var(--bg-ambient-3) 0%, transparent 70%);
+      animation-duration: 20s;
+      animation-delay: -10s;
+    }
+
+    @keyframes floatOrbs {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(60px, -40px) scale(1.1); }
+      100% { transform: translate(-40px, 50px) scale(0.95); }
+    }
+
+    /* ==========================================================================
+       2. REUSABLE LIQUID GLASS COMPONENTS
+       ========================================================================== */
+    .glass-panel {
+      background: var(--glass-surface);
+      backdrop-filter: blur(var(--glass-blur)) saturate(190%);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(190%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--glass-shadow);
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .glass-panel:hover {
+      border-color: var(--glass-border-light);
+    }
+
+    .glass-card {
+      background: var(--glass-card);
+      backdrop-filter: blur(18px) saturate(170%);
+      -webkit-backdrop-filter: blur(18px) saturate(170%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--glass-shadow-sm);
+      transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .glass-card:hover {
+      background: var(--glass-card-hover);
+      border-color: var(--glass-border-light);
+      transform: translateY(-3px);
+      box-shadow: var(--glass-shadow);
+    }
+
+    /* Rounded Transparent Glass Icons */
+    .glass-icon-badge {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--glass-border-light);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 4px 12px rgba(0, 0, 0, 0.1);
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .glass-icon-badge.glow-cyan {
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 0 20px rgba(0, 198, 255, 0.4);
+    }
+
+    .glass-icon-badge.glow-magenta {
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 0 20px rgba(247, 37, 133, 0.4);
+    }
+
+    .glass-icon-badge.glow-emerald {
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 0 20px rgba(16, 185, 129, 0.4);
+    }
+
+    /* Buttons with Liquid Glass & Glow */
+    .btn-glass {
+      background: var(--glass-surface);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: var(--glass-shadow-sm);
+      user-select: none;
+    }
+
+    .btn-glass:hover {
+      background: var(--glass-surface-hover);
+      border-color: var(--glass-border-light);
+      transform: translateY(-2px);
+      color: var(--text-main);
+    }
+
+    .btn-glass:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .btn-glass-primary {
+      background: var(--grad-primary);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      color: #ffffff !important;
+      box-shadow: 0 8px 25px -4px rgba(0, 198, 255, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    }
+
+    .btn-glass-primary:hover {
+      box-shadow: 0 12px 30px -4px rgba(0, 198, 255, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .btn-glass-danger {
+      background: var(--grad-danger);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ffffff !important;
+      box-shadow: 0 8px 20px -4px rgba(239, 68, 68, 0.4);
+    }
+
+    /* Glowing Pulsing Status Badges */
+    .liquid-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
+      font-weight: 700;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    }
+
+    .liquid-badge.badge-real {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border-color: rgba(52, 211, 153, 0.4);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
+    }
+
+    .liquid-badge.badge-demo {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border-color: rgba(251, 191, 36, 0.4);
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
+    }
+
+    .liquid-badge::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 10px currentColor;
+      animation: badgePulse 2s infinite ease-in-out;
+    }
+
+    @keyframes badgePulse {
+      0%, 100% { transform: scale(0.9); opacity: 0.7; }
+      50% { transform: scale(1.3); opacity: 1; filter: drop-shadow(0 0 6px currentColor); }
+    }
+
+    /* ==========================================================================
+       3. RESPONSIVE APPLICATION LAYOUT (MOBILE / DESKTOP / TV)
+       ========================================================================== */
+    .app-viewport {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    /* Floating Liquid Header */
+    .app-header {
+      height: var(--header-height);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      padding: 0 clamp(16px, 4vw, 40px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: var(--glass-surface);
+      backdrop-filter: blur(32px) saturate(200%);
+      -webkit-backdrop-filter: blur(32px) saturate(200%);
+      border-bottom: 1px solid var(--glass-border);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.25);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 800;
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
+      letter-spacing: -0.4px;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: var(--grad-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      box-shadow: 0 8px 20px rgba(0, 198, 255, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand-logo::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 50%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), transparent);
+      border-radius: 14px 14px 0 0;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Main Responsive Workspace */
+    .main-workspace {
+      flex: 1;
+      display: flex;
+      width: 100%;
+      max-width: 1720px;
+      margin: 0 auto;
+      padding: clamp(14px, 2.5vw, 32px);
+      gap: clamp(16px, 2.5vw, 32px);
+    }
+
+    /* Glass Sidebar (Desktop & Tablet) */
+    .sidebar {
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Main Stage / Files Canvas */
+    .main-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      min-width: 0;
+    }
+
+    /* Profile Glass Pill */
+    .user-profile-card {
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .user-avatar-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--grad-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: white;
+      box-shadow: 0 6px 18px rgba(247, 37, 133, 0.35);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      flex-shrink: 0;
+    }
+
+    .user-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .user-name {
+      font-weight: 700;
+      font-size: 1rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-email {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      direction: ltr;
+      text-align: start;
+    }
+
+    /* Storage Capacity Gauge Card */
+    .storage-meter-card {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .storage-meter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .storage-bar-track {
+      width: 100%;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      position: relative;
+      border: 1px solid var(--glass-border);
+    }
+
+    .storage-bar-fill {
+      height: 100%;
+      width: 0.5%;
+      border-radius: var(--radius-full);
+      background: var(--grad-primary);
+      box-shadow: 0 0 16px rgba(0, 198, 255, 0.7);
+      transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+
+    .storage-bar-fill::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      animation: barShimmer 2.2s infinite;
+    }
+
+    @keyframes barShimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* Navigation Glass Tabs */
+    .nav-tabs-pill {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px;
+    }
+
+    .nav-tab-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: all 0.22s ease;
+      background: transparent;
+      border: none;
+      width: 100%;
+      text-align: start;
+    }
+
+    .nav-tab-item:hover {
+      background: var(--glass-card-hover);
+      color: var(--text-main);
+      transform: translateX(currentLang === 'fa' ? -4px : 4px);
+    }
+
+    .nav-tab-item.active {
+      background: var(--glass-surface-hover);
+      color: var(--text-main);
+      border: 1px solid var(--glass-border-light);
+      box-shadow: var(--glass-shadow-sm);
+    }
+
+    .nav-tab-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-tab-badge {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+    }
+
+    /* Storage Channel Badge Info */
+    .channel-info-card {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      border-radius: var(--radius-sm);
+    }
+
+    /* Stage Header & Breadcrumb Toolbar */
+    .stage-toolbar {
+      padding: 16px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .breadcrumb-trail {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      flex-wrap: wrap;
+    }
+
+    .breadcrumb-node {
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    .breadcrumb-node:hover {
+      background: var(--glass-card-hover);
+      color: var(--accent-cyan);
+    }
+
+    .breadcrumb-sep {
+      color: var(--text-muted);
+      opacity: 0.6;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* ==========================================================================
+       4. FILES & FOLDERS LIQUID GRID / CARDS
+       ========================================================================== */
+    .files-grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 18px;
+      width: 100%;
+    }
+
+    /* Liquid Glass File Card */
+    .node-card {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .node-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: transparent;
+      transition: background 0.25s ease;
+    }
+
+    .node-card:hover::before {
+      background: var(--grad-primary);
+    }
+
+    .node-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .node-icon-wrapper {
+      width: 50px;
+      height: 50px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border-light);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .node-card:hover .node-icon-wrapper {
+      transform: scale(1.1) rotate(-3deg);
+    }
+
+    .node-actions-menu {
+      display: flex;
+      gap: 4px;
+      opacity: 0.85;
+      transition: opacity 0.2s;
+    }
+
+    .node-btn-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-card);
+      color: var(--text-main);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .node-btn-icon:hover {
+      background: var(--glass-surface-hover);
+      border-color: var(--accent-cyan);
+      transform: scale(1.12);
+      color: var(--accent-cyan);
+    }
+
+    .node-card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .node-card-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text-main);
+    }
+
+    .node-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    /* Empty States */
+    .empty-state-glass {
+      padding: 60px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      grid-column: 1 / -1;
+    }
+
+    .empty-icon-orb {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--glass-border-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.4rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      animation: floatOrbs 6s infinite alternate ease-in-out;
+    }
+
+    /* ==========================================================================
+       5. DRAG & DROP ZONE, UPLOAD MATRIX & CHUNKS PROGRESS
+       ========================================================================== */
+    .dropzone-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(13, 21, 39, 0.88);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      z-index: 500;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px dashed var(--accent-cyan);
+      border-radius: var(--radius-md);
+      box-shadow: 0 0 50px rgba(0, 198, 255, 0.4);
+      gap: 16px;
+      animation: fadeIn 0.25s ease;
+    }
+
+    /* Upload Live Monitor Panel */
+    .upload-tray {
+      padding: 18px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border: 1px solid var(--glass-border-glow);
+      box-shadow: 0 10px 40px -10px rgba(0, 198, 255, 0.25);
+      animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .upload-tray-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .chunks-matrix {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      max-height: 80px;
+      overflow-y: auto;
+      padding: 6px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+
+    .chunk-block {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.1);
+      transition: all 0.2s;
+    }
+
+    .chunk-block.uploaded {
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
+
+    .chunk-block.uploading {
+      background: #00c6ff;
+      box-shadow: 0 0 8px #00c6ff;
+      animation: badgePulse 1s infinite;
+    }
+
+    .chunk-block.error {
+      background: #ef4444;
+      box-shadow: 0 0 8px #ef4444;
+    }
+
+    /* Live MTProto Traffic Monitor Card */
+    .traffic-monitor-card {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .traffic-log-window {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      max-height: 180px;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      direction: ltr;
+      text-align: left;
+    }
+
+    .log-item {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      line-height: 1.4;
+    }
+
+    .log-method {
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .log-status-200 { color: #4ade80; }
+    .log-status-err { color: #f87171; }
+
+    /* ==========================================================================
+       6. MODALS & DIALOGS (TELEGRAM SETUP, PREVIEWS, PROMPTS)
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: rgba(5, 8, 16, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.22s ease;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 560px;
+      background: var(--glass-surface);
+      backdrop-filter: blur(36px) saturate(200%);
+      -webkit-backdrop-filter: blur(36px) saturate(200%);
+      border: 1px solid var(--glass-border-light);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 25px 70px -10px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.35);
+      padding: clamp(20px, 3.5vw, 32px);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--glass-border);
+      padding-bottom: 14px;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-close-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .modal-close-btn:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+      border-color: #ef4444;
+      transform: rotate(90deg);
+    }
+
+    /* Form Inputs */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .form-label {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .form-input {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.25s;
+    }
+
+    .form-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 16px rgba(0, 198, 255, 0.35);
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    /* Modal Sub-Tabs */
+    .modal-tabs {
+      display: flex;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 14px;
+    }
+
+    .modal-tab-btn {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .modal-tab-btn.active {
+      background: var(--glass-surface);
+      color: var(--text-main);
+      border: 1px solid var(--glass-border-light);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* ==========================================================================
+       7. MOBILE BOTTOM NAV & DEVICE EMULATOR PREVIEW OVERLAY
+       ========================================================================== */
+    .mobile-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: var(--glass-surface);
+      backdrop-filter: blur(28px) saturate(200%);
+      -webkit-backdrop-filter: blur(28px) saturate(200%);
+      border-top: 1px solid var(--glass-border);
+      z-index: 900;
+      padding: 0 16px;
+      align-items: center;
+      justify-content: space-around;
+      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+
+    .mobile-nav-item.active {
+      color: var(--accent-cyan);
+      background: var(--glass-card-hover);
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      padding: 12px 20px;
+      border-radius: var(--radius-full);
+      background: var(--glass-surface);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--glass-border-light);
+      box-shadow: var(--glass-shadow);
+      font-weight: 600;
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-main);
+      animation: toastIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: auto;
+    }
+
+    /* Keyframes */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.9); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ==========================================================================
+       8. DEVICE BREAKPOINTS & ADAPTIVE RATIOS (MOBILE / TABLET / 4K TV)
+       ========================================================================== */
+    /* Mobile Screen Breakpoint (< 768px) */
+    @media (max-width: 768px) {
+      :root {
+        --header-height: 62px;
+      }
+      .sidebar {
+        display: none; /* Replaced by bottom nav & mobile drawer */
+      }
+      .main-workspace {
+        padding: 12px;
+        padding-bottom: 80px;
+      }
+      .mobile-bottom-nav {
+        display: flex;
+      }
+      .files-grid-container {
+        grid-template-columns: 1fr;
+      }
+      .brand-title {
+        font-size: 1.05rem;
+      }
+      .header-actions .btn-glass span:last-child {
+        display: none; /* Icon only on mobile topbar for space */
+      }
+      .toast-container {
+        bottom: 85px;
+        width: 90%;
+      }
+    }
+
+    /* Tablet Breakpoint (769px - 1024px) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      :root {
+        --sidebar-width: 240px;
+      }
+      .files-grid-container {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      }
+    }
+
+    /* TV & Large 4K Displays (>= 1600px) */
+    @media (min-width: 1600px) {
+      :root {
+        --sidebar-width: 360px;
+        --header-height: 84px;
+      }
+      body {
+        font-size: 18px;
+      }
+      .files-grid-container {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 24px;
+      }
+      .glass-icon-badge {
+        width: 54px;
+        height: 54px;
+        font-size: 1.7rem;
+      }
+    }
+
+    /* Optional Phone Mockup Mode (toggleable) */
+    body.device-mockup-mode .main-workspace {
+      max-width: 440px;
+      margin: 20px auto;
+      border: 10px solid #1a2333;
+      border-radius: 46px;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8), 0 0 50px rgba(0, 198, 255, 0.3);
+      padding: 16px;
+      background: var(--bg-base);
+    }
+    body.device-mockup-mode .sidebar {
+      display: none;
+    }
+    body.device-mockup-mode .mobile-bottom-nav {
+      display: flex;
+      position: sticky;
+      bottom: 0;
+      border-radius: 0 0 36px 36px;
+    }
+  </style>
+</head>
+<body class="rtl">
+
+  <!-- Ambient Animated Liquid Mesh Background -->
+  <div class="liquid-mesh-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="app-viewport">
+
+    <!-- 1. FLOATING LIQUID GLASS HEADER -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-logo" title="TeleDrive">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+          </svg>
+        </div>
+        <span class="brand-title" data-i18n="appTitle">TeleDrive — درایو ابری تلگرام</span>
+        <span class="liquid-badge badge-demo" id="telegram-status-badge" onclick="openTelegramSetupModal()" style="cursor: pointer;" title="کلیک برای تنظیمات تلگرام">
+          حالت دمو (Demo)
+        </span>
+      </div>
+
+      <div class="header-actions">
+        <!-- PWA Install Button -->
+        <button class="btn-glass btn-glass-primary" id="btn-pwa-install" style="display: none;" onclick="triggerPwaInstall()">
+          <span>📲</span>
+          <span data-i18n="installPwaBtn">نصب PWA</span>
+        </button>
+
+        <!-- Telegram Connection Setup Modal Trigger -->
+        <button class="btn-glass btn-glass-primary" onclick="openTelegramSetupModal()">
+          <span>✈️</span>
+          <span data-i18n="telegramSetupBtn">اتصال به تلگرام واقعی</span>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button class="btn-glass" id="btn-theme-toggle" title="تغییر تم / Toggle Theme">
+          <span id="theme-icon">☀️</span>
+          <span id="theme-text" data-i18n="themeLight">تم روشن</span>
+        </button>
+
+        <!-- Language Toggle -->
+        <button class="btn-glass" id="btn-lang-toggle" title="تغییر زبان / Switch Language">
+          <span>🌐</span>
+          <span id="lang-text">English</span>
+        </button>
+
+        <!-- Adaptive Device Preview Toggle -->
+        <button class="btn-glass" id="btn-toggle-device-mockup" title="تغییر نمای دستگاه / Device View">
+          <span id="device-view-icon">📱</span>
+          <span id="device-view-text">شبیه‌ساز موبایل</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 2. MAIN WORKSPACE -->
+    <main class="main-workspace">
+
+      <!-- SIDEBAR (Desktop & Tablet) -->
+      <aside class="sidebar" id="sidebar-panel">
+
+        <!-- User Profile Pill -->
+        <div class="glass-panel user-profile-card">
+          <div class="user-avatar-circle" id="user-avatar-initials">☁️</div>
+          <div class="user-info">
+            <div class="user-name" id="user-display-name">کاربر مهمان</div>
+            <div class="user-email" id="user-email-text">guest@teledrive.dev</div>
+          </div>
+          <button class="node-btn-icon" title="خروج از حساب" onclick="handleLogout()" id="btn-logout" style="display: none;">🚪</button>
+        </div>
+
+        <!-- Storage Gauge Card -->
+        <div class="glass-panel storage-meter-card">
+          <div class="storage-meter-header">
+            <span data-i18n="storageTitle">فضای مصرفی ذخیره‌سازی</span>
+            <span id="quota-percent-text" style="color: var(--accent-cyan);">0.1%</span>
+          </div>
+          <div class="storage-bar-track">
+            <div class="storage-bar-fill" id="storage-bar-fill"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.76rem; color: var(--text-muted);">
+            <span id="quota-used-text">مصرف‌شده: 0 MB</span>
+            <span id="quota-total-text">کل: 100 TB</span>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="glass-panel nav-tabs-pill">
+          <button class="nav-tab-item active" id="tab-my-files" onclick="switchToFilesView()">
+            <div class="nav-tab-label">
+              <span class="glass-icon-badge glow-cyan" style="width: 32px; height: 32px; font-size: 1rem;">📂</span>
+              <span data-i18n="myFilesTab">فایل‌های من</span>
+            </div>
+            <span class="nav-tab-badge" id="count-files">0</span>
+          </button>
+
+          <button class="nav-tab-item" id="tab-trash" onclick="switchToTrashView()">
+            <div class="nav-tab-label">
+              <span class="glass-icon-badge glow-magenta" style="width: 32px; height: 32px; font-size: 1rem;">🗑️</span>
+              <span data-i18n="trashTab">سطل بازیافت</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Storage Channel Info Card -->
+        <div class="glass-panel channel-info-card">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span>📦</span>
+            <span id="storage-channel-status-label">کانال ذخیره‌سازی پیش‌فرض</span>
+          </div>
+          <button class="btn-glass" style="padding: 4px 10px; font-size: 0.72rem;" onclick="openTelegramSetupModal()">تغییر</button>
+        </div>
+
+        <!-- Live Traffic Monitor Card -->
+        <div class="glass-panel traffic-monitor-card">
+          <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; font-weight: 700;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span>⚡</span> <span>ترافیک زنده MTProto / API</span>
+            </div>
+            <span style="font-size: 0.72rem; color: var(--text-muted);" id="traffic-count">0 req</span>
+          </div>
+          <div class="traffic-log-window" id="traffic-log-window">
+            <div class="log-item" style="opacity: 0.6;">System ready. Monitoring network...</div>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- MAIN STAGE -->
+      <section class="main-stage">
+
+        <!-- Stage Toolbar & Actions -->
+        <div class="glass-panel stage-toolbar">
+          <!-- Breadcrumb Trail -->
+          <div class="breadcrumb-trail" id="breadcrumb-container">
+            <span class="breadcrumb-node" onclick="navigateToFolder(rootNodeId)">درایو اصلی</span>
+          </div>
+
+          <!-- Actions -->
+          <div class="toolbar-actions">
+            <input type="file" id="file-input-element" style="display: none;" onchange="handleFileSelect(event)" />
+            <button class="btn-glass btn-glass-primary" onclick="document.getElementById('file-input-element').click()">
+              <span>☁️</span>
+              <span data-i18n="uploadFileBtn">آپلود فایل جدید</span>
+            </button>
+            <button class="btn-glass" onclick="showNewFolderModal()">
+              <span>📁</span>
+              <span data-i18n="newFolderBtn">پوشه جدید</span>
+            </button>
+            <button class="btn-glass" onclick="createSampleFiles()" title="ساخت فایل نمونه تست">
+              <span>✨</span>
+              <span>فایل‌های نمونه</span>
+            </button>
+            <button class="btn-glass" onclick="refreshDrive()" title="بروزرسانی">
+              <span>🔄</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Upload Tray (when uploading) -->
+        <div class="glass-panel upload-tray" id="upload-tray" style="display: none;">
+          <div class="upload-tray-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="glass-icon-badge glow-cyan" style="width: 36px; height: 36px; font-size: 1.1rem;">⚡</span>
+              <div>
+                <div style="font-weight: 700; font-size: 0.95rem;" id="upload-filename-text">Uploading...</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);" id="upload-status-text">Encrypting AES-256-GCM chunks...</div>
+              </div>
+            </div>
+            <div style="font-weight: 800; font-size: 1.1rem; color: var(--accent-cyan);" id="upload-percentage-text">0%</div>
+          </div>
+          <div class="storage-bar-track">
+            <div class="storage-bar-fill" id="upload-progress-fill"></div>
+          </div>
+          <!-- Realtime Chunks Matrix -->
+          <div class="chunks-matrix" id="chunks-matrix"></div>
+        </div>
+
+        <!-- Dropzone Overlay for Drag & Drop -->
+        <div class="dropzone-overlay" id="dropzone-overlay">
+          <div class="glass-icon-badge glow-cyan" style="width: 90px; height: 90px; font-size: 3rem;">📥</div>
+          <h2 style="font-size: 1.4rem; font-weight: 800;">فایل را رها کنید</h2>
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">فایل با استاندارد AES-256-GCM رمزنگاری شده و چانک‌بندی می‌شود</p>
+        </div>
+
+        <!-- Files & Folders Grid -->
+        <div class="files-grid-container" id="files-grid">
+          <div class="empty-state-glass">
+            <div class="empty-icon-orb">📂</div>
+            <div style="font-size: 1.1rem; font-weight: 700;">در حال بارگذاری فایل‌ها...</div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <nav class="mobile-bottom-nav">
+      <button class="mobile-nav-item active" onclick="switchToFilesView()">
+        <span style="font-size: 1.3rem;">📂</span>
+        <span>فایل‌ها</span>
+      </button>
+      <button class="mobile-nav-item" onclick="document.getElementById('file-input-element').click()">
+        <span style="font-size: 1.3rem;">☁️</span>
+        <span>آپلود</span>
+      </button>
+      <button class="mobile-nav-item" onclick="switchToTrashView()">
+        <span style="font-size: 1.3rem;">🗑️</span>
+        <span>زباله‌دان</span>
+      </button>
+      <button class="mobile-nav-item" onclick="openTelegramSetupModal()">
+        <span style="font-size: 1.3rem;">⚙️</span>
+        <span>تنظیمات</span>
+      </button>
+    </nav>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- 3. LIQUID GLASS MODALS -->
+
+    <!-- Telegram Setup Modal -->
+    <div class="modal-overlay" id="telegram-modal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title">
+            <span class="glass-icon-badge glow-cyan" style="width: 38px; height: 38px; font-size: 1.1rem;">✈️</span>
+            <span>اتصال و راه‌اندازی تلگرام واقعی</span>
+          </h3>
+          <button class="modal-close-btn" onclick="closeTelegramModal()">✕</button>
+        </div>
+
+        <div style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6;">
+          برای خروج کامل از حالت دمو و ذخیره فایل‌های خود در کانال‌های تلگرام، می‌توانید با شماره تلفن یا بات تلگرام خود متصل شوید:
+        </div>
+
+        <div style="margin-bottom: 8px;">
+          <button type="button" class="btn-glass" style="width: 100%; border-color: var(--accent-cyan); color: var(--accent-cyan);" onclick="fillOfficialTelegramKeys()">
+            ⚡ پر کردن خودکار با کلیدهای رسمی تلگرام (پیشنهادی)
+          </button>
+        </div>
+
+        <div class="modal-tabs">
+          <button class="modal-tab-btn active" id="tab-btn-bot" onclick="switchTgTab('bot')">🤖 اتصال با بات تلگرام (سریع و آسان)</button>
+          <button class="modal-tab-btn" id="tab-btn-phone" onclick="switchTgTab('phone')">📱 ورود با شماره تلفن</button>
+          <button class="modal-tab-btn" id="tab-btn-session" onclick="switchTgTab('session')">🔑 نشست StringSession</button>
+        </div>
+
+        <!-- Common Telegram API ID & Hash -->
+        <div class="form-group">
+          <label class="form-label">Telegram API ID <small style="color: var(--text-muted);">(اختیاری - پیش‌فرض رسمی تلگرام قرار دارد)</small></label>
+          <input type="number" id="tg-api-id" class="form-input" placeholder="6" style="direction: ltr;" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Telegram API Hash <small style="color: var(--text-muted);">(اختیاری - پیش‌فرض رسمی قرار دارد)</small></label>
+          <input type="text" id="tg-api-hash" class="form-input" placeholder="eb06d4abfb49dc3eeb1aeb98ae0f581e" style="direction: ltr;" />
+        </div>
+
+        <!-- 1. Bot Login Panel -->
+        <div id="panel-tg-bot">
+          <div class="form-group">
+            <label class="form-label">Bot Token (از @BotFather تلگرام)</label>
+            <input type="text" id="tg-bot-token" class="form-input" placeholder="8917143727:AAFnW9lFjC1lnaPJNomNlgwwz7WWennR_PU" style="direction: ltr;" />
+          </div>
+          <button class="btn-glass btn-glass-primary" style="width: 100%; padding: 12px;" onclick="submitBotConnect()">
+            🤖 اتصال با توکن ربات
+          </button>
+        </div>
+
+        <!-- 2. Phone Login Panel -->
+        <div id="panel-tg-phone" style="display: none;">
+          <div id="step-send-code">
+            <div class="form-group">
+              <label class="form-label">شماره تلفن همراه تلگرام (با کد کشور)</label>
+              <input type="text" id="tg-phone-number" class="form-input" placeholder="+989123456789" style="direction: ltr;" />
+            </div>
+            <button class="btn-glass btn-glass-primary" style="width: 100%; padding: 12px;" onclick="requestTelegramCode()" id="btn-req-code">
+              📩 ارسال کد تأیید به تلگرام
+            </button>
+          </div>
+
+          <div id="step-verify-code" style="display: none; margin-top: 14px; border-top: 1px solid var(--glass-border); padding-top: 14px;">
+            <div class="form-group">
+              <label class="form-label">کد تأیید دریافت‌شده از تلگرام</label>
+              <input type="text" id="tg-verify-code" class="form-input" placeholder="12345" style="direction: ltr;" />
+            </div>
+            <div class="form-group" id="group-tg-2fa" style="display: none;">
+              <label class="form-label">رمز تأیید دومرحله‌ای (۲FA Cloud Password)</label>
+              <input type="password" id="tg-2fa-pass" class="form-input" placeholder="رمز دو مرحله‌ای" />
+            </div>
+            <button class="btn-glass btn-glass-primary" style="width: 100%; padding: 12px;" onclick="submitTelegramVerify()" id="btn-verify-code">
+              🔐 تأیید و ورود
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. StringSession Panel -->
+        <div id="panel-tg-session" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Telethon StringSession</label>
+            <textarea id="tg-string-session" class="form-input" rows="3" placeholder="1BJWap1wBu8..." style="direction: ltr; font-family: var(--font-mono);"></textarea>
+          </div>
+          <button class="btn-glass btn-glass-primary" style="width: 100%; padding: 12px;" onclick="submitStringSession()">
+            🔑 اتصال نشست
+          </button>
+        </div>
+
+        <!-- Storage Channel Section -->
+        <div style="margin-top: 18px; border-top: 1px solid var(--glass-border); padding-top: 16px;">
+          <h4 style="font-size: 0.95rem; margin-bottom: 8px;">📦 کانال ذخیره‌سازی ابری (Storage Channel)</h4>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px;">
+            شناسه کانال تلگرامی که ربات شما در آن ادمین است را وارد کنید:
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="tg-channel-id" class="form-input" placeholder="-1001234567890" style="direction: ltr; flex: 1;" />
+            <button class="btn-glass btn-glass-primary" onclick="saveStorageChannel(false)">ثبت کانال</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Generic Modal (Folder, Rename, Media Preview) -->
+    <div class="modal-overlay" id="generic-modal">
+      <div class="modal-card" id="generic-modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title" id="generic-modal-title">Modal Title</h3>
+          <button class="modal-close-btn" onclick="closeGenericModal()">✕</button>
+        </div>
+        <div id="generic-modal-body"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* ==========================================================================
+       JAVASCRIPT APPLICATION ENGINE (LOGIC & APIS)
+       ========================================================================== */
+    let authToken = localStorage.getItem('teledrive_token') || null;
+    let currentUser = null;
+    let rootNodeId = null;
+    let currentFolderId = null;
+    let currentPath = [];
+    let currentView = 'files'; // 'files' or 'trash'
+    let currentPhoneCodeHash = null;
+    let currentLang = localStorage.getItem('teledrive_lang') || 'fa';
+    let currentTheme = localStorage.getItem('teledrive_theme') || 'dark';
+    let isDeviceMockup = localStorage.getItem('teledrive_device_mockup') === 'true';
+    let deferredPwaPrompt = null;
+
+    // Bilingual Dictionary
+    const i18n = {
+      fa: {
+        appTitle: 'TeleDrive — درایو ابری تلگرام',
+        installPwaBtn: 'نصب PWA',
+        telegramSetupBtn: 'اتصال به تلگرام واقعی',
+        themeLight: 'تم روشن',
+        themeDark: 'تم تاریک',
+        myFilesTab: 'فایل‌های من',
+        trashTab: 'سطل بازیافت',
+        storageTitle: 'فضای مصرفی ذخیره‌سازی',
+        uploadFileBtn: 'آپلود فایل جدید',
+        newFolderBtn: 'پوشه جدید',
+        rootCrumb: 'درایو اصلی',
+        emptyFolder: 'این پوشه خالی است',
+        emptyFolderHint: 'می‌توانید فایل‌های خود را در این بخش درگ کنید یا دکمه آپلود را بزنید.',
+        emptyTrash: 'سطل بازیافت خالی است',
+        loading: 'در حال بارگذاری...',
+        loadingTrash: 'در حال خواندن زباله‌دان...',
+        folderLabel: 'پوشه',
+        restoreBtn: 'بازیابی',
+        purgeBtn: 'حذف دائمی',
+        renameBtn: 'تغییر نام',
+        deleteBtn: 'حذف',
+        downloadBtn: 'دانلود',
+        previewBtn: 'پیش‌نمایش',
+        modalCreateFolderTitle: 'ایجاد پوشه جدید',
+        folderNameLabel: 'نام پوشه:',
+        folderNamePlaceholder: 'مثال: اسناد پروژه',
+        createBtn: 'ایجاد پوشه',
+        cancelBtn: 'انصراف',
+        modalRenameTitle: 'تغییر نام فایل / پوشه',
+        renameInputLabel: 'نام جدید:',
+        saveBtn: 'ذخیره تغییرات',
+        mediaPreviewTitle: 'پخش و پیش‌نمایش رسانه',
+        loggedIn: 'با موفقیت وارد حساب شدید',
+        driveRefreshed: 'فهرست فایل‌ها بروزرسانی شد',
+        uploadSuccess: 'فایل با موفقیت آپلود و در تلگرام رمزنگاری شد!',
+        fileMovedToTrash: 'فایل به سطل زباله منتقل شد',
+        fileRestored: 'فایل با موفقیت بازیابی شد',
+        filePurged: 'فایل برای همیشه حذف گردید',
+        promptDeletePermanent: 'آیا از حذف دائمی و غیرقابل بازگشت این آیتم اطمینان دارید؟',
+      },
+      en: {
+        appTitle: 'TeleDrive — Cloud Drive',
+        installPwaBtn: 'Install PWA',
+        telegramSetupBtn: 'Connect Real Telegram',
+        themeLight: 'Light Theme',
+        themeDark: 'Dark Theme',
+        myFilesTab: 'My Files',
+        trashTab: 'Trash',
+        storageTitle: 'Storage Usage',
+        uploadFileBtn: 'Upload File',
+        newFolderBtn: 'New Folder',
+        rootCrumb: 'My Drive',
+        emptyFolder: 'This folder is empty',
+        emptyFolderHint: 'Drag and drop files here or click Upload to get started.',
+        emptyTrash: 'Trash is empty',
+        loading: 'Loading files...',
+        loadingTrash: 'Loading trash...',
+        folderLabel: 'Folder',
+        restoreBtn: 'Restore',
+        purgeBtn: 'Permanent Delete',
+        renameBtn: 'Rename',
+        deleteBtn: 'Delete',
+        downloadBtn: 'Download',
+        previewBtn: 'Preview',
+        modalCreateFolderTitle: 'Create New Folder',
+        folderNameLabel: 'Folder Name:',
+        folderNamePlaceholder: 'e.g. Project Documents',
+        createBtn: 'Create',
+        cancelBtn: 'Cancel',
+        modalRenameTitle: 'Rename Item',
+        renameInputLabel: 'New Name:',
+        saveBtn: 'Save Changes',
+        mediaPreviewTitle: 'Media Preview',
+        loggedIn: 'Successfully logged in',
+        driveRefreshed: 'Drive refreshed',
+        uploadSuccess: 'File encrypted and uploaded to Telegram successfully!',
+        fileMovedToTrash: 'Moved to trash',
+        fileRestored: 'Item restored',
+        filePurged: 'Item permanently deleted',
+        promptDeletePermanent: 'Are you sure you want to permanently delete this item?',
+      }
+    };
+
+    function t(key) {
+      return (i18n[currentLang] && i18n[currentLang][key]) || key;
+    }
+
+    function applyTranslations() {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.innerText = t(key);
+      });
+      document.body.dir = currentLang === 'fa' ? 'rtl' : 'ltr';
+      document.documentElement.lang = currentLang;
+      document.getElementById('lang-text').innerText = currentLang === 'fa' ? 'English' : 'فارسی';
+    }
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'fa' ? 'en' : 'fa';
+      localStorage.setItem('teledrive_lang', currentLang);
+      applyTranslations();
+      if (currentView === 'files') renderCurrentFolder();
+      else renderTrash();
+    }
+
+    function applyTheme() {
+      if (currentTheme === 'light') {
+        document.body.classList.add('light-theme');
+        document.getElementById('theme-icon').innerText = '🌙';
+        document.getElementById('theme-text').innerText = currentLang === 'fa' ? 'تم تاریک' : 'Dark Theme';
+      } else {
+        document.body.classList.remove('light-theme');
+        document.getElementById('theme-icon').innerText = '☀️';
+        document.getElementById('theme-text').innerText = currentLang === 'fa' ? 'تم روشن' : 'Light Theme';
+      }
+    }
+
+    function toggleTheme() {
+      currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('teledrive_theme', currentTheme);
+      applyTheme();
+    }
+
+    function applyDeviceMockupMode() {
+      if (isDeviceMockup) {
+        document.body.classList.add('device-mockup-mode');
+        document.getElementById('device-view-icon').innerText = '🖥️';
+        document.getElementById('device-view-text').innerText = currentLang === 'fa' ? 'نمای کامل دسکتاپ' : 'Desktop View';
+      } else {
+        document.body.classList.remove('device-mockup-mode');
+        document.getElementById('device-view-icon').innerText = '📱';
+        document.getElementById('device-view-text').innerText = currentLang === 'fa' ? 'شبیه‌ساز موبایل' : 'Mobile Mockup';
+      }
+    }
+
+    function toggleDeviceMockup() {
+      isDeviceMockup = !isDeviceMockup;
+      localStorage.setItem('teledrive_device_mockup', isDeviceMockup ? 'true' : 'false');
+      applyDeviceMockupMode();
+    }
+
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      let icon = 'ℹ️';
+      if (type === 'success') icon = '✅';
+      if (type === 'error') icon = '❌';
+      if (type === 'warning') icon = '⚠️';
+      toast.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(15px) scale(0.95)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function formatBytes(bytes, decimals = 1) {
+      if (!bytes || bytes === 0) return '0 B';
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    // Network & API helper
+    let requestCounter = 0;
+    async function apiRequest(endpoint, options = {}) {
+      requestCounter++;
+      document.getElementById('traffic-count').innerText = `${requestCounter} req`;
+
+      const startTime = performance.now();
+      const method = (options.method || 'GET').toUpperCase();
+
+      options.headers = options.headers || {};
+      if (authToken) {
+        options.headers['Authorization'] = `Bearer ${authToken}`;
+      }
+
+      try {
+        const resp = await fetch(endpoint, options);
+        const duration = Math.round(performance.now() - startTime);
+        logTraffic(method, endpoint, resp.status, duration);
+        return resp;
+      } catch (err) {
+        logTraffic(method, endpoint, 'ERR', 0);
+        throw err;
+      }
+    }
+
+    function logTraffic(method, endpoint, status, duration) {
+      const win = document.getElementById('traffic-log-window');
+      const div = document.createElement('div');
+      div.className = 'log-item';
+      const statusClass = status === 200 || status === 201 || status === 204 ? 'log-status-200' : 'log-status-err';
+      div.innerHTML = `
+        <span class="log-method">${method}</span>
+        <span class="${statusClass}">${status}</span>
+        <span style="color: var(--text-muted);">${endpoint.split('?')[0]}</span>
+        <span style="color: var(--text-muted); font-size: 0.65rem; margin-inline-start: auto;">${duration}ms</span>
+      `;
+      win.prepend(div);
+      if (win.children.length > 25) win.lastElementChild.remove();
+    }
+
+    // System Health & Telegram Config Check
+    async function checkSystemHealth() {
+      try {
+        const resp = await apiRequest('/api/v1/telegram/config');
+        if (!resp.ok) return;
+        const data = await resp.json();
+        const badge = document.getElementById('telegram-status-badge');
+        const channelLabel = document.getElementById('storage-channel-status-label');
+
+        if (data.is_real_telegram) {
+          badge.className = 'liquid-badge badge-real';
+          badge.innerText = currentLang === 'fa' ? 'متصل به تلگرام واقعی' : 'Connected to Telegram';
+        } else {
+          badge.className = 'liquid-badge badge-demo';
+          badge.innerText = currentLang === 'fa' ? 'حالت دمو (Demo)' : 'Demo Mode';
+        }
+
+        if (data.storage_pools && data.storage_pools.length > 0) {
+          const pool = data.storage_pools[0];
+          channelLabel.innerText = `کانال: ${pool.channel_id}`;
+        }
+      } catch (e) {
+        console.warn('Config check error:', e);
+      }
+    }
+
+    // Auto Demo Login if not logged in
+    async function ensureUserSession() {
+      if (authToken) {
+        try {
+          const meResp = await apiRequest('/api/v1/auth/me');
+          if (meResp.ok) {
+            currentUser = await meResp.json();
+            await setupDriveWorkspace();
+            return;
+          }
+        } catch (e) {}
+      }
+
+      // Quick Demo Auto-Enrollment
+      try {
+        const email = 'user@teledrive.dev';
+        const password = 'Password123!';
+        const name = 'TeleDrive User';
+
+        let resp = await apiRequest('/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        if (!resp.ok) {
+          resp = await apiRequest('/api/v1/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, display_name: name })
+          });
+        }
+
+        if (resp.ok) {
+          const data = await resp.json();
+          authToken = data.tokens ? data.tokens.access_token : data.access_token;
+          localStorage.setItem('teledrive_token', authToken);
+          const meResp = await apiRequest('/api/v1/auth/me');
+          currentUser = await meResp.json();
+          await setupDriveWorkspace();
+        }
+      } catch (e) {
+        console.error('Auto login error:', e);
+      }
+    }
+
+    async function setupDriveWorkspace() {
+      document.getElementById('user-display-name').innerText = currentUser.display_name || 'کاربر گرامی';
+      document.getElementById('user-email-text').innerText = currentUser.email;
+      document.getElementById('user-avatar-initials').innerText = (currentUser.display_name || currentUser.email)[0].toUpperCase();
+      document.getElementById('btn-logout').style.display = 'inline-flex';
+
+      const rootResp = await apiRequest('/api/v1/nodes/root');
+      if (rootResp.ok) {
+        const rootData = await rootResp.json();
+        rootNodeId = rootData.id;
+        currentFolderId = rootNodeId;
+        currentPath = [{ id: rootNodeId, name: t('rootCrumb') }];
+        updateBreadcrumbUI();
+        await fetchStorageStats();
+        await renderCurrentFolder();
+      }
+    }
+
+    async function fetchStorageStats() {
+      try {
+        const resp = await apiRequest('/api/v1/me/usage');
+        if (!resp.ok) return;
+        const usage = await resp.json();
+
+        document.getElementById('quota-used-text').innerText = `مصرف‌شده: ${formatBytes(usage.used_bytes)}`;
+        document.getElementById('quota-total-text').innerText = `کل: ${formatBytes(usage.quota_bytes)}`;
+        document.getElementById('count-files').innerText = usage.file_count || 0;
+
+        const percent = Math.min(100, Math.max(0.2, (usage.used_bytes / usage.quota_bytes) * 100));
+        document.getElementById('storage-bar-fill').style.width = `${percent}%`;
+        document.getElementById('quota-percent-text').innerText = `${percent.toFixed(2)}%`;
+      } catch (e) {}
+    }
+
+    function updateBreadcrumbUI() {
+      const container = document.getElementById('breadcrumb-container');
+      container.innerHTML = '';
+      currentPath.forEach((crumb, idx) => {
+        const span = document.createElement('span');
+        span.className = 'breadcrumb-node';
+        span.innerText = idx === 0 ? t('rootCrumb') : crumb.name;
+        span.onclick = () => {
+          currentPath = currentPath.slice(0, idx + 1);
+          currentFolderId = crumb.id;
+          updateBreadcrumbUI();
+          renderCurrentFolder();
+        };
+        container.appendChild(span);
+
+        if (idx < currentPath.length - 1) {
+          const sep = document.createElement('span');
+          sep.className = 'breadcrumb-sep';
+          sep.innerText = '❯';
+          container.appendChild(sep);
+        }
+      });
+    }
+
+    // Render Files Grid
+    async function renderCurrentFolder() {
+      currentView = 'files';
+      document.getElementById('tab-my-files').classList.add('active');
+      document.getElementById('tab-trash').classList.remove('active');
+
+      const grid = document.getElementById('files-grid');
+      grid.innerHTML = `<div class="empty-state-glass"><div class="empty-icon-orb">⏳</div><div>${t('loading')}</div></div>`;
+
+      try {
+        const resp = await apiRequest(`/api/v1/nodes?parent_id=${currentFolderId}`);
+        if (!resp.ok) throw new Error('بارگذاری پوشه ناموفق بود');
+        const data = await resp.json();
+        const items = Array.isArray(data) ? data : (data.items || []);
+
+        grid.innerHTML = '';
+        if (items.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state-glass">
+              <div class="empty-icon-orb">📂</div>
+              <div style="font-size: 1.15rem; font-weight: 800;">${t('emptyFolder')}</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted);">${t('emptyFolderHint')}</div>
+            </div>
+          `;
+          return;
+        }
+
+        // Sort: folders first, then alphabetical
+        items.sort((a, b) => {
+          const aFolder = (a.kind || a.type) === 'folder';
+          const bFolder = (b.kind || b.type) === 'folder';
+          if (aFolder === bFolder) return (a.name || '').localeCompare(b.name || '');
+          return aFolder ? -1 : 1;
+        });
+
+        items.forEach(node => {
+          const isFolder = (node.kind || node.type) === 'folder';
+          const icon = isFolder ? '📁' : getFileIcon(node.name, node.mime_type);
+          const iconGlow = isFolder ? 'glow-cyan' : (node.mime_type && node.mime_type.startsWith('video') ? 'glow-magenta' : 'glow-emerald');
+
+          const card = document.createElement('div');
+          card.className = 'glass-panel node-card';
+          card.innerHTML = `
+            <div class="node-card-top">
+              <div class="glass-icon-badge ${iconGlow}">${icon}</div>
+              <div class="node-actions-menu">
+                ${!isFolder ? `<button class="node-btn-icon" title="${t('previewBtn')}" onclick="event.stopPropagation(); previewFile('${node.id}', '${(node.name || '').replace(/'/g, "\\\\'")}', '${node.mime_type || ''}')">▶</button>` : ''}
+                ${!isFolder ? `<button class="node-btn-icon" title="${t('downloadBtn')}" onclick="event.stopPropagation(); downloadFile('${node.id}', '${(node.name || '').replace(/'/g, "\\\\'")}')">💾</button>` : ''}
+                <button class="node-btn-icon" title="${t('renameBtn')}" onclick="event.stopPropagation(); promptRename('${node.id}', '${(node.name || '').replace(/'/g, "\\\\'")}')">✏️</button>
+                <button class="node-btn-icon" title="${t('deleteBtn')}" onclick="event.stopPropagation(); trashNode('${node.id}')">🗑️</button>
+              </div>
+            </div>
+            <div class="node-card-body">
+              <div class="node-card-name" title="${node.name}">${node.name}</div>
+              <div class="node-card-meta">
+                <span>${isFolder ? t('folderLabel') : formatBytes(node.size_bytes)}</span>
+                <span>•</span>
+                <span>${new Date(node.created_at).toLocaleDateString(currentLang === 'fa' ? 'fa-IR' : 'en-US')}</span>
+              </div>
+            </div>
+          `;
+
+          card.onclick = () => {
+            if (isFolder) {
+              currentPath.push({ id: node.id, name: node.name });
+              currentFolderId = node.id;
+              updateBreadcrumbUI();
+              renderCurrentFolder();
+            } else {
+              previewFile(node.id, node.name, node.mime_type);
+            }
+          };
+
+          grid.appendChild(card);
+        });
+
+      } catch (err) {
+        grid.innerHTML = `<div class="empty-state-glass"><div class="empty-icon-orb">⚠️</div><div>Error: ${err.message}</div></div>`;
+      }
+    }
+
+    // Render Trash View
+    async function renderTrash() {
+      currentView = 'trash';
+      document.getElementById('tab-my-files').classList.remove('active');
+      document.getElementById('tab-trash').classList.add('active');
+
+      const grid = document.getElementById('files-grid');
+      grid.innerHTML = `<div class="empty-state-glass"><div class="empty-icon-orb">⏳</div><div>${t('loadingTrash')}</div></div>`;
+
+      try {
+        const resp = await apiRequest('/api/v1/nodes/trash');
+        if (!resp.ok) throw new Error('خواندن زباله‌دان ناموفق بود');
+        const data = await resp.json();
+        const items = Array.isArray(data) ? data : (data.items || []);
+
+        grid.innerHTML = '';
+        if (items.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state-glass">
+              <div class="empty-icon-orb">🗑️</div>
+              <div style="font-size: 1.15rem; font-weight: 800;">${t('emptyTrash')}</div>
+            </div>
+          `;
+          return;
+        }
+
+        items.forEach(node => {
+          const isFolder = (node.kind || node.type) === 'folder';
+          const icon = isFolder ? '📁' : '📄';
+
+          const card = document.createElement('div');
+          card.className = 'glass-panel node-card';
+          card.innerHTML = `
+            <div class="node-card-top">
+              <div class="glass-icon-badge glow-magenta">${icon}</div>
+              <div class="node-actions-menu">
+                <button class="node-btn-icon" style="color: #34d399;" title="${t('restoreBtn')}" onclick="restoreNode('${node.id}')">↩️</button>
+                <button class="node-btn-icon" style="color: #f87171;" title="${t('purgeBtn')}" onclick="deletePermanent('${node.id}')">❌</button>
+              </div>
+            </div>
+            <div class="node-card-body">
+              <div class="node-card-name" title="${node.name}">${node.name}</div>
+              <div class="node-card-meta">
+                <span>${isFolder ? t('folderLabel') : formatBytes(node.size_bytes)}</span>
+                <span>•</span>
+                <span>در سطل زباله</span>
+              </div>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+
+      } catch (err) {
+        grid.innerHTML = `<div class="empty-state-glass"><div class="empty-icon-orb">⚠️</div><div>Error: ${err.message}</div></div>`;
+      }
+    }
+
+    function switchToFilesView() {
+      renderCurrentFolder();
+    }
+
+    function switchToTrashView() {
+      renderTrash();
+    }
+
+    function refreshDrive() {
+      fetchStorageStats();
+      if (currentView === 'files') renderCurrentFolder();
+      else renderTrash();
+      showToast(t('driveRefreshed'), 'success');
+    }
+
+    function getFileIcon(name, mime) {
+      if (!name) return '📄';
+      const ext = name.split('.').pop().toLowerCase();
+      if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) return '🖼️';
+      if (['mp4', 'mov', 'mkv', 'webm', 'avi'].includes(ext)) return '🎬';
+      if (['mp3', 'wav', 'ogg', 'm4a', 'flac'].includes(ext)) return '🎵';
+      if (['pdf'].includes(ext)) return '📕';
+      if (['zip', 'tar', 'gz', 'rar', '7z'].includes(ext)) return '🗄️';
+      if (['py', 'js', 'html', 'css', 'json', 'ts', 'go', 'rs', 'sh'].includes(ext)) return '💻';
+      if (['txt', 'md', 'doc', 'docx'].includes(ext)) return '📝';
+      return '📄';
+    }
+
+    // Modal Handlers
+    function openGenericModal(title, html) {
+      document.getElementById('generic-modal-title').innerText = title;
+      document.getElementById('generic-modal-body').innerHTML = html;
+      document.getElementById('generic-modal').style.display = 'flex';
+    }
+
+    function closeGenericModal() {
+      document.getElementById('generic-modal').style.display = 'none';
+      document.getElementById('generic-modal-body').innerHTML = '';
+    }
+
+    function openTelegramSetupModal() {
+      document.getElementById('telegram-modal').style.display = 'flex';
+      fillOfficialTelegramKeys();
+      loadTelegramInputs();
+    }
+
+    function closeTelegramModal() {
+      document.getElementById('telegram-modal').style.display = 'none';
+    }
+
+    async function loadTelegramInputs() {
+      try {
+        const resp = await apiRequest('/api/v1/telegram/config');
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data.api_id) document.getElementById('tg-api-id').value = data.api_id;
+          if (data.storage_pools && data.storage_pools.length > 0) {
+            document.getElementById('tg-channel-id').value = data.storage_pools[0].channel_id;
+          }
+        }
+      } catch (e) {}
+    }
+
+    function fillOfficialTelegramKeys() {
+      document.getElementById('tg-api-id').value = '6';
+      document.getElementById('tg-api-hash').value = 'eb06d4abfb49dc3eeb1aeb98ae0f581e';
+      showToast('کلیدهای رسمی تلگرام با موفقیت پر شدند!', 'success');
+    }
+
+    function switchTgTab(tab) {
+      document.getElementById('tab-btn-bot').classList.toggle('active', tab === 'bot');
+      document.getElementById('tab-btn-phone').classList.toggle('active', tab === 'phone');
+      document.getElementById('tab-btn-session').classList.toggle('active', tab === 'session');
+
+      document.getElementById('panel-tg-bot').style.display = tab === 'bot' ? 'block' : 'none';
+      document.getElementById('panel-tg-phone').style.display = tab === 'phone' ? 'block' : 'none';
+      document.getElementById('panel-tg-session').style.display = tab === 'session' ? 'block' : 'none';
+    }
+
+    async function submitBotConnect() {
+      const apiIdInput = document.getElementById('tg-api-id').value.trim();
+      let apiId = apiIdInput ? parseInt(apiIdInput) : 6;
+      if (apiId === 5 || isNaN(apiId)) apiId = 6;
+      const apiHash = document.getElementById('tg-api-hash').value.trim() || 'eb06d4abfb49dc3eeb1aeb98ae0f581e';
+      const botToken = document.getElementById('tg-bot-token').value.trim();
+
+      if (!botToken) {
+        showToast('لطفاً توکن ربات (Bot Token) را وارد کنید', 'error');
+        return;
+      }
+
+      const btn = document.querySelector('#panel-tg-bot button');
+      const originalText = btn ? btn.innerText : '🤖 اتصال با توکن ربات';
+      if (btn) {
+        btn.innerText = 'در حال اتصال به بات تلگرام...';
+        btn.disabled = true;
+      }
+
+      try {
+        showToast('در حال اتصال به بات تلگرام...');
+        const resp = await apiRequest('/api/v1/telegram/auth/bot-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ api_id: apiId, api_hash: apiHash, bot_token: botToken })
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.detail || 'اتصال ربات ناموفق بود');
+
+        showToast(`ربات @${data.username} با موفقیت متصل شد!`, 'success');
+        closeTelegramModal();
+        await checkSystemHealth();
+      } catch (e) {
+        showToast(e.message, 'error');
+      } finally {
+        if (btn) {
+          btn.innerText = originalText;
+          btn.disabled = false;
+        }
+      }
+    }
+
+    async function requestTelegramCode() {
+      const apiIdInput = document.getElementById('tg-api-id').value.trim();
+      const apiId = apiIdInput ? parseInt(apiIdInput) : 6;
+      const apiHash = document.getElementById('tg-api-hash').value.trim() || 'eb06d4abfb49dc3eeb1aeb98ae0f581e';
+      const phone = document.getElementById('tg-phone-number').value.trim();
+
+      if (!phone) {
+        showToast('لطفاً شماره تلفن همراه خود را وارد کنید', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btn-req-code');
+      btn.innerText = 'در حال ارسال کد به تلگرام...';
+      btn.disabled = true;
+
+      try {
+        const resp = await apiRequest('/api/v1/telegram/auth/send-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ api_id: apiId, api_hash: apiHash, phone })
+        });
+
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.detail || 'ارسال کد ناموفق بود');
+
+        currentPhoneCodeHash = data.phone_code_hash;
+        document.getElementById('step-send-code').style.display = 'none';
+        document.getElementById('step-verify-code').style.display = 'block';
+        showToast('کد تأیید به تلگرام شما ارسال شد!', 'success');
+      } catch (e) {
+        showToast(e.message, 'error');
+      } finally {
+        btn.innerText = '📩 ارسال کد تأیید به تلگرام';
+        btn.disabled = false;
+      }
+    }
+
+    async function submitTelegramVerify() {
+      const code = document.getElementById('tg-verify-code').value.trim();
+      const password = document.getElementById('tg-2fa-pass').value.trim();
+
+      if (!code) {
+        showToast('لطفاً کد دریافتی را وارد کنید', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btn-verify-code');
+      btn.innerText = 'در حال بررسی کد...';
+      btn.disabled = true;
+
+      try {
+        const resp = await apiRequest('/api/v1/telegram/auth/verify-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phone_code_hash: currentPhoneCodeHash,
+            code,
+            password: password || null
+          })
+        });
+
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.detail || 'تأیید کد ناموفق بود');
+
+        if (data.status === '2fa_required') {
+          document.getElementById('group-tg-2fa').style.display = 'block';
+          showToast('رمز تأیید دومرحله‌ای فعال است. لطفاً رمز خود را وارد کنید.', 'info');
+          btn.innerText = '🔐 ورود با رمز دومرحله‌ای';
+          btn.disabled = false;
+          return;
+        }
+
+        showToast(`حساب تلگرام ${data.first_name || ''} متصل شد!`, 'success');
+        closeTelegramModal();
+        await checkSystemHealth();
+      } catch (e) {
+        showToast(e.message, 'error');
+        btn.innerText = '🔐 تأیید و ورود';
+        btn.disabled = false;
+      }
+    }
+
+    async function submitStringSession() {
+      const apiIdInput = document.getElementById('tg-api-id').value.trim();
+      const apiId = apiIdInput ? parseInt(apiIdInput) : 6;
+      const apiHash = document.getElementById('tg-api-hash').value.trim() || 'eb06d4abfb49dc3eeb1aeb98ae0f581e';
+      const sessionString = document.getElementById('tg-string-session').value.trim();
+
+      if (!sessionString) {
+        showToast('لطفاً رشته نشست را وارد کنید', 'error');
+        return;
+      }
+
+      try {
+        showToast('در حال اتصال نشست...');
+        const resp = await apiRequest('/api/v1/telegram/auth/session-string', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ api_id: apiId, api_hash: apiHash, session_string: sessionString })
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.detail || 'اتصال نشست ناموفق بود');
+
+        showToast(`نشست کاربر ${data.first_name} متصل شد!`, 'success');
+        closeTelegramModal();
+        await checkSystemHealth();
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    async function saveStorageChannel(autoCreate = false) {
+      const channelId = document.getElementById('tg-channel-id').value.trim();
+      if (!autoCreate && !channelId) {
+        showToast('لطفاً شناسه کانال را وارد کنید', 'error');
+        return;
+      }
+
+      try {
+        showToast('در حال ثبت کانال ذخیره‌سازی...');
+        const resp = await apiRequest('/api/v1/telegram/channels/setup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            channel_id: channelId ? parseInt(channelId) : null,
+            auto_create: autoCreate
+          })
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.detail || 'ثبت کانال ناموفق بود');
+
+        showToast(data.message, 'success');
+        closeTelegramModal();
+        await checkSystemHealth();
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    // Folder Actions
+    function showNewFolderModal() {
+      openGenericModal(t('modalCreateFolderTitle'), `
+        <div class="form-group">
+          <label class="form-label">${t('folderNameLabel')}</label>
+          <input type="text" id="new-folder-name" class="form-input" placeholder="${t('folderNamePlaceholder')}" autofocus />
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
+          <button class="btn-glass" onclick="closeGenericModal()">${t('cancelBtn')}</button>
+          <button class="btn-glass btn-glass-primary" onclick="submitCreateFolder()">${t('createBtn')}</button>
+        </div>
+      `);
+    }
+
+    async function submitCreateFolder() {
+      const name = document.getElementById('new-folder-name').value.trim();
+      if (!name) return;
+      try {
+        const resp = await apiRequest('/api/v1/nodes/folders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ parent_id: currentFolderId, name })
+        });
+        if (!resp.ok) throw new Error('ایجاد پوشه ناموفق بود');
+        closeGenericModal();
+        showToast(`پوشه "${name}" ساخته شد`, 'success');
+        renderCurrentFolder();
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    function promptRename(nodeId, oldName) {
+      openGenericModal(t('modalRenameTitle'), `
+        <div class="form-group">
+          <label class="form-label">${t('renameInputLabel')}</label>
+          <input type="text" id="rename-node-name" class="form-input" value="${oldName}" autofocus />
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
+          <button class="btn-glass" onclick="closeGenericModal()">${t('cancelBtn')}</button>
+          <button class="btn-glass btn-glass-primary" onclick="submitRename('${nodeId}')">${t('saveBtn')}</button>
+        </div>
+      `);
+    }
+
+    async function submitRename(nodeId) {
+      const newName = document.getElementById('rename-node-name').value.trim();
+      if (!newName) return;
+      try {
+        const resp = await apiRequest(`/api/v1/nodes/${nodeId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: newName })
+        });
+        if (!resp.ok) throw new Error('تغییر نام ناموفق بود');
+        closeGenericModal();
+        showToast('نام با موفقیت تغییر کرد', 'success');
+        renderCurrentFolder();
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    async function trashNode(nodeId) {
+      try {
+        const resp = await apiRequest(`/api/v1/nodes/${nodeId}/trash`, { method: 'POST' });
+        if (!resp.ok) throw new Error('انتقال به زباله‌دان ناموفق بود');
+        showToast(t('fileMovedToTrash'), 'success');
+        fetchStorageStats();
+        renderCurrentFolder();
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    async function restoreNode(nodeId) {
+      try {
+        const resp = await apiRequest(`/api/v1/nodes/${nodeId}/restore`, { method: 'POST' });
+        if (!resp.ok) throw new Error('بازیابی فایل ناموفق بود');
+        showToast(t('fileRestored'), 'success');
+        fetchStorageStats();
+        renderTrash();
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    async function deletePermanent(nodeId) {
+      if (!confirm(t('promptDeletePermanent'))) return;
+      try {
+        const resp = await apiRequest(`/api/v1/nodes/${nodeId}`, { method: 'DELETE' });
+        if (!resp.ok) throw new Error('حذف دائمی ناموفق بود');
+        showToast(t('filePurged'), 'success');
+        fetchStorageStats();
+        renderTrash();
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    // Drag and drop setup
+    const dropzone = document.getElementById('dropzone-overlay');
+    ['dragenter', 'dragover'].forEach(name => {
+      window.addEventListener(name, (e) => {
+        e.preventDefault();
+        dropzone.style.display = 'flex';
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(name => {
+      dropzone.addEventListener(name, (e) => {
+        e.preventDefault();
+        if (name === 'drop') {
+          const files = e.dataTransfer.files;
+          if (files.length > 0) startResumableUpload(files[0]);
+        }
+        dropzone.style.display = 'none';
+      });
+    });
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) startResumableUpload(file);
+      e.target.value = '';
+    }
+
+    // Resumable Chunk Upload Engine
+    async function startResumableUpload(file) {
+      const CHUNK_SIZE = 1 * 1024 * 1024; // 1 MB
+      const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+      const tray = document.getElementById('upload-tray');
+      const filenameText = document.getElementById('upload-filename-text');
+      const statusText = document.getElementById('upload-status-text');
+      const percentText = document.getElementById('upload-percentage-text');
+      const fillBar = document.getElementById('upload-progress-fill');
+      const matrix = document.getElementById('chunks-matrix');
+
+      tray.style.display = 'flex';
+      filenameText.innerText = file.name;
+      statusText.innerText = `در حال ایجاد نشست رمزنگاری AES-256 (${formatBytes(file.size)})...`;
+      percentText.innerText = '0%';
+      fillBar.style.width = '0%';
+      matrix.innerHTML = '';
+
+      for (let i = 0; i < totalChunks; i++) {
+        const blk = document.createElement('div');
+        blk.className = 'chunk-block';
+        blk.id = `chunk-blk-${i}`;
+        matrix.appendChild(blk);
+      }
+
+      try {
+        const sessionPayload = {
+          parent_id: currentFolderId,
+          name: file.name,
+          size_bytes: file.size,
+          mime_type: file.type || 'application/octet-stream',
+          chunk_size: CHUNK_SIZE
+        };
+
+        const sessionResp = await apiRequest('/api/v1/uploads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sessionPayload)
+        });
+
+        if (!sessionResp.ok) {
+          const err = await sessionResp.json();
+          throw new Error(err.detail || 'ایجاد جلسه آپلود ناموفق بود');
+        }
+
+        const sessionData = await sessionResp.json();
+        const uploadId = sessionData.id;
+
+        for (let i = 0; i < totalChunks; i++) {
+          const blk = document.getElementById(`chunk-blk-${i}`);
+          if (blk) blk.className = 'chunk-block uploading';
+
+          statusText.innerText = `در حال ارسال چانک ${i + 1} از ${totalChunks} به تلگرام...`;
+
+          const start = i * CHUNK_SIZE;
+          const end = Math.min(file.size, start + CHUNK_SIZE);
+          const chunkBlob = file.slice(start, end);
+          const chunkData = await chunkBlob.arrayBuffer();
+
+          // Calculate SHA-256 for chunk verification
+          const chunkHashBuf = await crypto.subtle.digest('SHA-256', chunkData);
+          const chunkSha256 = Array.from(new Uint8Array(chunkHashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+          const chunkResp = await apiRequest(`/api/v1/uploads/${uploadId}/chunks/${i}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/octet-stream',
+              'X-Chunk-SHA256': chunkSha256
+            },
+            body: chunkData
+          });
+
+          if (!chunkResp.ok) {
+            if (blk) blk.className = 'chunk-block error';
+            let errMsg = `ارسال چانک ${i + 1} با خطا مواجه شد`;
+            try {
+              const errData = await chunkResp.json();
+              if (errData.detail) errMsg += `: ${errData.detail}`;
+            } catch (e) {}
+            throw new Error(errMsg);
+          }
+
+          if (blk) blk.className = 'chunk-block uploaded';
+          const pct = Math.round(((i + 1) / totalChunks) * 100);
+          percentText.innerText = `${pct}%`;
+          fillBar.style.width = `${pct}%`;
+        }
+
+        statusText.innerText = 'در حال اعتبارسنجی نهایی و امضای دیجیتال...';
+        let wholeSha256 = null;
+        try {
+          if (file.size <= 80 * 1024 * 1024) {
+            const fileBuffer = await file.arrayBuffer();
+            const hashBuf = await crypto.subtle.digest('SHA-256', fileBuffer);
+            wholeSha256 = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+          }
+        } catch (e) {
+          console.warn('Whole file SHA256 calc skipped:', e);
+        }
+
+        const completePayload = wholeSha256 ? { sha256: wholeSha256 } : {};
+        const completeResp = await apiRequest(`/api/v1/uploads/${uploadId}/complete`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(completePayload)
+        });
+
+        if (!completeResp.ok) {
+          let errDetail = 'اعتبارسنجی نهایی ناموفق بود';
+          try {
+            const errData = await completeResp.json();
+            if (errData.detail) errDetail += `: ${errData.detail}`;
+          } catch (e) {}
+          throw new Error(errDetail);
+        }
+
+        showToast(t('uploadSuccess'), 'success');
+        setTimeout(() => { tray.style.display = 'none'; }, 2000);
+        fetchStorageStats();
+        renderCurrentFolder();
+
+      } catch (err) {
+        statusText.innerText = `خطا: ${err.message}`;
+        showToast(err.message, 'error');
+      }
+    }
+
+    // Media Preview & Range Streaming
+    async function previewFile(nodeId, fileName, mimeType) {
+      openGenericModal(`${t('mediaPreviewTitle')} — ${fileName}`, `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; min-height: 200px;">
+          <div class="empty-icon-orb">⏳</div>
+          <div>در حال آماده‌سازی استریم رمزگشایی...</div>
+        </div>
+      `);
+
+      const ext = (fileName || '').split('.').pop().toLowerCase();
+      const isVideo = ['mp4', 'webm', 'ogg', 'mov', 'mkv'].includes(ext) || (mimeType && mimeType.startsWith('video'));
+      const isAudio = ['mp3', 'wav', 'ogg', 'm4a', 'flac'].includes(ext) || (mimeType && mimeType.startsWith('audio'));
+      const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext) || (mimeType && mimeType.startsWith('image'));
+
+      try {
+        const streamUrl = `/api/v1/files/${nodeId}/content`;
+
+        if (isVideo) {
+          document.getElementById('generic-modal-body').innerHTML = `
+            <video controls autoplay playsinline style="width: 100%; max-height: 70vh; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+              <source src="${streamUrl}" type="${mimeType || 'video/mp4'}">
+            </video>
+          `;
+        } else if (isAudio) {
+          document.getElementById('generic-modal-body').innerHTML = `
+            <div style="padding: 24px; text-align: center;">
+              <div class="glass-icon-badge glow-magenta" style="width: 70px; height: 70px; font-size: 2.2rem; margin: 0 auto 16px;">🎵</div>
+              <div style="font-weight: 700; margin-bottom: 14px;">${fileName}</div>
+              <audio controls autoplay style="width: 100%;">
+                <source src="${streamUrl}" type="${mimeType || 'audio/mpeg'}">
+              </audio>
+            </div>
+          `;
+        } else if (isImage) {
+          document.getElementById('generic-modal-body').innerHTML = `
+            <div style="text-align: center;">
+              <img src="${streamUrl}" style="max-width: 100%; max-height: 70vh; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);" />
+            </div>
+          `;
+        } else {
+          const resp = await apiRequest(streamUrl);
+          const text = await resp.text();
+          document.getElementById('generic-modal-body').innerHTML = `
+            <pre style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 12px; max-height: 60vh; overflow: auto; font-family: var(--font-mono); font-size: 0.82rem; direction: ltr; text-align: left;">${text.replace(/</g, '&lt;')}</pre>
+          `;
+        }
+      } catch (e) {
+        document.getElementById('generic-modal-body').innerHTML = `
+          <div class="empty-state-glass">
+            <div class="empty-icon-orb">⚠️</div>
+            <div>${e.message}</div>
+          </div>
+        `;
+      }
+    }
+
+    async function downloadFile(nodeId, fileName) {
+      try {
+        showToast(`در حال رمزگشایی و دریافت "${fileName}"...`);
+        const resp = await apiRequest(`/api/v1/files/${nodeId}/content`);
+        if (!resp.ok) throw new Error('دانلود ناموفق بود');
+        const blob = await resp.blob();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        showToast(`فایل "${fileName}" با موفقیت ذخیره شد`, 'success');
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    async function createSampleFiles() {
+      showToast('در حال ایجاد فایل‌های نمونه...');
+      const sampleText = `سند معرفی درایو ابری تلگرام (TeleDrive)
+========================================
+طراحی: Liquid Glass & Glassmorphism
+رمزنگاری: سرتاسری کلاینت AES-256-GCM
+محل ذخیره‌سازی: کانال‌های خصوصی تلگرام
+سیستم ریسپانسیو: سازگار هوشمند با موبایل، تبلت، دسکتاپ و تلویزیون
+سهمیه ابری: ۱۰۰ ترابایت اختصاصی
+`;
+      const blob = new Blob([sampleText], { type: 'text/plain;charset=utf-8' });
+      const file = new File([blob], currentLang === 'fa' ? 'راهنمای_تل‌درایو.txt' : 'welcome_teledrive.txt', { type: 'text/plain' });
+      await startResumableUpload(file);
+    }
+
+    function handleLogout() {
+      authToken = null;
+      localStorage.removeItem('teledrive_token');
+      location.reload();
+    }
+
+    // PWA Install Prompt Hook
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPwaPrompt = e;
+      const installBtn = document.getElementById('btn-pwa-install');
+      if (installBtn) installBtn.style.display = 'inline-flex';
+    });
+
+    async function triggerPwaInstall() {
+      if (!deferredPwaPrompt) return;
+      deferredPwaPrompt.prompt();
+      const { outcome } = await deferredPwaPrompt.userChoice;
+      if (outcome === 'accepted') {
+        document.getElementById('btn-pwa-install').style.display = 'none';
+        showToast('برنامه PWA با موفقیت روی دستگاه شما نصب شد!', 'success');
+      }
+      deferredPwaPrompt = null;
+    }
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW register fail:', err));
+      });
+    }
+
+    // Init App
+    window.addEventListener('DOMContentLoaded', async () => {
+      applyTheme();
+      applyLanguage();
+      applyDeviceMockupMode();
+
+      document.getElementById('btn-theme-toggle').onclick = toggleTheme;
+      document.getElementById('btn-lang-toggle').onclick = toggleLanguage;
+      document.getElementById('btn-toggle-device-mockup').onclick = toggleDeviceMockup;
+
+      await checkSystemHealth();
+      await ensureUserSession();
+    });
+
+    function applyLanguage() {
+      applyTranslations();
+    }
+  </script>
+</body>
+</html>
