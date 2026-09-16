@@ -31,10 +31,6 @@ fi
 
 # 2. Setup Target Directory
 APP_DIR="/opt/telegram-drive"
-if [ ! -f "Dockerfile" ]; then
-    mkdir -p "$APP_DIR"
-    cd "$APP_DIR"
-fi
 
 # 3. Update System Packages & Install Core Tools
 echo -e "${CYAN}[۱/۵] به‌روزرسانی پکیج‌های سیستم و نصب ابزارهای مورد نیاز...${NC}"
@@ -47,6 +43,18 @@ apt-get install -y --no-install-recommends \
     lsb-release \
     openssl \
     ufw
+
+# Clone project if running standalone installer
+if [ ! -f "Dockerfile" ]; then
+    echo -e "${YELLOW}در حال دریافت سورس‌کد پروژه از گیت‌هاب...${NC}"
+    if [ ! -d "$APP_DIR/.git" ]; then
+        git clone https://github.com/armin7270/TipsTopNetwork_telegramdrive.git "$APP_DIR"
+    else
+        echo -e "${GREEN}✓ مخزن از قبل موجود است. در حال به‌روزرسانی...${NC}"
+        git -C "$APP_DIR" pull origin main || true
+    fi
+    cd "$APP_DIR"
+fi
 
 # 4. Install Docker & Docker Compose if missing
 echo -e "\n${CYAN}[۲/۵] بررسی و نصب موتور داکر (Docker Engine)...${NC}"
