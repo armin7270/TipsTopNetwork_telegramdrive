@@ -233,7 +233,7 @@ class TestAuthFlow:
         assert resp.status_code == 401
         assert resp.json()["code"] == "invalid_init_data"
 
-    async def test_telegram_login_rejects_stale_initdata(self, client):
+    async def test_telegram_login_rejects_stale_initdata(self, client, settings):
         """A valid signature must still expire, or a captured string is a
         permanent credential."""
         import hashlib
@@ -241,9 +241,6 @@ class TestAuthFlow:
         import time
         import urllib.parse
 
-        from app.core.config import get_settings
-
-        settings = get_settings()
         if not settings.telegram_bot_token:
             pytest.skip("no bot token configured")
 
