@@ -88,6 +88,7 @@ class InMemoryRepository:
         self.upload_sessions: dict[str, dict[str, Any]] = {}
         self.refresh_tokens: dict[bytes, dict[str, Any]] = {}
         self.storage_pools: dict[str, dict[str, Any]] = {}
+        self.telegram_sessions: dict[str, dict[str, Any]] = {}
         self.jobs: list[dict[str, Any]] = []
         self.audit_log: list[dict[str, Any]] = []
 
@@ -124,6 +125,7 @@ class InMemoryRepository:
                 "nodes": self.nodes,
                 "chunks": self.chunks,
                 "storage_pools": self.storage_pools,
+                "telegram_sessions": self.telegram_sessions,
                 "pool_channel_bytes": {str(k): v for k, v in self.pool_channel_bytes.items()},
                 "pool_channel_messages": {str(k): v for k, v in self.pool_channel_messages.items()},
             }
@@ -150,6 +152,7 @@ class InMemoryRepository:
             self.nodes.update(data.get("nodes", {}))
             self.chunks.update(data.get("chunks", {}))
             self.storage_pools.update(data.get("storage_pools", {}))
+            self.telegram_sessions.update(data.get("telegram_sessions", {}))
             if "pool_channel_bytes" in data:
                 self.pool_channel_bytes.update({int(k): v for k, v in data["pool_channel_bytes"].items()})
             if "pool_channel_messages" in data:
@@ -1142,6 +1145,37 @@ class InMemoryRepository:
                 "created_at": utcnow(),
             }
         )
+
+    # --- telegram sessions -----------------------------------------------
+
+    async def list_telegram_sessions(self, *, active_only: bool = True) -> list[dict[str, Any]]:
+        sessions = list(self.telegram_sessions.values())
+        if active_only:
+            sessions = [s for s in sessions if s.get("is_active", True)]
+        return sessions
+
+    async def register_telegram_session(
+        self,
+        *,
+        session_enc: bytes,
+        label: str,
+        dc_id: int | None = 2,
+        is_active: bool = True,
+        session_id: str | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        sid = session_id or uuid.uuid4().hex
+        item = {
+            "id": sid,
+            "label": label,
+            "session_enc": session_enc,
+            "dc_id": dc_id,
+            "is_active": is_active,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        self.telegram_sessions[sid] = item
+        self._save_state()
+        return item
 
     # --- helpers --------------------------------------------------------
 

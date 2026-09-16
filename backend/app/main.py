@@ -133,7 +133,12 @@ async def _provision_sessions(
         return
 
     store: TelethonStore = backend
-    rows = await repo.list_telegram_sessions(active_only=True)
+    rows = []
+    if repo and hasattr(repo, "list_telegram_sessions"):
+        try:
+            rows = await repo.list_telegram_sessions(active_only=True)
+        except Exception:
+            log.exception("failed to list telegram sessions from repository")
 
     if not rows and settings.telegram_bot_token:
         try:
@@ -163,10 +168,21 @@ async def _provision_sessions(
 
     for row in rows:
         try:
-            session_string = decrypt_session_string(
-                row["session_enc"], settings.master_kek,
-                session_id_bytes=uuid.UUID(str(row["id"])).bytes,
-            )
+            try:
+                sid_bytes = uuid.UUID(str(row["id"])).bytes
+            except Exception:
+                sid_bytes = uuid.UUID(int=0).bytes
+
+            try:
+                session_string = decrypt_session_string(
+                    row["session_enc"], settings.master_kek,
+                    session_id_bytes=sid_bytes,
+                )
+            except Exception:
+                session_string = decrypt_session_string(
+                    row["session_enc"], settings.master_kek,
+                    session_id_bytes=uuid.UUID(int=0).bytes,
+                )
             client = await store.build_client(session_string)
             await pool.add_session(
                 session_id=str(row["id"]), label=row["label"], client=client
