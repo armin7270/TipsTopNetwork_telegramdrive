@@ -233,9 +233,23 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         else None
     )
 
+    from app.telegram.bot_service import TelegramBotService
+
+    bot_service = TelegramBotService(
+        settings=settings,
+        repo=app.state.repo,
+        pool=app.state.pool,
+        upload_service=app.state.upload_service,
+        download_service=app.state.download_service,
+    )
+    await bot_service.start()
+    app.state.bot_service = bot_service
+
     try:
         yield
     finally:
+        if hasattr(app.state, "bot_service") and app.state.bot_service is not None:
+            await app.state.bot_service.stop()
         if app.state.pool is not None:
             await app.state.pool.stop()
         if hasattr(app.state.repo, "close"):

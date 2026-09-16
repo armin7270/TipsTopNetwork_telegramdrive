@@ -231,6 +231,7 @@ async def put_chunk(
 async def complete_upload(
     upload_id: str,
     payload: CompleteUploadRequest,
+    request: Request,
     uploads: UploadService = Depends(get_uploads),
     principal: Principal = Depends(current_user),
 ) -> CompleteUploadResponse:
@@ -246,6 +247,16 @@ async def complete_upload(
     # False in zero-knowledge mode, where the server has no plaintext to hash —
     # claiming verification there would be a lie the client might rely on.
     verified = payload.sha256 is not None and node.get("hash_mode") != "client_hmac"
+
+    # Notify via Telegram bot if configured
+    try:
+        bot_svc = getattr(request.app.state, "bot_service", None)
+        if bot_svc is not None:
+            import asyncio
+            asyncio.create_task(bot_svc.notify_upload(node, principal))
+    except Exception as exc:
+        log.debug("Could not trigger upload notification: %s", exc)
+
     return CompleteUploadResponse(
         node=_node(node),
         verified=verified,

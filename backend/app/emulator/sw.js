@@ -1,4 +1,4 @@
-const CACHE_NAME = 'teledrive-pwa-v4';
+const CACHE_NAME = 'teledrive-pwa-v5';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
