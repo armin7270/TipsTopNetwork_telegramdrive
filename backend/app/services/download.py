@@ -332,9 +332,16 @@ class DownloadService:
         """
         wrapped = await self.repo.get_user_wrapped_dek(owner_id)
         if wrapped:
-            return crypto.unwrap_dek(
-                wrapped, self.settings.master_kek, user_id_bytes=uuid.UUID(str(owner_id)).bytes
-            )
+            try:
+                return crypto.unwrap_dek(
+                    wrapped, self.settings.master_kek, user_id_bytes=uuid.UUID(str(owner_id)).bytes
+                )
+            except Exception as exc:
+                log.warning(
+                    "download: failed to unwrap DEK for user %s (%s). Falling back to derive_subkey.",
+                    owner_id,
+                    exc,
+                )
         return crypto.derive_subkey(
             self.settings.master_kek, salt=node_id_bytes, info=b"teledrive/user-dek/v1"
         )

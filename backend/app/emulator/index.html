@@ -15,10 +15,12 @@
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
   <link rel="icon" type="image/png" href="/icons/icon-192.png">
 
-  <!-- Google Fonts: Vazirmatn (Farsi) & Plus Jakarta Sans / JetBrains Mono (English/Code) -->
+  <!-- Persian Handwriting & Aesthetic Webfonts: Sahel & Shabnam (jsDelivr) + Aref Ruqaa Ink & Vazirmatn (Google Fonts) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa+Ink:wght@400;700&family=Lateef:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/shabnam-font@v5.0.1/dist/font-face.css">
 
   <style>
     /* ==========================================================================
@@ -69,7 +71,9 @@
       --radius-lg: 26px;
       --radius-full: 9999px;
       
-      --font-family: 'Vazirmatn', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      /* Persian First-Class Typography with Handwritten / Calligraphic options */
+      --font-family: 'Sahel', 'Shabnam', 'Vazirmatn', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-handwriting: 'Sahel', 'Aref Ruqaa Ink', 'Lateef', 'Vazirmatn', cursive, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
 
       /* Layout Defaults */
@@ -116,6 +120,58 @@
       background-color: var(--bg-base);
       color: var(--text-main);
       transition: background-color 0.35s ease, color 0.35s ease;
+    }
+
+    /* Persian Handwritten & Script Styling ("دست‌نوشته و قلم زیبا") */
+    h1, h2, h3, h4,
+    .brand-title,
+    .modal-title,
+    .breadcrumb-trail,
+    .node-card-name,
+    .liquid-badge,
+    .nav-tab-label,
+    .stage-title,
+    .handwriting-font {
+      font-family: var(--font-handwriting), var(--font-family);
+      letter-spacing: 0;
+    }
+
+    /* Strict RTL Layout Enforcement & Anti-Scramble for Persian */
+    html[dir="rtl"], body[dir="rtl"] {
+      direction: rtl;
+      text-align: right;
+    }
+
+    html[dir="rtl"] .sidebar {
+      order: 1;
+    }
+
+    html[dir="rtl"] .main-stage {
+      order: 2;
+    }
+
+    html[dir="rtl"] .node-card-body,
+    html[dir="rtl"] .node-card-name,
+    html[dir="rtl"] .node-card-meta {
+      text-align: right;
+    }
+
+    /* Bidi-safe containers prevent colons and English numbers from reversing in Persian */
+    .bidi-safe {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      unicode-bidi: isolate;
+      direction: rtl;
+      text-align: right;
+    }
+
+    .bidi-val {
+      unicode-bidi: isolate;
+      direction: ltr;
+      display: inline-block;
+      font-family: var(--font-mono), var(--font-family);
+      font-weight: 700;
     }
 
     /* Ambient Liquid Mesh Background */
@@ -343,15 +399,17 @@
 
     /* Floating Liquid Header */
     .app-header {
-      height: var(--header-height);
+      min-height: var(--header-height);
+      height: auto;
       position: sticky;
       top: 0;
       z-index: 1000;
-      padding: 0 clamp(16px, 4vw, 40px);
+      padding: 10px clamp(14px, 3vw, 36px);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 14px;
+      flex-wrap: wrap;
       background: var(--glass-surface);
       backdrop-filter: blur(32px) saturate(200%);
       -webkit-backdrop-filter: blur(32px) saturate(200%);
@@ -395,8 +453,14 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .header-actions .btn-glass {
+      padding: 7px 14px;
+      font-size: 0.83rem;
     }
 
     /* Main Responsive Workspace */
@@ -408,6 +472,7 @@
       margin: 0 auto;
       padding: clamp(14px, 2.5vw, 32px);
       gap: clamp(16px, 2.5vw, 32px);
+      direction: inherit;
     }
 
     /* Glass Sidebar (Desktop & Tablet) */
@@ -1274,9 +1339,13 @@
           <div class="storage-bar-track">
             <div class="storage-bar-fill" id="storage-bar-fill"></div>
           </div>
-          <div style="display: flex; justify-content: space-between; font-size: 0.76rem; color: var(--text-muted);">
-            <span id="quota-used-text">مصرف‌شده: 0 MB</span>
-            <span id="quota-total-text">کل: 100 TB</span>
+          <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); direction: inherit;">
+            <span id="quota-used-text" class="bidi-safe">
+              <span>مصرف‌شده:</span> <bdi class="bidi-val">0 B</bdi>
+            </span>
+            <span id="quota-total-text" class="bidi-safe">
+              <span>کل:</span> <bdi class="bidi-val">100 TB</bdi>
+            </span>
           </div>
         </div>
 
@@ -1302,16 +1371,16 @@
         <div class="glass-panel channel-info-card">
           <div style="display: flex; align-items: center; gap: 8px;">
             <span>📦</span>
-            <span id="storage-channel-status-label">کانال ذخیره‌سازی پیش‌فرض</span>
+            <span id="storage-channel-status-label" data-i18n="defaultChannel">کانال ذخیره‌سازی پیش‌فرض</span>
           </div>
-          <button class="btn-glass" style="padding: 4px 10px; font-size: 0.72rem;" onclick="openTelegramSetupModal()">تغییر</button>
+          <button class="btn-glass" style="padding: 4px 10px; font-size: 0.72rem;" onclick="openTelegramSetupModal()" data-i18n="changeBtn">تغییر</button>
         </div>
 
         <!-- Live Traffic Monitor Card -->
         <div class="glass-panel traffic-monitor-card">
           <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; font-weight: 700;">
             <div style="display: flex; align-items: center; gap: 6px;">
-              <span>⚡</span> <span>ترافیک زنده MTProto / API</span>
+              <span>⚡</span> <span data-i18n="trafficTitle">ترافیک زنده MTProto / API</span>
             </div>
             <span style="font-size: 0.72rem; color: var(--text-muted);" id="traffic-count">0 req</span>
           </div>
@@ -1345,7 +1414,7 @@
             </button>
             <button class="btn-glass" onclick="createSampleFiles()" title="ساخت فایل نمونه تست">
               <span>✨</span>
-              <span>فایل‌های نمونه</span>
+              <span data-i18n="sampleFilesBtn">فایل‌های نمونه</span>
             </button>
             <button class="btn-glass" onclick="refreshDrive()" title="بروزرسانی">
               <span>🔄</span>
@@ -1354,16 +1423,16 @@
         </div>
 
         <!-- Dynamic Upload Tray (when uploading) -->
-        <div class="glass-panel upload-tray" id="upload-tray" style="display: none;">
-          <div class="upload-tray-header">
-            <div style="display: flex; align-items: center; gap: 10px;">
+        <div class="glass-panel upload-tray" id="upload-tray" style="display: none; direction: inherit;">
+          <div class="upload-tray-header" style="direction: inherit;">
+            <div style="display: flex; align-items: center; gap: 12px;">
               <span class="glass-icon-badge glow-cyan" style="width: 36px; height: 36px; font-size: 1.1rem;">⚡</span>
               <div>
-                <div style="font-weight: 700; font-size: 0.95rem;" id="upload-filename-text">Uploading...</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted);" id="upload-status-text">Encrypting AES-256-GCM chunks...</div>
+                <div style="font-weight: 700; font-size: 0.95rem;" id="upload-filename-text" class="handwriting-font">در حال آماده‌سازی...</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);" id="upload-status-text">ایجاد نشست رمزنگاری AES-256-GCM...</div>
               </div>
             </div>
-            <div style="font-weight: 800; font-size: 1.1rem; color: var(--accent-cyan);" id="upload-percentage-text">0%</div>
+            <div style="font-weight: 800; font-size: 1.15rem; color: var(--accent-cyan);" id="upload-percentage-text" class="bidi-val">0%</div>
           </div>
           <div class="storage-bar-track">
             <div class="storage-bar-fill" id="upload-progress-fill"></div>
@@ -1542,12 +1611,13 @@
     let currentPath = [];
     let currentView = 'files'; // 'files' or 'trash'
     let currentPhoneCodeHash = null;
-    let currentLang = localStorage.getItem('teledrive_lang') || 'fa';
+    let storedLang = localStorage.getItem('teledrive_lang');
+    let currentLang = (storedLang === 'en') ? 'en' : 'fa'; // Persian by default
     let currentTheme = localStorage.getItem('teledrive_theme') || 'dark';
     let isDeviceMockup = localStorage.getItem('teledrive_device_mockup') === 'true';
     let deferredPwaPrompt = null;
 
-    // Bilingual Dictionary
+    // Comprehensive Bilingual Dictionary
     const i18n = {
       fa: {
         appTitle: 'TeleDrive — درایو ابری تلگرام',
@@ -1560,6 +1630,7 @@
         storageTitle: 'فضای مصرفی ذخیره‌سازی',
         uploadFileBtn: 'آپلود فایل جدید',
         newFolderBtn: 'پوشه جدید',
+        sampleFilesBtn: 'فایل‌های نمونه',
         rootCrumb: 'درایو اصلی',
         emptyFolder: 'این پوشه خالی است',
         emptyFolderHint: 'می‌توانید فایل‌های خود را در این بخش درگ کنید یا دکمه آپلود را بزنید.',
@@ -1589,6 +1660,16 @@
         fileRestored: 'فایل با موفقیت بازیابی شد',
         filePurged: 'فایل برای همیشه حذف گردید',
         promptDeletePermanent: 'آیا از حذف دائمی و غیرقابل بازگشت این آیتم اطمینان دارید؟',
+        usedPrefix: 'مصرف‌شده:',
+        totalPrefix: 'کل:',
+        trafficTitle: 'ترافیک زنده MTProto / API',
+        defaultChannel: 'کانال ذخیره‌سازی پیش‌فرض',
+        changeBtn: 'تغییر',
+        demoBadge: 'حالت دمو (Demo)',
+        realBadge: 'متصل به تلگرام واقعی',
+        mobileMockup: 'شبیه‌ساز موبایل',
+        desktopView: 'نمای کامل دسکتاپ',
+        welcomeGuest: 'کاربر گرامی',
       },
       en: {
         appTitle: 'TeleDrive — Cloud Drive',
@@ -1601,6 +1682,7 @@
         storageTitle: 'Storage Usage',
         uploadFileBtn: 'Upload File',
         newFolderBtn: 'New Folder',
+        sampleFilesBtn: 'Sample Files',
         rootCrumb: 'My Drive',
         emptyFolder: 'This folder is empty',
         emptyFolderHint: 'Drag and drop files here or click Upload to get started.',
@@ -1630,6 +1712,16 @@
         fileRestored: 'Item restored',
         filePurged: 'Item permanently deleted',
         promptDeletePermanent: 'Are you sure you want to permanently delete this item?',
+        usedPrefix: 'Used:',
+        totalPrefix: 'Total:',
+        trafficTitle: 'Live MTProto / API Traffic',
+        defaultChannel: 'Default Storage Channel',
+        changeBtn: 'Change',
+        demoBadge: 'Demo Mode',
+        realBadge: 'Connected to Telegram',
+        mobileMockup: 'Mobile Mockup',
+        desktopView: 'Desktop View',
+        welcomeGuest: 'Guest User',
       }
     };
 
@@ -1642,9 +1734,35 @@
         const key = el.getAttribute('data-i18n');
         el.innerText = t(key);
       });
-      document.body.dir = currentLang === 'fa' ? 'rtl' : 'ltr';
+      const isRtl = currentLang === 'fa';
+      document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
       document.documentElement.lang = currentLang;
-      document.getElementById('lang-text').innerText = currentLang === 'fa' ? 'English' : 'فارسی';
+      document.body.dir = isRtl ? 'rtl' : 'ltr';
+      document.body.classList.toggle('is-rtl', isRtl);
+      document.body.classList.toggle('is-ltr', !isRtl);
+
+      const langBtn = document.getElementById('btn-lang-toggle');
+      if (langBtn) {
+        langBtn.title = isRtl ? 'Switch to English (تغییر زبان به انگلیسی)' : 'تغییر زبان به فارسی (Switch to Persian)';
+      }
+      const langText = document.getElementById('lang-text');
+      if (langText) {
+        langText.innerText = isRtl ? 'English' : 'فارسی';
+      }
+
+      const badge = document.getElementById('telegram-status-badge');
+      if (badge) {
+        const isReal = badge.classList.contains('badge-real');
+        badge.innerText = isReal ? t('realBadge') : t('demoBadge');
+      }
+
+      const deviceBtn = document.getElementById('device-view-text');
+      if (deviceBtn) {
+        deviceBtn.innerText = isDeviceMockup ? t('desktopView') : t('mobileMockup');
+      }
+
+      updateBreadcrumbUI();
+      fetchStorageStats();
     }
 
     function toggleLanguage() {
@@ -1854,18 +1972,31 @@
         if (!resp.ok) return;
         const usage = await resp.json();
 
-        document.getElementById('quota-used-text').innerText = `مصرف‌شده: ${formatBytes(usage.used_bytes)}`;
-        document.getElementById('quota-total-text').innerText = `کل: ${formatBytes(usage.quota_bytes)}`;
-        document.getElementById('count-files').innerText = usage.file_count || 0;
+        const usedStr = formatBytes(usage.used_bytes || 0);
+        const totalStr = formatBytes(usage.quota_bytes || 0);
+        const usedEl = document.getElementById('quota-used-text');
+        const totalEl = document.getElementById('quota-total-text');
+
+        if (usedEl) {
+          usedEl.innerHTML = `<span>${t('usedPrefix')}</span> <bdi class="bidi-val">${usedStr}</bdi>`;
+        }
+        if (totalEl) {
+          totalEl.innerHTML = `<span>${t('totalPrefix')}</span> <bdi class="bidi-val">${totalStr}</bdi>`;
+        }
+        const fileCountEl = document.getElementById('count-files');
+        if (fileCountEl) fileCountEl.innerText = usage.file_count || 0;
 
         const percent = Math.min(100, Math.max(0.2, (usage.used_bytes / usage.quota_bytes) * 100));
-        document.getElementById('storage-bar-fill').style.width = `${percent}%`;
-        document.getElementById('quota-percent-text').innerText = `${percent.toFixed(2)}%`;
+        const fillBar = document.getElementById('storage-bar-fill');
+        if (fillBar) fillBar.style.width = `${percent}%`;
+        const pctEl = document.getElementById('quota-percent-text');
+        if (pctEl) pctEl.innerText = `${percent.toFixed(2)}%`;
       } catch (e) {}
     }
 
     function updateBreadcrumbUI() {
       const container = document.getElementById('breadcrumb-container');
+      if (!container) return;
       container.innerHTML = '';
       currentPath.forEach((crumb, idx) => {
         const span = document.createElement('span');
@@ -1882,7 +2013,7 @@
         if (idx < currentPath.length - 1) {
           const sep = document.createElement('span');
           sep.className = 'breadcrumb-sep';
-          sep.innerText = '❯';
+          sep.innerText = currentLang === 'fa' ? '❮' : '❯';
           container.appendChild(sep);
         }
       });

@@ -237,9 +237,26 @@ class UploadService:
         """
         wrapped = await self.repo.get_user_wrapped_dek(owner_id)
         if wrapped:
-            return crypto.unwrap_dek(
-                wrapped, self.settings.master_kek, user_id_bytes=uuid.UUID(str(owner_id)).bytes
-            )
+            try:
+                return crypto.unwrap_dek(
+                    wrapped, self.settings.master_kek, user_id_bytes=uuid.UUID(str(owner_id)).bytes
+                )
+            except Exception as exc:
+                log.warning(
+                    "upload: unwrapping stored DEK for user %s failed (%s). Provisioning fresh DEK.",
+                    owner_id,
+                    exc,
+                )
+                try:
+                    new_dek = crypto.generate_dek()
+                    new_wrapped = crypto.wrap_dek(
+                        new_dek, self.settings.master_kek, user_id_bytes=uuid.UUID(str(owner_id)).bytes
+                    )
+                    await self.repo.set_user_wrapped_dek(owner_id, new_wrapped, version=1)
+                    return new_dek
+                except Exception:
+                    log.exception("upload: failed to persist re-wrapped DEK, falling back to derive_subkey")
+
         return crypto.derive_subkey(
             self.settings.master_kek, salt=node_id_bytes, info=b"teledrive/user-dek/v1"
         )

@@ -20,7 +20,7 @@ import logging
 
 from fastapi import APIRouter, Depends, Header, Request, Response, status
 
-from app.core.errors import chunk_hash_mismatch, invalid_argument, not_found
+from app.core.errors import ProblemError, chunk_hash_mismatch, invalid_argument, not_found
 from app.schemas import (
     AbortUploadRequest,
     ChunkReceiptResponse,
@@ -79,18 +79,28 @@ async def create_upload(
         if parent["kind"] != "folder":
             raise invalid_argument("parent_id must reference a folder")
 
-    session = await uploads.create_session(
-        owner_id=principal.user_id,
-        parent_id=parent_id,
-        name=payload.name,
-        size_bytes=payload.size_bytes,
-        mime_type=payload.mime_type,
-        chunk_size=payload.chunk_size,
-        encryption_mode=payload.encryption_mode,
-        overwrite=payload.overwrite,
-        idempotency_key=payload.idempotency_key or idempotency_key,
-    )
-    return _session(session)
+    try:
+        session = await uploads.create_session(
+            owner_id=principal.user_id,
+            parent_id=parent_id,
+            name=payload.name,
+            size_bytes=payload.size_bytes,
+            mime_type=payload.mime_type,
+            chunk_size=payload.chunk_size,
+            encryption_mode=payload.encryption_mode,
+            overwrite=payload.overwrite,
+            idempotency_key=payload.idempotency_key or idempotency_key,
+        )
+        return _session(session)
+    except ProblemError:
+        raise
+    except Exception as exc:
+        log.exception("Failed to create upload session: %s", exc)
+        raise ProblemError(
+            status.HTTP_400_BAD_REQUEST,
+            "upload_session_failed",
+            f"Failed to initialize upload session: {str(exc)}",
+        ) from exc
 
 
 @router.get(
