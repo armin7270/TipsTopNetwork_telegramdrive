@@ -909,3 +909,44 @@ class TestUsageEndpoint:
         # The node is gone entirely, so it cannot be fetched.
         gone = await client.get(f"/api/v1/nodes/{node_id}", headers=headers)
         assert gone.status_code == 404
+
+    async def test_download_content_with_query_param_token(self, client):
+        """Verify direct download works using ?token= without Bearer authorization header."""
+        body = await _register(client, "querytoken@example.com")
+        headers = _auth(body["tokens"])
+        root = (await client.get("/api/v1/nodes/root", headers=headers)).json()
+        data = b"Hello from direct link download!"
+        result = await _upload_file(
+            client, headers, name="direct.txt", data=data, parent_id=root["id"]
+        )
+        node_id = result["node"]["id"]
+        token = body["tokens"]["access_token"]
+
+        # Request WITHOUT headers, only ?token=
+        resp = await client.get(f"/api/v1/files/{node_id}/content?token={token}")
+        assert resp.status_code == 200
+        assert resp.content == data
+
+    def test_bot_service_public_base_url(self, settings):
+        """Verify bot_service resolves Railway domain and explicit public URLs correctly."""
+        from app.telegram.bot_service import TelegramBotService
+
+        svc = TelegramBotService(settings=settings, repo=None)
+
+        # Default fallback
+        assert "tipstopnetworktelegramdrive-production.up.railway.app" in svc.public_base_url
+        assert svc.public_base_url.startswith("https://")
+
+        # Railway public domain
+        os.environ["RAILWAY_PUBLIC_DOMAIN"] = "my-custom-domain.railway.app"
+        try:
+            assert svc.public_base_url == "https://my-custom-domain.railway.app"
+        finally:
+            del os.environ["RAILWAY_PUBLIC_DOMAIN"]
+
+        # Explicit PUBLIC_URL
+        os.environ["PUBLIC_URL"] = "https://custom.teledrive.dev"
+        try:
+            assert svc.public_base_url == "https://custom.teledrive.dev"
+        finally:
+            del os.environ["PUBLIC_URL"]

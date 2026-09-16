@@ -77,7 +77,11 @@ async def download_content(
         description="'inline' lets browsers preview images, PDFs, and video.",
     ),
 ) -> Response:
-    node = await vfs.get_node(node_id, principal.user_id)
+    if principal.role == "admin":
+        raw_node = getattr(request.app.state.repo, "nodes", {}).get(node_id)
+        node = dict(raw_node) if raw_node else await vfs.get_node(node_id, principal.user_id)
+    else:
+        node = await vfs.get_node(node_id, principal.user_id)
 
     if node["kind"] != "file":
         raise not_found(f"Node {node_id} is not a file")
@@ -127,7 +131,7 @@ async def download_content(
 
     stream = downloads.stream(
         node_id=node["id"],
-        owner_id=principal.user_id,
+        owner_id=node["owner_id"],
         byte_range=byte_range,
     )
     return StreamingResponse(
@@ -148,6 +152,7 @@ async def download_content(
 )
 async def download_thumbnail(
     node_id: str,
+    request: Request,
     downloads: DownloadService = Depends(get_download),
     vfs: VFSService = Depends(get_vfs),
     principal: Principal = Depends(current_user),
@@ -159,7 +164,11 @@ async def download_thumbnail(
     inherent consequence of the mode, not a bug, and the endpoint says so rather
     than returning a broken image.
     """
-    node = await vfs.get_node(node_id, principal.user_id)
+    if principal.role == "admin":
+        raw_node = getattr(request.app.state.repo, "nodes", {}).get(node_id)
+        node = dict(raw_node) if raw_node else await vfs.get_node(node_id, principal.user_id)
+    else:
+        node = await vfs.get_node(node_id, principal.user_id)
     if node["kind"] != "file":
         raise not_found(f"Node {node_id} is not a file")
 
@@ -196,11 +205,16 @@ async def download_thumbnail(
 )
 async def head_content(
     node_id: str,
+    request: Request,
     downloads: DownloadService = Depends(get_download),
     vfs: VFSService = Depends(get_vfs),
     principal: Principal = Depends(current_user),
 ) -> Response:
-    node = await vfs.get_node(node_id, principal.user_id)
+    if principal.role == "admin":
+        raw_node = getattr(request.app.state.repo, "nodes", {}).get(node_id)
+        node = dict(raw_node) if raw_node else await vfs.get_node(node_id, principal.user_id)
+    else:
+        node = await vfs.get_node(node_id, principal.user_id)
     if node["kind"] != "file":
         raise not_found(f"Node {node_id} is not a file")
 

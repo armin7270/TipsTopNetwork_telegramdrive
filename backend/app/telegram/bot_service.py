@@ -70,6 +70,50 @@ class TelegramBotService:
     def api_base(self) -> str:
         return f"https://api.telegram.org/bot{self.bot_token}"
 
+    @property
+    def public_base_url(self) -> str:
+        """Derive canonical public base URL for links and WebApp.
+        
+        Prioritizes environment variables, Railway public domain, and falls back
+        to the production URL, ensuring HTTPS protocol.
+        """
+        for var in ("PUBLIC_URL", "APP_URL", "SERVER_URL", "TELEDRIVE_PUBLIC_URL"):
+            val = os.environ.get(var, "").strip()
+            if val:
+                if not val.startswith(("http://", "https://")):
+                    val = f"https://{val}"
+                return val.rstrip("/")
+
+        railway_domain = (
+            os.environ.get("RAILWAY_PUBLIC_DOMAIN")
+            or os.environ.get("RAILWAY_STATIC_URL")
+            or ""
+        ).strip()
+        if railway_domain:
+            if not railway_domain.startswith(("http://", "https://")):
+                railway_domain = f"https://{railway_domain}"
+            return railway_domain.rstrip("/")
+
+        server_host = os.environ.get("SERVER_HOST", "").strip()
+        if server_host and not server_host.startswith("127.0.0.1") and not server_host.startswith("localhost"):
+            if not server_host.startswith(("http://", "https://")):
+                server_host = f"https://{server_host}"
+            return server_host.rstrip("/")
+
+        return "https://tipstopnetworktelegramdrive-production.up.railway.app"
+
+    def _mint_download_token(self, user: dict[str, Any] | None) -> str | None:
+        """Mint a 7-day signed JWT access token for direct browser downloads."""
+        if not user:
+            return None
+        try:
+            from app.services.auth import AuthService
+            auth_service = AuthService(repository=self.repo, settings=self.settings)
+            return auth_service.create_download_token(user)
+        except Exception as e:
+            log.warning("Could not mint download token: %s", e)
+            return None
+
     async def start(self) -> None:
         """Start the bot polling loop and register commands."""
         if not self.bot_token:
@@ -80,6 +124,15 @@ class TelegramBotService:
         self._client = httpx.AsyncClient(timeout=httpx.Timeout(35.0, connect=10.0))
 
         try:
+            # Delete any existing webhook to ensure getUpdates polling works cleanly (avoids 409 Conflict)
+            try:
+                await self._client.post(
+                    f"{self.api_base}/deleteWebhook",
+                    json={"drop_pending_updates": False},
+                )
+            except Exception as e:
+                log.debug("deleteWebhook note: %s", e)
+
             resp = await self._client.get(f"{self.api_base}/getMe")
             if resp.status_code == 200:
                 data = resp.json()
@@ -123,6 +176,16 @@ class TelegramBotService:
             await self._client.aclose()
         log.info("TelegramBotService stopped.")
 
+    async def restart(self, bot_token: str | None = None, channel_id: str | None = None) -> None:
+        """Dynamically update credentials and restart bot service."""
+        if bot_token:
+            self.bot_token = bot_token
+        if channel_id:
+            self.channel_id = channel_id
+        await self.stop()
+        if self.bot_token:
+            await self.start()
+
     # --- Notification System --------------------------------------------------
 
     async def notify_upload(self, node: dict[str, Any], principal: Any) -> None:
@@ -147,8 +210,10 @@ class TelegramBotService:
         except Exception:
             pass
 
-        server_host = os.environ.get("SERVER_HOST") or "127.0.0.1:8000"
-        download_url = f"http://{server_host}/api/v1/files/{node['id']}/content"
+        token = self._mint_download_token(user)
+        token_param = f"?token={token}" if token else ""
+        download_url = f"{self.public_base_url}/api/v1/files/{node['id']}/content{token_param}"
+        web_url = f"{self.public_base_url}/"
 
         text = (
             "🔔 *آپلود جدید در درایو ابری TeleDrive*\n\n"
@@ -163,7 +228,7 @@ class TelegramBotService:
             "inline_keyboard": [
                 [
                     {"text": "⬇️ دریافت فایل", "url": download_url},
-                    {"text": "🌐 ورود به درایو", "url": f"http://{server_host}/"},
+                    {"text": "🌐 ورود به درایو", "url": web_url},
                 ]
             ]
         }
@@ -214,6 +279,18 @@ class TelegramBotService:
                     params={"offset": offset, "timeout": 20},
                     timeout=30.0,
                 )
+                if resp.status_code == 409:
+                    log.warning("getUpdates 409 Conflict: webhook is active, clearing webhook...")
+                    try:
+                        await self._client.post(
+                            f"{self.api_base}/deleteWebhook",
+                            json={"drop_pending_updates": False},
+                        )
+                    except Exception:
+                        pass
+                    await asyncio.sleep(2)
+                    continue
+
                 if resp.status_code != 200:
                     await asyncio.sleep(3)
                     continue
@@ -280,8 +357,7 @@ class TelegramBotService:
 
     async def _send_welcome(self, chat_id: int, from_user: dict[str, Any]) -> None:
         name = from_user.get("first_name", "کاربر عزیز")
-        server_host = os.environ.get("SERVER_HOST") or "127.0.0.1:8000"
-        web_url = f"http://{server_host}/"
+        web_url = f"{self.public_base_url}/"
 
         welcome_text = (
             f"👋 سلام *{name}*!\n\n"
@@ -416,7 +492,8 @@ class TelegramBotService:
         text = f"📂 *فایل‌های شما در درایو TeleDrive* (صفحه {page + 1} از {total_pages}):\n\n"
         keyboard_rows = []
 
-        server_host = os.environ.get("SERVER_HOST") or "127.0.0.1:8000"
+        token = self._mint_download_token(user)
+        token_param = f"?token={token}" if token else ""
 
         for idx, node in enumerate(page_items, start=page * PAGE_SIZE + 1):
             name = node.get("name", "file")
@@ -424,7 +501,7 @@ class TelegramBotService:
             emoji = self._get_emoji(name)
             text += f"{idx}. {emoji} *{name}* ({size})\n"
 
-            download_url = f"http://{server_host}/api/v1/files/{node['id']}/content"
+            download_url = f"{self.public_base_url}/api/v1/files/{node['id']}/content{token_param}"
             keyboard_rows.append(
                 [
                     {"text": f"⬇️ دریافت {name[:20]}", "url": download_url},
@@ -479,7 +556,8 @@ class TelegramBotService:
             )
             return
 
-        server_host = os.environ.get("SERVER_HOST") or "127.0.0.1:8000"
+        token = self._mint_download_token(user)
+        token_param = f"?token={token}" if token else ""
         text = f"🔍 *نتایج جستجو برای «{query}»:* ({len(matched)} مورد)\n\n"
         buttons = []
 
@@ -488,7 +566,7 @@ class TelegramBotService:
             size = format_bytes(node.get("size_bytes", 0))
             emoji = self._get_emoji(name)
             text += f"• {emoji} *{name}* ({size})\n"
-            url = f"http://{server_host}/api/v1/files/{node['id']}/content"
+            url = f"{self.public_base_url}/api/v1/files/{node['id']}/content{token_param}"
             buttons.append([{"text": f"⬇️ دریافت {name[:24]}", "url": url}])
 
         buttons.append([{"text": "🔙 بازگشت", "callback_data": "files_0"}])
@@ -545,8 +623,6 @@ class TelegramBotService:
         # Telegram Bot API limit for direct getFile download is 20 MB
         BOT_API_DOWNLOAD_LIMIT = 20 * 1024 * 1024
 
-        server_host = os.environ.get("SERVER_HOST") or "127.0.0.1:8000"
-
         if file_size > BOT_API_DOWNLOAD_LIMIT:
             msg = (
                 f"⚠️ *فایل انتخابی ({format_bytes(file_size)}) بزرگتر از محدودیت ربات (۲۰ مگابایت) است.*\n\n"
@@ -555,7 +631,7 @@ class TelegramBotService:
             )
             keyboard = {
                 "inline_keyboard": [
-                    [{"text": "🌐 ورود به وب‌اپلیکیشن TeleDrive", "url": f"http://{server_host}/"}],
+                    [{"text": "🌐 ورود به وب‌اپلیکیشن TeleDrive", "url": f"{self.public_base_url}/"}],
                     [{"text": "🔙 بازگشت به منو", "callback_data": "start"}],
                 ]
             }
@@ -604,41 +680,80 @@ class TelegramBotService:
             hasher = hashlib.sha256(content_bytes)
             file_sha256 = hasher.hexdigest()
 
-            # Create file node
-            node_id = str(uuid.uuid4())
-            await self.repo.create_file_node(
-                node_id=node_id,
-                owner_id=owner_id,
-                parent_id=root_id,
-                name=file_name,
-                size_bytes=len(content_bytes),
-                mime_type=mime_type or mimetypes.guess_type(file_name)[0] or "application/octet-stream",
-                chunk_size=1024 * 1024,
-                total_chunks=1,
-            )
+            node_id = None
+            if self.upload_service:
+                try:
+                    session = await self.upload_service.create_session(
+                        owner_id=owner_id,
+                        parent_id=root_id,
+                        name=file_name,
+                        size_bytes=len(content_bytes),
+                        mime_type=mime_type or mimetypes.guess_type(file_name)[0] or "application/octet-stream",
+                        encryption_mode="server_managed",
+                    )
+                    node_id = session["node_id"]
+                    upload_id = session["id"]
+                    await self.upload_service.put_chunk(
+                        upload_id=upload_id,
+                        owner_id=owner_id,
+                        chunk_index=0,
+                        body=content_bytes,
+                        declared_sha256=file_sha256,
+                    )
+                    await self.upload_service.finish_upload(
+                        upload_id=upload_id,
+                        owner_id=owner_id,
+                        declared_sha256=file_sha256,
+                    )
+                except Exception as upload_err:
+                    log.warning("upload_service in bot failed, using repo fallback: %s", upload_err)
+                    node_id = None
 
-            # Store chunk
-            await self.repo.insert_chunk(
-                node_id=node_id,
-                chunk_index=0,
-                plaintext_size=len(content_bytes),
-                ciphertext_size=len(content_bytes),
-                sha256=file_sha256,
-                telegram_message_id=message.get("message_id", 1),
-                telegram_channel_id=int(self.channel_id) if self.channel_id else -1001111111111,
-            )
-
-            await self.repo.finalize_file_node(
-                node_id=node_id,
-                owner_id=owner_id,
-                size_bytes=len(content_bytes),
-                sha256=file_sha256,
-            )
-
-            await self.repo.recompute_usage(owner_id)
+            if not node_id:
+                node = await self.repo.create_file_node(
+                    owner_id=owner_id,
+                    parent_id=root_id,
+                    name=file_name,
+                    size_bytes=len(content_bytes),
+                    mime_type=mime_type or mimetypes.guess_type(file_name)[0] or "application/octet-stream",
+                    chunk_size=1024 * 1024,
+                    total_chunks=1,
+                    encryption_mode="server_managed",
+                    upload_state="uploading",
+                )
+                node_id = node["id"]
+                pools = await self.repo.list_storage_pools() if hasattr(self.repo, "list_storage_pools") else []
+                pool_id = pools[0]["id"] if pools else "pool-default"
+                channel_id_num = (
+                    int(self.channel_id)
+                    if (self.channel_id and str(self.channel_id).lstrip("-").isdigit())
+                    else -1001111111111
+                )
+                await self.repo.insert_chunk(
+                    node_id=node_id,
+                    chunk_index=0,
+                    plaintext_size=len(content_bytes),
+                    ciphertext_size=len(content_bytes),
+                    sha256=bytes.fromhex(file_sha256),
+                    iv=b"\x00" * 12,
+                    auth_tag=b"\x00" * 16,
+                    storage_pool_id=pool_id,
+                    telegram_channel_id=channel_id_num,
+                    telegram_message_id=message.get("message_id", 1),
+                    telegram_file_id=file_id,
+                )
+                await self.repo.finalize_file_node(
+                    node_id=node_id,
+                    owner_id=owner_id,
+                    sha256_hex=file_sha256,
+                    hash_mode="plaintext_sha256",
+                )
+                await self.repo.recompute_usage(owner_id)
 
             # Update confirmation message
-            direct_link = f"http://{server_host}/api/v1/files/{node_id}/content"
+            token = self._mint_download_token(user)
+            token_param = f"?token={token}" if token else ""
+            direct_link = f"{self.public_base_url}/api/v1/files/{node_id}/content{token_param}"
             done_text = (
                 "🎉 *فایل با موفقیت در TeleDrive ذخیره شد!*\n\n"
                 f"📄 *نام فایل:* `{file_name}`\n"

@@ -346,6 +346,25 @@ class AuthService:
             payload, self.settings.jwt_secret, algorithm=self.settings.jwt_algorithm
         )
 
+    def create_download_token(self, user: dict[str, Any], ttl_seconds: int = 86400 * 7) -> str:
+        """Create a signed access token suitable for direct download links in browser/bot."""
+        now = int(time.time())
+        payload = {
+            "sub": user["id"],
+            "email": user.get("email"),
+            "role": user.get("role", "user"),
+            "iss": self.settings.jwt_issuer,
+            "aud": self.settings.jwt_audience,
+            "iat": now,
+            "nbf": now,
+            "exp": now + ttl_seconds,
+            "jti": str(uuid.uuid4()),
+            "typ": "access",
+        }
+        return pyjwt.encode(
+            payload, self.settings.jwt_secret, algorithm=self.settings.jwt_algorithm
+        )
+
     async def _issue_tokens(
         self, user: dict[str, Any], *, user_agent: str | None, ip: str | None
     ) -> TokenPair:
@@ -445,14 +464,16 @@ async def current_user(
     request: Request,
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
 ) -> Principal:
-    """Resolve the authenticated principal, or raise a 401 problem document."""
-    if credentials is None or not credentials.credentials:
+    token = credentials.credentials if credentials and credentials.credentials else None
+    if not token:
+        token = request.query_params.get("token") or request.query_params.get("access_token")
+    if not token:
         raise unauthorized()
 
     service = AuthService(
         repository=request.app.state.repo, settings=request.app.state.settings
     )
-    principal = service.decode_access_token(credentials.credentials)
+    principal = service.decode_access_token(token)
 
     # Confirm the account still exists and is active: a JWT stays valid until it
     # expires, so a suspended or deleted user would otherwise keep access for the

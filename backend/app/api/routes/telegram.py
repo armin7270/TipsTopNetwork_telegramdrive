@@ -226,6 +226,14 @@ async def connect_bot_token(request: Request, payload: BotLoginRequest) -> dict[
         _update_env_file("TELEGRAM_API_ID", str(api_id))
         _update_env_file("TELEGRAM_API_HASH", api_hash)
         _update_env_file("TELEGRAM_BOT_TOKEN", payload.bot_token)
+        os.environ["TELEGRAM_BOT_TOKEN"] = payload.bot_token
+
+        bot_service = getattr(request.app.state, "bot_service", None)
+        if bot_service:
+            try:
+                await bot_service.restart(bot_token=payload.bot_token)
+            except Exception as bot_err:
+                log.warning("Could not restart bot service after token connect: %s", bot_err)
 
         await _enroll_live_session(request, client=client, session_string=session_string, label=f"bot-{me.id}")
 
@@ -360,6 +368,11 @@ async def setup_storage_channel(request: Request, payload: SetupChannelRequest) 
     # Update .env
     _update_env_file("STORAGE_POOL_CHANNEL_IDS", str(channel_id))
     _update_env_file("TELEDRIVE_FAKE_TELEGRAM", "0")
+    os.environ["STORAGE_POOL_CHANNEL_IDS"] = str(channel_id)
+
+    bot_service = getattr(request.app.state, "bot_service", None)
+    if bot_service:
+        bot_service.channel_id = str(channel_id)
 
     return {
         "status": "ready",
