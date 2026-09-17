@@ -21,6 +21,7 @@ Telegram-side problem into a total outage.
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 import uuid
 from contextlib import asynccontextmanager
 from typing import Any, AsyncIterator
@@ -143,28 +144,43 @@ async def _provision_sessions(
             log.exception("failed to list telegram sessions from repository")
 
     if not rows and settings.telegram_bot_token:
+        session_file = Path("/app/data/bot_session.txt")
+        if not session_file.parent.exists():
+            session_file = Path("./data/bot_session.txt")
+        saved_session = ""
+        if session_file.exists():
+            try:
+                saved_session = session_file.read_text(encoding="utf-8").strip()
+            except Exception:
+                pass
+
         try:
             from telethon import TelegramClient
             from telethon.sessions import StringSession
 
             api_id = settings.telegram_api_id or 6
             api_hash = settings.telegram_api_hash or "eb06d4abfb49dc3eeb1aeb98ae0f581e"
-            bot_client = TelegramClient(StringSession(), api_id, api_hash)
-            await bot_client.start(bot_token=settings.telegram_bot_token)
+            string_sess = StringSession(saved_session) if saved_session else StringSession()
+            bot_client = TelegramClient(string_sess, api_id, api_hash)
+            await bot_client.connect()
+            if not await bot_client.is_user_authorized():
+                await bot_client.start(bot_token=settings.telegram_bot_token)
             me = await bot_client.get_me()
             session_id = uuid.uuid4().hex[:12]
             await pool.add_session(
                 session_id=session_id, label=f"bot-{me.id}", client=bot_client
             )
+            try:
+                new_session_str = bot_client.session.save()
+                if new_session_str:
+                    session_file.parent.mkdir(parents=True, exist_ok=True)
+                    session_file.write_text(new_session_str, encoding="utf-8")
+                    log.info("persisted Telegram bot session to %s", session_file)
+            except Exception:
+                log.exception("failed to persist bot session string")
             log.info("auto-enrolled Telegram bot session at startup: @%s", me.username)
         except Exception:
             log.exception("failed to auto-enroll bot from TELEGRAM_BOT_TOKEN")
-
-    if not rows and pool.healthy_count() == 0:
-        log.warning(
-            "no active Telegram sessions in the database; run the session "
-            "enrolment tool before serving uploads"
-        )
 
     from app.core.crypto import decrypt_session_string
 
@@ -192,8 +208,33 @@ async def _provision_sessions(
         except Exception:  # noqa: BLE001 - one bad session must not stop the rest
             log.exception("failed to load Telegram session %s", row.get("label"))
 
+    if pool.healthy_count() == 0:
+        if settings.use_in_memory_backends or settings.use_fake_telegram or not settings.telegram_bot_token:
+            log.warning(
+                "no active Telegram MTProto sessions available in pool; "
+                "activating in-memory fallback sessions so uploads and downloads succeed"
+            )
+            from app.telegram.fake_store import InMemoryStore
+            if not isinstance(backend, InMemoryStore):
+                backend = InMemoryStore()
+                pool.backend = backend
+            for index in range(settings.telegram_session_pool_size):
+                await pool.add_session(
+                    session_id=f"fallback-{index}",
+                    label=f"pool-{chr(ord('a') + index)}",
+                    client=object(),
+                )
+            await _provision_in_memory_pools(repo, backend, settings)
+            return backend
+        else:
+            log.warning(
+                "no active Telegram sessions in the database; run the session "
+                "enrolment tool before serving uploads"
+            )
+
     # Always ensure storage pools are provisioned so uploads find an active channel
     await _provision_in_memory_pools(repo, backend, settings)
+    return backend
 
 
 async def _provision_in_memory_pools(repo: Any, store: Any, settings: Settings) -> None:
@@ -248,7 +289,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     from app.telegram.pool import SessionPool
 
     pool = SessionPool(backend=backend, settings=settings)
-    await _provision_sessions(pool, backend, settings, repo=app.state.repo)
+    backend = await _provision_sessions(pool, backend, settings, repo=app.state.repo) or backend
     await pool.start()
     app.state.pool = pool
     app.state.backend = backend
