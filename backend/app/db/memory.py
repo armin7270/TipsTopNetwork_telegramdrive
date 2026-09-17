@@ -906,6 +906,10 @@ class InMemoryRepository:
         """
         return True
 
+    async def migrate(self) -> None:
+        """No-op schema migration for in-memory / JSON repository."""
+        return None
+
     async def list_storage_pools(self) -> list[dict[str, Any]]:
         return [dict(p) for p in self.storage_pools.values()]
 

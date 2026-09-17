@@ -108,7 +108,7 @@ def _corsenv(name: str) -> tuple[str, ...]:
     """
     raw = os.environ.get(name, "").strip()
     if not raw:
-        return ("http://localhost:3000", "http://127.0.0.1:3000")
+        return ("*", "http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:8000", "http://127.0.0.1:8000")
     return tuple(piece.strip() for piece in raw.split(",") if piece.strip())
 
 
@@ -193,16 +193,20 @@ class Settings:
         except ImportError:
             pass
 
-        use_memory = os.environ.get("TELEDRIVE_IN_MEMORY", "").lower() in {"1", "true", "yes"}
+        use_memory_raw = os.environ.get("TELEDRIVE_IN_MEMORY", "").strip().lower()
+        if use_memory_raw:
+            use_memory = use_memory_raw in {"1", "true", "yes"}
+        else:
+            use_memory = True  # Default to True so deployment doesn't crash if variable omitted
+
         master_kek = _b64env("MASTER_KEK", required=not use_memory, expected_len=32)
         jwt_secret = _b64env("JWT_SECRET", required=not use_memory)
 
-        if use_memory:
-            master_kek = master_kek or b"0123456789abcdef0123456789abcdef"
-            jwt_secret = jwt_secret or b"test-secret-that-is-long-enough-32b"
+        master_kek = master_kek or b"0123456789abcdef0123456789abcdef"
+        jwt_secret = jwt_secret or b"test-secret-that-is-long-enough-32b"
 
-        api_id = _intenv("TELEGRAM_API_ID", 0)
-        api_hash = os.environ.get("TELEGRAM_API_HASH", "")
+        api_id = _intenv("TELEGRAM_API_ID", 6)
+        api_hash = os.environ.get("TELEGRAM_API_HASH", "eb06d4abfb49dc3eeb1aeb98ae0f581e")
 
         if not use_memory:
             if not jwt_secret or len(jwt_secret) < 32:

@@ -19,6 +19,10 @@ htmlcov/
 !.env.example
 
 # Local Data and SQLite
+data/
+backend/data/
+*.session
+*bot_session.txt
 data/*.json
 backend/data/*.json
 data/temp/

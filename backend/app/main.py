@@ -20,6 +20,7 @@ Telegram-side problem into a total outage.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from pathlib import Path
 import uuid
@@ -154,7 +155,7 @@ async def _provision_sessions(
             except Exception:
                 pass
 
-        try:
+        async def _connect_bot() -> None:
             from telethon import TelegramClient
             from telethon.sessions import StringSession
 
@@ -179,6 +180,11 @@ async def _provision_sessions(
             except Exception:
                 log.exception("failed to persist bot session string")
             log.info("auto-enrolled Telegram bot session at startup: @%s", me.username)
+
+        try:
+            await asyncio.wait_for(_connect_bot(), timeout=15.0)
+        except asyncio.TimeoutError:
+            log.warning("Telegram bot MTProto connection timed out after 15s during startup; will proceed to boot")
         except Exception:
             log.exception("failed to auto-enroll bot from TELEGRAM_BOT_TOKEN")
 
@@ -271,7 +277,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.repo = _build_repository(settings)
     if hasattr(app.state.repo, "connect"):
         await app.state.repo.connect()
-    if not settings.use_in_memory_backends:
+    if hasattr(app.state.repo, "migrate"):
         await app.state.repo.migrate()
 
     # The session pool is optional at boot. A deployment that has not yet added
@@ -400,3 +406,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
 
 app = create_app()
+
+
+if __name__ == "__main__":
+    import os
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(
+        "app.main:app",
+        host="0.0.0.0",
+        port=port,
+        proxy_headers=True,
+        forwarded_allow_ips="*",
+    )

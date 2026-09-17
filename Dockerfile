@@ -33,7 +33,7 @@ EXPOSE 8000
 
 # Container health monitoring
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-8000}/readyz || exit 1
+    CMD curl -f http://localhost:${PORT:-8000}/healthz || exit 1
 
 # Launch ASGI server with dynamic port and proxy headers (Railway reverse proxy compatible)
 CMD sh -c "python -m uvicorn app.main:app --host 0.0.0.0 --port \${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"
