@@ -1785,9 +1785,10 @@ class TelegramBotService:
         date_shamsi = note.get("date_shamsi", "")
         hex_id = note["id"].replace("-", "")[:12]
 
+        date_line = f"📅 تاریخ: `{date_shamsi}`\n" if date_shamsi else ""
         text = (
             f"📝 *{title}*\n"
-            f"{('📅 تاریخ: `' + date_shamsi + '`\\n') if date_shamsi else ''}\n"
+            f"{date_line}"
             f"━━━━━━━━━━━━━━━━━━━\n"
             f"{content}\n"
             f"━━━━━━━━━━━━━━━━━━━\n"

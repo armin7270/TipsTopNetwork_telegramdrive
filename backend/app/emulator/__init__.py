@@ -1,1 +1,1 @@
-﻿"""TeleDrive Web Emulator Package."""
+"""TeleDrive Web Emulator Package."""
