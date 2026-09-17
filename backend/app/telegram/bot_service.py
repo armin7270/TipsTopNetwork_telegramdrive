@@ -401,13 +401,20 @@ class TelegramBotService:
             token = self._mint_download_token(user)
             token_param = f"?token={token}" if token else ""
             download_url = f"{self.public_base_url}/api/v1/files/{node_id}/content{token_param}"
+            hex_id = str(node_id).replace("-", "")
+
+            action_row = []
+            size_int = node.get("size_bytes", 0) if node else 0
+            if size_int <= 50 * 1024 * 1024:
+                action_row.append({"text": "📥 دریافت در تلگرام", "callback_data": f"get_{hex_id}"})
+            action_row.append({"text": "🌐 دانلود با نام جدید", "url": download_url})
 
             keyboard = {
                 "inline_keyboard": [
-                    [{"text": "⬇️ دریافت فایل با نام جدید", "url": download_url}],
+                    action_row,
                     [
-                        {"text": "✏️ ویرایش مجدد", "callback_data": f"ren_{node_id[:12]}"},
-                        {"text": "🗑️ حذف فایل", "callback_data": f"askdel_{node_id[:12]}"},
+                        {"text": "✏️ ویرایش مجدد", "callback_data": f"ren_{hex_id}"},
+                        {"text": "🗑️ حذف فایل", "callback_data": f"askdel_{hex_id}"},
                     ],
                     [{"text": "📂 فایل‌های من", "callback_data": "files_0"}],
                 ]
@@ -466,6 +473,9 @@ class TelegramBotService:
                 break
 
         if found_user:
+            for u in getattr(self.repo, "users", {}).values():
+                if u.get("telegram_user_id") == user_id and u["id"] != found_user["id"]:
+                    u["telegram_user_id"] = None
             found_user["telegram_user_id"] = user_id
             if hasattr(self.repo, "_save_state"):
                 self.repo._save_state()
@@ -617,21 +627,31 @@ class TelegramBotService:
         # Collect all active file nodes owned by user across the entire drive
         file_nodes = [
             n for n in getattr(self.repo, "nodes", {}).values()
-            if n.get("owner_id") == owner_id
+            if str(n.get("owner_id")) == str(owner_id)
             and n.get("kind") == "file"
             and not n.get("trashed_at")
         ]
 
-        # If user has no files and there is a single primary user, fallback to primary user
-        if not file_nodes and hasattr(self.repo, "users") and len(self.repo.users) == 1:
-            main_user = next(iter(self.repo.users.values()))
-            file_nodes = [
-                n for n in getattr(self.repo, "nodes", {}).values()
-                if n.get("owner_id") == main_user["id"]
-                and n.get("kind") == "file"
-                and not n.get("trashed_at")
-            ]
-            owner_id = main_user["id"]
+        # Fail-safe: If user has no files, check if files exist under any account in this drive
+        if not file_nodes and hasattr(self.repo, "nodes"):
+            for candidate_node in self.repo.nodes.values():
+                if candidate_node.get("kind") == "file" and not candidate_node.get("trashed_at"):
+                    cand_owner_id = candidate_node.get("owner_id")
+                    cand_user = self.repo.users.get(cand_owner_id) if hasattr(self.repo, "users") else None
+                    if cand_user:
+                        cand_user["telegram_user_id"] = tg_user_id
+                        user["telegram_user_id"] = None
+                        user = cand_user
+                        owner_id = cand_owner_id
+                        if hasattr(self.repo, "_save_state"):
+                            self.repo._save_state()
+                        file_nodes = [
+                            n for n in self.repo.nodes.values()
+                            if str(n.get("owner_id")) == str(owner_id)
+                            and n.get("kind") == "file"
+                            and not n.get("trashed_at")
+                        ]
+                        break
 
         file_nodes.sort(key=lambda x: str(x.get("created_at") or ""), reverse=True)
 
@@ -673,22 +693,25 @@ class TelegramBotService:
 
         for idx, node in enumerate(page_items, start=page * PAGE_SIZE + 1):
             name = node.get("name", "file")
-            size = format_bytes(node.get("size_bytes", 0))
+            size_bytes = int(node.get("size_bytes", 0))
+            size = format_bytes(size_bytes)
             emoji = self._get_emoji(name)
-            node_id = node["id"]
-            short_id = node_id[:12]
+            node_id = str(node["id"])
+            hex_id = node_id.replace("-", "")
 
             text += f"{idx}. {emoji} *{name}*\n   💾 حجم: `{size}`\n\n"
 
             download_url = f"{self.public_base_url}/api/v1/files/{node_id}/content{token_param}"
 
-            # Actions: Download, Rename, Delete
+            row_actions = []
+            if size_bytes <= 50 * 1024 * 1024:
+                row_actions.append({"text": "📥 دریافت در تلگرام", "callback_data": f"get_{hex_id}"})
+            row_actions.append({"text": "🌐 لینک دانلود مستقیم", "url": download_url})
+            keyboard_rows.append(row_actions)
+
             keyboard_rows.append([
-                {"text": f"⬇️ دریافت {name[:16]}", "url": download_url},
-            ])
-            keyboard_rows.append([
-                {"text": "✏️ ویرایش نام", "callback_data": f"ren_{short_id}"},
-                {"text": "🗑️ حذف فایل", "callback_data": f"askdel_{short_id}"},
+                {"text": "✏️ ویرایش نام", "callback_data": f"ren_{hex_id}"},
+                {"text": "🗑️ حذف فایل", "callback_data": f"askdel_{hex_id}"},
             ])
 
         # Pagination navigation
@@ -934,11 +957,15 @@ class TelegramBotService:
                     hash_mode="plaintext_sha256",
                 )
                 await self.repo.recompute_usage(owner_id)
+                if hasattr(self.repo, "_save_state"):
+                    self.repo._save_state()
 
             # Update confirmation message
             token = self._mint_download_token(user)
             token_param = f"?token={token}" if token else ""
             direct_link = f"{self.public_base_url}/api/v1/files/{node_id}/content{token_param}"
+            hex_id = str(node_id).replace("-", "")
+
             done_text = (
                 "🎉 *فایل با موفقیت در TeleDrive ذخیره شد!*\n\n"
                 f"📄 *نام فایل:* `{file_name}`\n"
@@ -947,12 +974,17 @@ class TelegramBotService:
                 f"🔗 [دانلود مستقیم و پخش آنلاین]({direct_link})"
             )
 
+            action_row = []
+            if len(content_bytes) <= 50 * 1024 * 1024:
+                action_row.append({"text": "📥 دریافت در تلگرام", "callback_data": f"get_{hex_id}"})
+            action_row.append({"text": "🌐 لینک دانلود مستقیم", "url": direct_link})
+
             keyboard = {
                 "inline_keyboard": [
-                    [{"text": "⬇️ دریافت مستقیم فایل", "url": direct_link}],
+                    action_row,
                     [
-                        {"text": "✏️ ویرایش نام", "callback_data": f"ren_{node_id[:12]}"},
-                        {"text": "🗑️ حذف فایل", "callback_data": f"askdel_{node_id[:12]}"},
+                        {"text": "✏️ ویرایش نام", "callback_data": f"ren_{hex_id}"},
+                        {"text": "🗑️ حذف فایل", "callback_data": f"askdel_{hex_id}"},
                     ],
                     [
                         {"text": "📂 فایل‌های من", "callback_data": "files_0"},
@@ -1007,9 +1039,19 @@ class TelegramBotService:
             await self._send_help(chat_id)
         elif data == "search_prompt":
             await self._send_search(chat_id, user_id, "")
+        elif data.startswith("get_"):
+            hex_id = data.split("_")[1]
+            node = self._find_node_by_hex(hex_id)
+            if not node:
+                await self._client.post(
+                    f"{self.api_base}/sendMessage",
+                    json={"chat_id": chat_id, "text": "❌ فایل مورد نظر یافت نشد."},
+                )
+                return
+            await self._send_file_to_chat(chat_id, user_id, node)
         elif data.startswith("askdel_"):
-            prefix = data.split("_")[1]
-            node = self._find_node_by_prefix(prefix)
+            hex_id = data.split("_")[1]
+            node = self._find_node_by_hex(hex_id)
             if not node:
                 await self._client.post(
                     f"{self.api_base}/sendMessage",
@@ -1021,7 +1063,7 @@ class TelegramBotService:
             keyboard = {
                 "inline_keyboard": [
                     [
-                        {"text": "🗑️ بله، فایل حذف شود", "callback_data": f"dodel_{prefix}"},
+                        {"text": "🗑️ بله، فایل حذف شود", "callback_data": f"dodel_{hex_id}"},
                         {"text": "❌ انصراف", "callback_data": "files_0"},
                     ]
                 ]
@@ -1041,8 +1083,8 @@ class TelegramBotService:
                 },
             )
         elif data.startswith("dodel_") or data.startswith("del_"):
-            prefix = data.split("_")[1]
-            node = self._find_node_by_prefix(prefix)
+            hex_id = data.split("_")[1]
+            node = self._find_node_by_hex(hex_id)
             if not node:
                 await self._client.post(
                     f"{self.api_base}/sendMessage",
@@ -1053,6 +1095,8 @@ class TelegramBotService:
             owner_id = node.get("owner_id", user["id"])
             await self.repo.delete_node(node["id"], owner_id)
             await self.repo.recompute_usage(owner_id)
+            if hasattr(self.repo, "_save_state"):
+                self.repo._save_state()
             await self._client.post(
                 f"{self.api_base}/sendMessage",
                 json={
@@ -1063,8 +1107,8 @@ class TelegramBotService:
             )
             await self._send_file_list(chat_id, user_id, page=0)
         elif data.startswith("ren_"):
-            prefix = data.split("_")[1]
-            node = self._find_node_by_prefix(prefix)
+            hex_id = data.split("_")[1]
+            node = self._find_node_by_hex(hex_id)
             if not node:
                 await self._client.post(
                     f"{self.api_base}/sendMessage",
@@ -1105,28 +1149,208 @@ class TelegramBotService:
 
     # --- Helpers --------------------------------------------------------------
 
-    def _find_node_by_prefix(self, prefix: str) -> dict[str, Any] | None:
+    async def _send_file_to_chat(self, chat_id: int, user_id: int, node: dict[str, Any]) -> None:
+        """Send a stored file directly to the Telegram chat as a document."""
+        size = int(node.get("size_bytes", 0))
+        name = node.get("name", "file")
+        user = await self._get_or_create_user(user_id)
+        token = self._mint_download_token(user)
+        token_param = f"?token={token}" if token else ""
+        download_url = f"{self.public_base_url}/api/v1/files/{node['id']}/content{token_param}"
+
+        if size > 50 * 1024 * 1024:
+            await self._client.post(
+                f"{self.api_base}/sendMessage",
+                json={
+                    "chat_id": chat_id,
+                    "text": (
+                        f"⚠️ حجم فایل *«{name}»* ({format_bytes(size)}) بیشتر از سقف ۵۰ مگابایت تلگرام برای ربات‌ها است.\n\n"
+                        "لطفاً جهت دانلود یا تماشای آنلاین، از لینک دانلود مستقیم استفاده فرمایید:"
+                    ),
+                    "parse_mode": "Markdown",
+                    "reply_markup": {
+                        "inline_keyboard": [
+                            [{"text": "🌐 دانلود مستقیم در مرورگر", "url": download_url}]
+                        ]
+                    },
+                },
+            )
+            return
+
+        status_msg = await self._client.post(
+            f"{self.api_base}/sendMessage",
+            json={
+                "chat_id": chat_id,
+                "text": f"⏳ در حال آماده‌سازی و ارسال فایل *«{name}»* ({format_bytes(size)}) به تلگرام...",
+                "parse_mode": "Markdown",
+            },
+        )
+        status_id = None
+        if status_msg.is_success:
+            try:
+                status_id = status_msg.json().get("result", {}).get("message_id")
+            except Exception:
+                pass
+
+        try:
+            file_bytes = b""
+            if self.download_service:
+                stream = self.download_service.stream(
+                    node_id=node["id"],
+                    owner_id=node["owner_id"],
+                    byte_range=None,
+                )
+                chunks = []
+                async for chunk in stream:
+                    chunks.append(chunk)
+                file_bytes = b"".join(chunks)
+
+            if not file_bytes:
+                async with httpx.AsyncClient(timeout=60.0) as cli:
+                    resp = await cli.get(download_url)
+                    if resp.is_success:
+                        file_bytes = resp.content
+
+            if not file_bytes:
+                raise ValueError("محتوای فایل خالی است یا قابل واکشی نمی‌باشد.")
+
+            mime = node.get("mime_type") or "application/octet-stream"
+            files = {"document": (name, file_bytes, mime)}
+            resp = await self._client.post(
+                f"{self.api_base}/sendDocument",
+                data={
+                    "chat_id": chat_id,
+                    "caption": f"✅ *فایل شما با موفقیت دریافت شد:*\n📄 `{name}`\n💾 حجم: `{format_bytes(len(file_bytes))}`",
+                    "parse_mode": "Markdown",
+                },
+                files=files,
+                timeout=httpx.Timeout(120.0, connect=10.0),
+            )
+            if not resp.is_success:
+                log.error("sendDocument error: %s", resp.text)
+                await self._client.post(
+                    f"{self.api_base}/sendMessage",
+                    json={
+                        "chat_id": chat_id,
+                        "text": f"❌ ارسال مستقیم فایل به تلگرام با خطا مواجه شد. لطفاً از لینک دانلود مستقیم استفاده نمایید:\n{download_url}",
+                    },
+                )
+            if status_id:
+                try:
+                    await self._client.post(
+                        f"{self.api_base}/deleteMessage",
+                        json={"chat_id": chat_id, "message_id": status_id},
+                    )
+                except Exception:
+                    pass
+        except Exception as e:
+            log.exception("Error sending file to chat: %s", e)
+            await self._client.post(
+                f"{self.api_base}/sendMessage",
+                json={
+                    "chat_id": chat_id,
+                    "text": (
+                        f"❌ خطا در ارسال فایل: `{str(e)}`\n\n"
+                        f"می‌توانید فایل را از طریق لینک مستقیم دانلود کنید:\n{download_url}"
+                    ),
+                    "reply_markup": {
+                        "inline_keyboard": [
+                            [{"text": "🌐 دانلود مستقیم در مرورگر", "url": download_url}]
+                        ]
+                    },
+                },
+            )
+
+    def _find_node_by_hex(self, hex_or_prefix: str) -> dict[str, Any] | None:
         nodes = getattr(self.repo, "nodes", {})
+        try:
+            import uuid
+            direct_uuid = str(uuid.UUID(hex_or_prefix))
+            if direct_uuid in nodes and nodes[direct_uuid].get("kind") == "file" and not nodes[direct_uuid].get("trashed_at"):
+                return nodes[direct_uuid]
+        except Exception:
+            pass
+
+        clean_target = hex_or_prefix.replace("-", "").lower()
         for node in nodes.values():
-            if node.get("id", "").startswith(prefix) and node.get("kind") == "file":
+            node_id_str = str(node.get("id", ""))
+            node_hex = node_id_str.replace("-", "").lower()
+            if (
+                node_hex == clean_target
+                or node_hex.startswith(clean_target)
+                or node_id_str.startswith(hex_or_prefix)
+            ) and node.get("kind") == "file" and not node.get("trashed_at"):
                 return node
         return None
 
+    def _find_node_by_prefix(self, prefix: str) -> dict[str, Any] | None:
+        return self._find_node_by_hex(prefix)
+
     async def _get_or_create_user(self, telegram_user_id: int) -> dict[str, Any]:
-        """Look up user by Telegram ID or auto-link/provision one."""
+        """Look up user by Telegram ID, auto-linking to the primary web account."""
         user = await self.repo.get_user_by_telegram_id(telegram_user_id)
+
+        # Look for the primary web user in the system (e.g. user@teledrive.dev, user with files, or first non-tg user)
+        primary_user = None
+        users_list = list(getattr(self.repo, "users", {}).values())
+
+        # 1. Look for user@teledrive.dev
+        for u in users_list:
+            if (u.get("email") or "").lower() == "user@teledrive.dev":
+                primary_user = u
+                break
+
+        # 2. If not found, look for any user who owns active files
+        if not primary_user and hasattr(self.repo, "nodes"):
+            for u in users_list:
+                if any(str(n.get("owner_id")) == str(u["id"]) for n in self.repo.nodes.values() if n.get("kind") == "file" and not n.get("trashed_at")):
+                    primary_user = u
+                    break
+
+        # 3. If not found, look for any user whose email does NOT start with tg_
+        if not primary_user:
+            for u in users_list:
+                if not (u.get("email") or "").startswith("tg_"):
+                    primary_user = u
+                    break
+
+        # Unify if user is an isolated dummy tg_ user and primary web user exists
+        if user and (user.get("email") or "").startswith("tg_") and primary_user and primary_user["id"] != user["id"]:
+            log.info("Unifying dummy tg user %s into primary web user %s", user["id"], primary_user["id"])
+            if hasattr(self.repo, "nodes"):
+                for n in self.repo.nodes.values():
+                    if str(n.get("owner_id")) == str(user["id"]):
+                        n["owner_id"] = primary_user["id"]
+            primary_user["telegram_user_id"] = telegram_user_id
+            if hasattr(self.repo, "users"):
+                if user["id"] in self.repo.users:
+                    self.repo.users[user["id"]]["telegram_user_id"] = None
+                if primary_user["id"] in self.repo.users:
+                    self.repo.users[primary_user["id"]]["telegram_user_id"] = telegram_user_id
+            user["telegram_user_id"] = None
+            if hasattr(self.repo, "_save_state"):
+                self.repo._save_state()
+            return primary_user
+
         if user:
             return user
 
-        # Single-tenant personal drive auto-link: if there is only 1 user, link automatically
-        if hasattr(self.repo, "users"):
-            users = list(self.repo.users.values())
-            if len(users) == 1:
-                users[0]["telegram_user_id"] = telegram_user_id
-                if hasattr(self.repo, "_save_state"):
-                    self.repo._save_state()
-                log.info("Auto-linked sole user %s to telegram id %s", users[0]["id"], telegram_user_id)
-                return users[0]
+        # Auto-link primary web user if not linked yet
+        if primary_user:
+            log.info("Auto-linked primary user %s to telegram id %s", primary_user["id"], telegram_user_id)
+            primary_user["telegram_user_id"] = telegram_user_id
+            if hasattr(self.repo, "users") and primary_user["id"] in self.repo.users:
+                self.repo.users[primary_user["id"]]["telegram_user_id"] = telegram_user_id
+            if hasattr(self.repo, "_save_state"):
+                self.repo._save_state()
+            return primary_user
+
+        # Single-tenant personal drive auto-link fallback
+        if len(users_list) == 1:
+            users_list[0]["telegram_user_id"] = telegram_user_id
+            if hasattr(self.repo, "_save_state"):
+                self.repo._save_state()
+            return users_list[0]
 
         user = await self.repo.create_user(
             email=f"tg_{telegram_user_id}@teledrive.dev",

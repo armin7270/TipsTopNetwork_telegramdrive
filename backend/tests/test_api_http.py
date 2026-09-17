@@ -420,6 +420,13 @@ class TestVFSOverHTTP:
         assert restored.status_code == 200
         assert restored.json()["trashed_at"] is None
 
+        # Test POST /{id}/trash
+        trash_post = await client.post(
+            f"/api/v1/nodes/{folder['id']}/trash", headers=headers
+        )
+        assert trash_post.status_code == 200
+        assert trash_post.json()["trashed_at"] is not None
+
     async def test_other_users_cannot_see_or_touch_nodes(self, client):
         """The core multi-tenancy guarantee: every query is owner-scoped."""
         a = await _register(client, "alice@example.com")
@@ -950,3 +957,93 @@ class TestUsageEndpoint:
             assert svc.public_base_url == "https://custom.teledrive.dev"
         finally:
             del os.environ["PUBLIC_URL"]
+
+    @pytest.mark.asyncio
+    async def test_bot_service_auto_links_primary_web_user(self, settings):
+        """Verify bot_service auto-links Telegram users to user@teledrive.dev."""
+        from app.db.memory import InMemoryRepository
+        from app.telegram.bot_service import TelegramBotService
+
+        repo = InMemoryRepository()
+        web_user = await repo.create_user(
+            email="user@teledrive.dev",
+            password_hash="hash",
+            display_name="Web User",
+        )
+
+        svc = TelegramBotService(settings=settings, repo=repo)
+        tg_user = await svc._get_or_create_user(telegram_user_id=987654321)
+
+        assert tg_user["id"] == web_user["id"]
+        assert tg_user["email"] == "user@teledrive.dev"
+        stored_user = await repo.get_user(web_user["id"])
+        assert stored_user["telegram_user_id"] == 987654321
+
+    @pytest.mark.asyncio
+    async def test_bot_service_unifies_dummy_tg_user(self, settings):
+        """Verify bot_service merges dummy tg_... users into user@teledrive.dev."""
+        from app.db.memory import InMemoryRepository
+        from app.telegram.bot_service import TelegramBotService
+
+        repo = InMemoryRepository()
+        web_user = await repo.create_user(
+            email="user@teledrive.dev",
+            password_hash="hash",
+            display_name="Web User",
+        )
+        dummy_user = await repo.create_user(
+            email="tg_11223344@teledrive.dev",
+            password_hash=None,
+            display_name="Dummy TG",
+            telegram_user_id=11223344,
+        )
+
+        svc = TelegramBotService(settings=settings, repo=repo)
+        resolved_user = await svc._get_or_create_user(telegram_user_id=11223344)
+
+        assert resolved_user["id"] == web_user["id"]
+        stored_web = await repo.get_user(web_user["id"])
+        assert stored_web["telegram_user_id"] == 11223344
+        stored_dummy = await repo.get_user(dummy_user["id"])
+        assert stored_dummy["telegram_user_id"] is None
+
+    @pytest.mark.asyncio
+    async def test_bot_service_find_node_by_hex(self, settings):
+        """Verify _find_node_by_hex matches by UUID, hex, and prefix, ignoring trashed nodes."""
+        from app.db.memory import InMemoryRepository
+        from app.telegram.bot_service import TelegramBotService
+
+        repo = InMemoryRepository()
+        user = await repo.create_user(
+            email="test@teledrive.dev",
+            password_hash="hash",
+            display_name="Test User",
+        )
+        root = await repo.get_root_node(user["id"])
+        node = await repo.create_file_node(
+            owner_id=user["id"],
+            parent_id=root["id"],
+            name="document.pdf",
+            size_bytes=1024,
+            mime_type="application/pdf",
+            chunk_size=1024,
+            total_chunks=1,
+            encryption_mode="server_side",
+            upload_state="ready",
+        )
+
+        svc = TelegramBotService(settings=settings, repo=repo)
+        node_id = node["id"]
+        hex_id = node_id.replace("-", "")
+
+        # 1. Direct UUID match
+        assert svc._find_node_by_hex(node_id)["id"] == node_id
+        # 2. Hex match (without dashes)
+        assert svc._find_node_by_hex(hex_id)["id"] == node_id
+        # 3. Short prefix match
+        assert svc._find_node_by_hex(hex_id[:12])["id"] == node_id
+
+        # 4. Trashed node should not be found
+        await repo.trash_node(node_id, user["id"], purge_after_days=30)
+        assert svc._find_node_by_hex(node_id) is None
+        assert svc._find_node_by_hex(hex_id) is None

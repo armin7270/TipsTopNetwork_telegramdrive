@@ -522,6 +522,7 @@ class InMemoryRepository:
         node["name"] = name
         node["name_folded"] = name.lower()
         node["updated_at"] = utcnow()
+        self._save_state()
         return dict(node)
 
     async def move_node(
@@ -552,6 +553,7 @@ class InMemoryRepository:
             raise node_name_conflict(node["name"])
 
         self._reparent(node, parent)
+        self._save_state()
         return dict(node)
 
     def _reparent(self, node: dict[str, Any], parent: dict[str, Any]) -> None:
@@ -591,6 +593,7 @@ class InMemoryRepository:
             raise not_found(f"Node {node_id} was not found")
         node["is_starred"] = starred
         node["updated_at"] = utcnow()
+        self._save_state()
         return dict(node)
 
     async def trash_node(self, node_id: str, owner_id: str, purge_after_days: int) -> None:
@@ -619,6 +622,7 @@ class InMemoryRepository:
                 child["updated_at"] = when
 
         await self.recompute_usage(owner_id)
+        self._save_state()
 
     async def restore_node(self, node_id: str, owner_id: str) -> dict[str, Any]:
         node = self.nodes.get(node_id)
@@ -635,6 +639,7 @@ class InMemoryRepository:
             target["updated_at"] = utcnow()
 
         await self.recompute_usage(owner_id)
+        self._save_state()
         return dict(node)
 
     async def delete_node(self, node_id: str, owner_id: str) -> None:
@@ -651,6 +656,7 @@ class InMemoryRepository:
                 self._delete_single(child["id"])
         self._delete_single(node_id)
         await self.recompute_usage(owner_id)
+        self._save_state()
 
     def _delete_single(self, node_id: str) -> None:
         node = self.nodes.pop(node_id, None)

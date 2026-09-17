@@ -247,6 +247,20 @@ async def copy_node(
 
 
 @router.post(
+    "/{node_id}/trash",
+    response_model=NodeResponse,
+    summary="Move a node to the trash",
+)
+async def trash_node(
+    node_id: str,
+    vfs: VFSService = Depends(get_vfs),
+    principal: Principal = Depends(current_user),
+) -> NodeResponse:
+    await vfs.delete(node_id, principal.user_id, purge=False)
+    return _node(await vfs.get_node(node_id, principal.user_id))
+
+
+@router.post(
     "/{node_id}/restore",
     response_model=NodeResponse,
     summary="Restore a node from the trash",

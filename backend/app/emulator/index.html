@@ -2549,7 +2549,10 @@
 
     async function trashNode(nodeId) {
       try {
-        const resp = await apiRequest(`/api/v1/nodes/${nodeId}/trash`, { method: 'POST' });
+        let resp = await apiRequest(`/api/v1/nodes/${nodeId}/trash`, { method: 'POST' });
+        if (!resp.ok) {
+          resp = await apiRequest(`/api/v1/nodes/${nodeId}`, { method: 'DELETE' });
+        }
         if (!resp.ok) throw new Error('انتقال به زباله‌دان ناموفق بود');
         showToast(t('fileMovedToTrash'), 'success');
         fetchStorageStats();
@@ -2574,7 +2577,7 @@
     async function deletePermanent(nodeId) {
       if (!confirm(t('promptDeletePermanent'))) return;
       try {
-        const resp = await apiRequest(`/api/v1/nodes/${nodeId}`, { method: 'DELETE' });
+        const resp = await apiRequest(`/api/v1/nodes/${nodeId}?purge=true&recursive=true`, { method: 'DELETE' });
         if (!resp.ok) throw new Error('حذف دائمی ناموفق بود');
         showToast(t('filePurged'), 'success');
         fetchStorageStats();
