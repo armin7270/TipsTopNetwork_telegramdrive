@@ -188,8 +188,12 @@ class Settings:
     @classmethod
     def from_env(cls) -> "Settings":
         try:
-            from dotenv import load_dotenv
-            load_dotenv()
+            from dotenv import find_dotenv, load_dotenv
+            dotenv_path = find_dotenv(usecwd=True)
+            if dotenv_path:
+                load_dotenv(dotenv_path)
+            else:
+                load_dotenv()
         except ImportError:
             pass
 

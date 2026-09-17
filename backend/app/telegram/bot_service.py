@@ -126,6 +126,10 @@ class TelegramBotService:
 
     async def start(self) -> None:
         """Start the bot polling loop and register commands."""
+        if getattr(self.settings, "use_fake_telegram", False):
+            log.info("TelegramBotService: running in virtual/mock mode; real Telegram Bot polling disabled.")
+            return
+
         if not self.bot_token:
             log.info("TelegramBotService: TELEGRAM_BOT_TOKEN is empty; bot will not poll.")
             return
@@ -295,6 +299,7 @@ class TelegramBotService:
     async def _poll_loop(self) -> None:
         """Long-polling for bot events."""
         offset = 0
+        conflict_count = 0
         while self._running:
             try:
                 if not self._client:
@@ -307,17 +312,26 @@ class TelegramBotService:
                     timeout=30.0,
                 )
                 if resp.status_code == 409:
-                    log.warning("getUpdates 409 Conflict: webhook is active, clearing webhook...")
-                    try:
-                        await self._client.post(
-                            f"{self.api_base}/deleteWebhook",
-                            json={"drop_pending_updates": False},
+                    conflict_count += 1
+                    if conflict_count <= 2:
+                        log.warning("getUpdates 409 Conflict: webhook or another instance active, clearing webhook...")
+                        try:
+                            await self._client.post(
+                                f"{self.api_base}/deleteWebhook",
+                                json={"drop_pending_updates": False},
+                            )
+                        except Exception:
+                            pass
+                        await asyncio.sleep(3)
+                    else:
+                        log.warning(
+                            "getUpdates 409 Conflict persists (another bot instance is actively polling). "
+                            "Backing off polling for 45s to avoid spamming Telegram..."
                         )
-                    except Exception:
-                        pass
-                    await asyncio.sleep(2)
+                        await asyncio.sleep(45)
                     continue
 
+                conflict_count = 0
                 if resp.status_code != 200:
                     await asyncio.sleep(3)
                     continue
