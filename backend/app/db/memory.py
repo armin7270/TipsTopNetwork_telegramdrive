@@ -1200,6 +1200,10 @@ class InMemoryRepository:
         date_shamsi: str | None = None,
         is_daily: bool = False,
         color: str | None = None,
+        is_pinned: bool = False,
+        checklist: list[dict[str, Any]] | None = None,
+        tags: list[str] | None = None,
+        reminder_at: str | None = None,
     ) -> dict[str, Any]:
         note_id = new_id()
         when = utcnow()
@@ -1211,6 +1215,10 @@ class InMemoryRepository:
             "date_shamsi": date_shamsi,
             "is_daily": is_daily,
             "color": color or "#38bdf8",
+            "is_pinned": bool(is_pinned),
+            "checklist": checklist or [],
+            "tags": tags or [],
+            "reminder_at": reminder_at,
             "created_at": when,
             "updated_at": when,
         }
@@ -1241,7 +1249,8 @@ class InMemoryRepository:
             if is_daily is not None and n.get("is_daily") != is_daily:
                 continue
             results.append(dict(n))
-        results.sort(key=lambda x: str(x.get("updated_at") or ""), reverse=True)
+        # Pinned notes first, then latest updated
+        results.sort(key=lambda x: (1 if x.get("is_pinned") else 0, str(x.get("updated_at") or "")), reverse=True)
         return results
 
     async def update_note(
@@ -1253,6 +1262,10 @@ class InMemoryRepository:
         content: str | None = None,
         date_shamsi: str | None = None,
         color: str | None = None,
+        is_pinned: bool | None = None,
+        checklist: list[dict[str, Any]] | None = None,
+        tags: list[str] | None = None,
+        reminder_at: str | None = None,
     ) -> dict[str, Any] | None:
         item = self.notes.get(note_id)
         if not item or str(item.get("owner_id")) != str(owner_id):
@@ -1265,6 +1278,14 @@ class InMemoryRepository:
             item["date_shamsi"] = date_shamsi
         if color is not None:
             item["color"] = color
+        if is_pinned is not None:
+            item["is_pinned"] = bool(is_pinned)
+        if checklist is not None:
+            item["checklist"] = checklist
+        if tags is not None:
+            item["tags"] = tags
+        if reminder_at is not None:
+            item["reminder_at"] = reminder_at
         item["updated_at"] = utcnow()
         self._save_state()
         return dict(item)

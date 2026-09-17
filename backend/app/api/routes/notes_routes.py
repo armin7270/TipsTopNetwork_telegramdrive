@@ -17,14 +17,22 @@ class NoteCreateRequest(BaseModel):
     content: str = Field(default="")
     date_shamsi: str | None = Field(default=None, max_length=20)
     is_daily: bool = Field(default=False)
-    color: str | None = Field(default="#38bdf8", max_length=30)
+    color: str | None = Field(default="#38bdf8", max_length=50)
+    is_pinned: bool = Field(default=False)
+    checklist: list[dict[str, Any]] | None = Field(default=None)
+    tags: list[str] | None = Field(default=None)
+    reminder_at: str | None = Field(default=None, max_length=50)
 
 
 class NoteUpdateRequest(BaseModel):
     title: str | None = Field(default=None, max_length=255)
     content: str | None = Field(default=None)
     date_shamsi: str | None = Field(default=None, max_length=20)
-    color: str | None = Field(default=None, max_length=30)
+    color: str | None = Field(default=None, max_length=50)
+    is_pinned: bool | None = Field(default=None)
+    checklist: list[dict[str, Any]] | None = Field(default=None)
+    tags: list[str] | None = Field(default=None)
+    reminder_at: str | None = Field(default=None, max_length=50)
 
 
 @router.get("", summary="List notes")
@@ -56,6 +64,10 @@ async def create_note(
         date_shamsi=payload.date_shamsi,
         is_daily=payload.is_daily,
         color=payload.color,
+        is_pinned=payload.is_pinned,
+        checklist=payload.checklist,
+        tags=payload.tags,
+        reminder_at=payload.reminder_at,
     )
 
 
@@ -87,6 +99,10 @@ async def update_note(
         content=payload.content,
         date_shamsi=payload.date_shamsi,
         color=payload.color,
+        is_pinned=payload.is_pinned,
+        checklist=payload.checklist,
+        tags=payload.tags,
+        reminder_at=payload.reminder_at,
     )
     if not updated:
         raise HTTPException(status_code=404, detail="یادداشت یافت نشد")

@@ -71,9 +71,9 @@
       --radius-lg: 26px;
       --radius-full: 9999px;
       
-      /* Persian First-Class Typography with Handwritten / Calligraphic options */
-      --font-family: 'Sahel', 'Shabnam', 'Vazirmatn', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      --font-handwriting: 'Sahel', 'Aref Ruqaa Ink', 'Lateef', 'Vazirmatn', cursive, sans-serif;
+      /* Persian First-Class Modern Typography (Vazirmatn) */
+      --font-family: 'Vazirmatn', 'Shabnam', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-handwriting: 'Vazirmatn', 'Shabnam', sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
 
       /* Layout Defaults */
@@ -1305,43 +1305,103 @@
     }
 
     /* ==========================================================================
-       9. PERSIAN CALENDAR, NOTES & REMINDERS STYLING
+       9. PERSIAN CALENDAR & GOOGLE KEEP STUDIO STYLING
        ========================================================================== */
-    .calendar-dashboard {
-      display: grid;
-      grid-template-columns: 1.1fr 1fr;
-      gap: 20px;
-      width: 100%;
+    .calendar-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 22px;
+      margin-bottom: 22px;
+      gap: 16px;
+      flex-wrap: wrap;
+      border-radius: var(--radius-md);
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow-sm);
     }
 
-    @media (max-width: 960px) {
+    .cal-today-badge {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .cal-today-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cal-today-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .cal-top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .calendar-dashboard {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 24px;
+      width: 100%;
+      align-items: start;
+      direction: rtl;
+    }
+
+    @media (max-width: 1080px) {
       .calendar-dashboard {
         grid-template-columns: 1fr;
       }
     }
 
-    .calendar-card {
-      padding: 22px;
+    /* Sidebar Column */
+    .cal-sidebar-col {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 18px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .card-mini-header {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Persian Calendar Card */
+    .calendar-card {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      border-radius: var(--radius-md);
     }
 
     .calendar-header-nav {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+      gap: 10px;
     }
 
     .calendar-month-title {
-      font-size: 1.25rem;
+      font-size: 1.18rem;
       font-weight: 800;
       color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
     .calendar-nav-buttons {
@@ -1353,8 +1413,9 @@
     .calendar-grid-table {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 8px;
+      gap: 6px;
       width: 100%;
+      direction: rtl;
     }
 
     .calendar-weekday-cell {
@@ -1362,11 +1423,11 @@
       font-size: 0.82rem;
       font-weight: 700;
       color: var(--text-secondary);
-      padding: 8px 0;
+      padding: 6px 0;
     }
 
     .calendar-weekday-cell.friday-head {
-      color: #f87171;
+      color: #f43f5e;
     }
 
     .calendar-day-box {
@@ -1380,17 +1441,19 @@
       justify-content: center;
       cursor: pointer;
       position: relative;
-      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
       user-select: none;
       font-weight: 700;
-      font-size: 1rem;
-      padding: 4px;
+      font-size: 0.95rem;
+      padding: 2px;
+      color: var(--text-main);
     }
 
     .calendar-day-box:hover {
       background: var(--glass-card-hover);
       border-color: var(--glass-border-light);
-      transform: translateY(-2px) scale(1.04);
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     }
 
     .calendar-day-box.empty {
@@ -1402,18 +1465,18 @@
     .calendar-day-box.today {
       background: var(--grad-primary);
       color: #ffffff !important;
-      border-color: rgba(255, 255, 255, 0.5);
+      border-color: rgba(255, 255, 255, 0.6);
       box-shadow: 0 4px 18px rgba(0, 198, 255, 0.5);
     }
 
     .calendar-day-box.selected:not(.today) {
       border: 2px solid var(--accent-cyan);
       background: rgba(0, 198, 255, 0.18);
-      box-shadow: 0 0 16px rgba(0, 198, 255, 0.35);
+      box-shadow: 0 0 14px rgba(0, 198, 255, 0.4);
     }
 
     .calendar-day-box.friday:not(.today) {
-      color: #fca5a5;
+      color: #fb7185;
     }
 
     .calendar-dots-bar {
@@ -1421,8 +1484,8 @@
       align-items: center;
       justify-content: center;
       gap: 3px;
-      margin-top: 3px;
-      height: 6px;
+      margin-top: 2px;
+      height: 5px;
     }
 
     .cal-dot {
@@ -1435,135 +1498,43 @@
     .cal-dot-task { background: #fbbf24; box-shadow: 0 0 4px #fbbf24; }
     .cal-dot-occasion { background: #f472b6; box-shadow: 0 0 4px #f472b6; }
 
-    /* Daily Note Card */
-    .daily-note-box {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .daily-note-title-input {
-      font-size: 1.05rem;
-      font-weight: 700;
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-      padding: 10px 14px;
-      color: var(--text-main);
-      outline: none;
-    }
-
-    .daily-note-title-input:focus {
-      border-color: var(--accent-cyan);
-    }
-
-    .daily-note-textarea {
-      width: 100%;
-      min-height: 140px;
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-      padding: 12px 14px;
-      color: var(--text-main);
-      font-size: 0.95rem;
-      line-height: 1.6;
-      resize: vertical;
-      outline: none;
-    }
-
-    .daily-note-textarea:focus {
-      border-color: var(--accent-cyan);
-    }
-
-    /* Tasks and Reminders Box */
-    .reminders-box {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .filter-tabs-pill {
-      display: flex;
-      gap: 6px;
-      background: rgba(0, 0, 0, 0.2);
-      padding: 4px;
-      border-radius: var(--radius-sm);
-      overflow-x: auto;
-    }
-
-    .filter-tab-btn {
-      padding: 6px 12px;
-      border-radius: 8px;
-      border: none;
-      background: transparent;
-      color: var(--text-secondary);
-      font-weight: 600;
-      font-size: 0.8rem;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.2s;
-    }
-
-    .filter-tab-btn.active {
-      background: var(--glass-surface);
-      color: var(--text-main);
-      border: 1px solid var(--glass-border-light);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .reminder-card-item {
-      padding: 14px 16px;
-      border-radius: var(--radius-sm);
-      background: var(--glass-card);
-      border: 1px solid var(--glass-border);
+    .calendar-legend {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      gap: 14px;
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .calendar-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Quick Timers Card */
+    .quick-timers-card {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
       gap: 12px;
-      transition: all 0.25s;
+      border-radius: var(--radius-md);
     }
-
-    .reminder-card-item:hover {
-      background: var(--glass-card-hover);
-      border-color: var(--glass-border-light);
-      transform: translateY(-2px);
-    }
-
-    .reminder-card-item.completed {
-      opacity: 0.55;
-      background: rgba(0, 0, 0, 0.15);
-    }
-
-    .reminder-card-item.completed .reminder-title-text {
-      text-decoration: line-through;
-    }
-
-    .reminder-type-tag {
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: var(--radius-full);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      white-space: nowrap;
-    }
-
-    .tag-task { background: rgba(0, 198, 255, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); }
-    .tag-occasion { background: rgba(236, 72, 153, 0.15); color: #f472b6; border-color: rgba(244, 114, 182, 0.4); }
-    .tag-timer { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(251, 191, 36, 0.4); }
 
     .quick-timer-chips {
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
       align-items: center;
-      margin-bottom: 6px;
     }
 
     .timer-chip-btn {
-      padding: 5px 10px;
+      padding: 6px 11px;
       border-radius: var(--radius-full);
-      background: rgba(255, 255, 255, 0.07);
+      background: rgba(255, 255, 255, 0.06);
       border: 1px solid var(--glass-border);
       color: var(--text-main);
       font-size: 0.76rem;
@@ -1579,17 +1550,614 @@
       transform: translateY(-1px);
     }
 
-    .tg-sync-banner {
-      padding: 12px 16px;
+    .active-timers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+
+    .timer-running-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
       border-radius: var(--radius-sm);
-      background: rgba(0, 198, 255, 0.08);
-      border: 1px solid rgba(0, 198, 255, 0.25);
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      font-size: 0.8rem;
+    }
+
+    /* Selected Day Box */
+    .selected-day-box {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border-radius: var(--radius-md);
+    }
+
+    .daily-note-title-input {
+      font-size: 0.95rem;
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      color: var(--text-main);
+      outline: none;
+      width: 100%;
+    }
+
+    .daily-note-title-input:focus {
+      border-color: var(--accent-cyan);
+    }
+
+    .daily-note-textarea {
+      width: 100%;
+      min-height: 100px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      color: var(--text-main);
+      font-size: 0.88rem;
+      line-height: 1.6;
+      resize: vertical;
+      outline: none;
+    }
+
+    .daily-note-textarea:focus {
+      border-color: var(--accent-cyan);
+    }
+
+    /* ==========================================================================
+       GOOGLE KEEP STUDIO STYLING
+       ========================================================================== */
+    .keep-studio-col {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    /* Google Keep Color Schemes */
+    .keep-color-default { --card-bg: var(--glass-surface); --card-border: var(--glass-border); --card-text: var(--text-main); --card-muted: var(--text-muted); }
+    .keep-color-coral   { --card-bg: rgba(120, 28, 40, 0.65); --card-border: rgba(242, 139, 130, 0.4); --card-text: #ffe4e6; --card-muted: #fecdd3; }
+    .keep-color-peach   { --card-bg: rgba(124, 60, 16, 0.65); --card-border: rgba(251, 188, 4, 0.4); --card-text: #fef3c7; --card-muted: #fde68a; }
+    .keep-color-sand    { --card-bg: rgba(115, 95, 12, 0.65); --card-border: rgba(255, 244, 117, 0.4); --card-text: #fef9c3; --card-muted: #fef08a; }
+    .keep-color-mint    { --card-bg: rgba(22, 85, 48, 0.65); --card-border: rgba(204, 255, 144, 0.4); --card-text: #dcfce7; --card-muted: #bbf7d0; }
+    .keep-color-teal    { --card-bg: rgba(15, 80, 75, 0.65); --card-border: rgba(167, 255, 235, 0.4); --card-text: #ccfbf1; --card-muted: #99f6e4; }
+    .keep-color-fog     { --card-bg: rgba(30, 64, 135, 0.65); --card-border: rgba(203, 240, 248, 0.4); --card-text: #dbeafe; --card-muted: #bfdbfe; }
+    .keep-color-storm   { --card-bg: rgba(78, 30, 125, 0.65); --card-border: rgba(215, 174, 251, 0.4); --card-text: #f3e8ff; --card-muted: #e9d5ff; }
+    .keep-color-blossom { --card-bg: rgba(130, 24, 65, 0.65); --card-border: rgba(253, 207, 232, 0.4); --card-text: #fce7f3; --card-muted: #fbcfe8; }
+    .keep-color-clay    { --card-bg: rgba(75, 52, 28, 0.65); --card-border: rgba(230, 201, 168, 0.4); --card-text: #f5ebe0; --card-muted: #e7d8c9; }
+
+    body.light-theme .keep-color-default { --card-bg: var(--glass-surface); --card-border: var(--glass-border); --card-text: var(--text-main); --card-muted: var(--text-muted); }
+    body.light-theme .keep-color-coral   { --card-bg: #f28b82; --card-border: #ea746a; --card-text: #202124; --card-muted: #3c4043; }
+    body.light-theme .keep-color-peach   { --card-bg: #fbbc04; --card-border: #f2a600; --card-text: #202124; --card-muted: #3c4043; }
+    body.light-theme .keep-color-sand    { --card-bg: #fff475; --card-border: #f0e350; --card-text: #202124; --card-muted: #3c4043; }
+    body.light-theme .keep-color-mint    { --card-bg: #ccff90; --card-border: #aef062; --card-text: #202124; --card-muted: #3c4043; }
+    body.light-theme .keep-color-teal    { --card-bg: #a7ffeb; --card-border: #7bf5da; --card-text: #202124; --card-muted: #3c4043; }
+    body.light-theme .keep-color-fog     { --card-bg: #cbf0f8; --card-border: #a4e4f2; --card-text: #202124; --card-muted: #3c4043; }
+    body.light-theme .keep-color-storm   { --card-bg: #d7aefb; --card-border: #c392f5; --card-text: #202124; --card-muted: #3c4043; }
+    body.light-theme .keep-color-blossom { --card-bg: #fdcfe8; --card-border: #f8a8d4; --card-text: #202124; --card-muted: #3c4043; }
+    body.light-theme .keep-color-clay    { --card-bg: #e6c9a8; --card-border: #d4b18c; --card-text: #202124; --card-muted: #3c4043; }
+
+    /* Google Keep Composer (Take a Note) */
+    .keep-composer-box {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+      border-radius: var(--radius-md);
+      transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .keep-composer-collapsed {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      cursor: text;
+      border-radius: var(--radius-md);
+    }
+
+    .keep-composer-placeholder {
+      font-size: 0.96rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      user-select: none;
+    }
+
+    .keep-composer-quick-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .keep-icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.05rem;
+      transition: all 0.2s;
+    }
+
+    .keep-icon-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--text-main);
+      transform: scale(1.08);
+    }
+
+    .keep-composer-expanded {
+      padding: 16px 20px 12px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .keep-composer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .keep-title-input {
+      font-size: 1.15rem;
+      font-weight: 700;
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      outline: none;
+      width: 100%;
+      padding: 4px 0;
+    }
+
+    .keep-title-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .keep-pin-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      opacity: 0.45;
+      transition: all 0.2s;
+      padding: 4px;
+    }
+
+    .keep-pin-btn:hover,
+    .keep-pin-btn.active {
+      opacity: 1;
+      transform: rotate(-25deg) scale(1.15);
+    }
+
+    .keep-content-textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--text-main);
+      resize: vertical;
+      min-height: 75px;
+    }
+
+    .keep-content-textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    .keep-checklist-items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 240px;
+      overflow-y: auto;
+      padding-inline-end: 4px;
+    }
+
+    .keep-checklist-row {
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 0.8rem;
-      color: #bae6fd;
-      line-height: 1.5;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+    }
+
+    .keep-checkbox {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent-cyan);
+      cursor: pointer;
+    }
+
+    .keep-checklist-row-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      outline: none;
+      font-size: 0.92rem;
+    }
+
+    .keep-checklist-row-input.done {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .keep-checklist-del-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.85rem;
+      padding: 2px 6px;
+    }
+
+    .keep-checklist-del-btn:hover {
+      color: #f87171;
+    }
+
+    .keep-checklist-add-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 10px;
+      color: var(--text-muted);
+      border-top: 1px dashed var(--glass-border);
+      margin-top: 4px;
+    }
+
+    .keep-checklist-add-row input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .keep-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .keep-card-badges {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .keep-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: var(--radius-full);
+      font-size: 0.72rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+    }
+
+    .keep-composer-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 8px;
+      border-top: 1px solid var(--glass-border);
+      position: relative;
+    }
+
+    .keep-tools-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+    }
+
+    .keep-palette-wrapper {
+      position: relative;
+    }
+
+    .keep-palette-dropdown {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      right: 0;
+      background: var(--glass-surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border-light);
+      border-radius: var(--radius-md);
+      padding: 8px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      z-index: 100;
+      box-shadow: var(--glass-shadow);
+      width: 170px;
+    }
+
+    .keep-color-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.18s;
+      background-color: var(--card-bg);
+      border-color: var(--card-border);
+    }
+
+    .keep-color-circle:hover {
+      transform: scale(1.22);
+    }
+
+    .keep-color-circle.selected {
+      border-color: #fff;
+      box-shadow: 0 0 6px #fff;
+    }
+
+    .keep-dropdown-menu {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      right: 0;
+      background: var(--glass-surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border-light);
+      border-radius: var(--radius-sm);
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      z-index: 100;
+      box-shadow: var(--glass-shadow);
+      min-width: 180px;
+    }
+
+    .keep-menu-item {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      color: var(--text-main);
+      transition: all 0.18s;
+    }
+
+    .keep-menu-item:hover {
+      background: var(--glass-card-hover);
+    }
+
+    /* Keep Filter & Search Bar */
+    .keep-filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      flex-wrap: wrap;
+    }
+
+    .keep-search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.18);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-full);
+      padding: 6px 14px;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .keep-search-box input {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      outline: none;
+      font-size: 0.88rem;
+      width: 100%;
+    }
+
+    .keep-filter-chips {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 2px 0;
+    }
+
+    .keep-chip {
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--glass-border);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .keep-chip:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+    }
+
+    .keep-chip.active {
+      background: var(--grad-primary);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 2px 10px rgba(0, 198, 255, 0.35);
+    }
+
+    .keep-view-toggle {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Keep Cards Section */
+    .keep-section-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .keep-count-badge {
+      font-size: 0.72rem;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+    }
+
+    .keep-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      width: 100%;
+    }
+
+    .keep-cards-grid.list-view {
+      display: flex;
+      flex-direction: column;
+      max-width: 720px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Google Keep Note Card */
+    .keep-card {
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--card-text);
+      box-shadow: var(--glass-shadow-sm);
+      position: relative;
+      user-select: none;
+    }
+
+    .keep-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px -6px rgba(0, 0, 0, 0.45);
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    .keep-card-top-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .keep-card-title {
+      font-weight: 800;
+      font-size: 1rem;
+      line-height: 1.45;
+      color: var(--card-text);
+      flex: 1;
+      word-break: break-word;
+    }
+
+    .keep-card-pin {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      opacity: 0.35;
+      transition: all 0.2s;
+      padding: 2px;
+    }
+
+    .keep-card:hover .keep-card-pin,
+    .keep-card-pin.active {
+      opacity: 1;
+    }
+
+    .keep-card-body {
+      font-size: 0.91rem;
+      line-height: 1.6;
+      color: var(--card-text);
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .keep-card-checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .keep-card-check-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+    }
+
+    .keep-card-check-item.done {
+      text-decoration: line-through;
+      opacity: 0.55;
+    }
+
+    .keep-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: auto;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      opacity: 0.85;
+      transition: opacity 0.2s;
+    }
+
+    .keep-card:hover .keep-card-footer {
+      opacity: 1;
+    }
+
+    .keep-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      position: relative;
     }
   </style>
 </head>
@@ -1826,27 +2394,46 @@
 
         <!-- Calendar & Notes Dashboard (shown when currentView === 'calendar') -->
         <div id="calendar-notes-view" style="display: none; width: 100%;">
+          <!-- Top Header Bar -->
+          <div class="calendar-top-bar glass-panel">
+            <div class="cal-today-badge">
+              <span class="glass-icon-badge glow-cyan" style="width: 44px; height: 44px; font-size: 1.3rem;">📅</span>
+              <div>
+                <div class="cal-today-title" id="cal-today-header-text">تقویم و یادداشت‌های شمسی</div>
+                <div class="cal-today-sub" id="cal-today-sub-text">یادداشت‌های سبک Google Keep، چک‌لیست‌ها و تایمرهای همگام با تلگرام</div>
+              </div>
+            </div>
+            <div class="cal-top-actions">
+              <button class="btn-glass btn-glass-primary" onclick="focusGoogleKeepComposer()">
+                <span>➕</span> <span>یادداشت جدید</span>
+              </button>
+              <button class="btn-glass" onclick="openQuickTaskDialog()">
+                <span>⚡</span> <span>وظیفه یا مناسبت</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Main 2-Column Dashboard -->
           <div class="calendar-dashboard">
 
-            <!-- LEFT COLUMN: Persian Calendar & Selected Day Daily Note -->
-            <div style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- SIDEBAR PANEL (تقویم شمسی، تایمرها، یادداشت روز) -->
+            <div class="cal-sidebar-col">
 
-              <!-- Persian Calendar Glass Card -->
+              <!-- 1. Persian Calendar Glass Card -->
               <div class="glass-panel calendar-card">
                 <div class="calendar-header-nav">
                   <div class="calendar-month-title">
-                    <span class="glass-icon-badge glow-emerald" style="width: 38px; height: 38px; font-size: 1.15rem;">📅</span>
-                    <span id="cal-month-name-year" class="handwriting-font">شهریور ۱۴۰۵</span>
+                    <span id="cal-month-name-year">شهریور ۱۴۰۵</span>
                   </div>
                   <div class="calendar-nav-buttons">
-                    <button class="btn-glass" onclick="goToTodayCalendar()" style="padding: 6px 12px; font-size: 0.8rem;">امروز</button>
+                    <button class="btn-glass" onclick="goToTodayCalendar()" style="padding: 4px 10px; font-size: 0.78rem;">امروز</button>
                     <button class="node-btn-icon" onclick="changeCalendarMonth(-1)" title="ماه قبل">❮</button>
                     <button class="node-btn-icon" onclick="changeCalendarMonth(1)" title="ماه بعد">❯</button>
                   </div>
                 </div>
 
-                <!-- Calendar Weekdays Header -->
-                <div class="calendar-grid-table" style="gap: 4px; margin-bottom: -6px;">
+                <!-- Calendar Weekdays Header (ش تا ج) -->
+                <div class="calendar-grid-table">
                   <div class="calendar-weekday-cell">ش</div>
                   <div class="calendar-weekday-cell">ی</div>
                   <div class="calendar-weekday-cell">د</div>
@@ -1861,97 +2448,212 @@
                   <!-- Dynamically rendered -->
                 </div>
 
-                <!-- Legend / Status Hint -->
-                <div style="display: flex; align-items: center; justify-content: center; gap: 16px; font-size: 0.76rem; color: var(--text-muted); margin-top: 6px; flex-wrap: wrap;">
-                  <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="cal-dot cal-dot-note"></span> یادداشت روزانه</span>
-                  <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="cal-dot cal-dot-task"></span> وظیفه / کار</span>
-                  <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="cal-dot cal-dot-occasion"></span> مناسبت خاص</span>
+                <!-- Legend -->
+                <div class="calendar-legend">
+                  <span><span class="cal-dot cal-dot-note"></span> یادداشت</span>
+                  <span><span class="cal-dot cal-dot-task"></span> وظیفه</span>
+                  <span><span class="cal-dot cal-dot-occasion"></span> مناسبت</span>
                 </div>
               </div>
 
-              <!-- Daily Note Editor for Selected Day -->
-              <div class="glass-panel daily-note-box">
-                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <span class="glass-icon-badge glow-cyan" style="width: 32px; height: 32px; font-size: 1rem;">📝</span>
-                    <span id="daily-note-selected-date-text" style="font-weight: 700; font-size: 0.95rem;">یادداشت روز: امروز</span>
-                  </div>
-                  <div style="display: flex; gap: 6px;">
-                    <button class="node-btn-icon" id="btn-delete-daily-note" style="display: none; color: #f87171;" onclick="deleteCurrentDailyNote()" title="حذف یادداشت روز">🗑️</button>
-                    <button class="btn-glass btn-glass-primary" style="padding: 6px 14px; font-size: 0.82rem;" onclick="saveCurrentDailyNote()" id="btn-save-daily-note">
-                      <span>💾</span>
-                      <span>ذخیره یادداشت</span>
-                    </button>
-                  </div>
+              <!-- 2. Quick Timers Card -->
+              <div class="glass-panel quick-timers-card">
+                <div class="card-mini-header">
+                  <span>⏱️</span> <span>تایمرهای فوری شمارش معکوس</span>
                 </div>
-
-                <input type="text" id="daily-note-title" class="daily-note-title-input" placeholder="عنوان یادداشت روزانه..." />
-                <textarea id="daily-note-content" class="daily-note-textarea" placeholder="یادداشت‌های این روز، نکات، چک‌لیست و برنامه‌ها..."></textarea>
-                <div id="daily-note-status-hint" style="font-size: 0.75rem; color: var(--text-muted); text-align: left; direction: ltr;">Ready</div>
-              </div>
-
-            </div>
-
-            <!-- RIGHT COLUMN: Tasks, Occasions, Timers & General Notes -->
-            <div style="display: flex; flex-direction: column; gap: 20px;">
-
-              <!-- Telegram Bot Sync Info Card -->
-              <div class="tg-sync-banner">
-                <span style="font-size: 1.4rem;">🤖</span>
-                <div>
-                  <strong>همگام‌سازی بلادرنگ با ربات تلگرام:</strong>
-                  تمام یادداشت‌ها و وظایف این بخش هم در وب و هم در ربات تلگرام در دسترستان است. در زمان تعیین‌شده، ربات تلگرام زنگ هشدار ارسال می‌کند!
-                </div>
-              </div>
-
-              <!-- Quick Task / Reminder Form Card -->
-              <div class="glass-panel" style="padding: 18px; display: flex; flex-direction: column; gap: 12px;">
-                <div style="font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
-                  <span>⚡</span> <span>ثبت سریع وظیفه یا رویداد</span>
-                </div>
-
-                <!-- Quick Timer Chips -->
                 <div class="quick-timer-chips">
-                  <span style="font-size: 0.75rem; color: var(--text-muted);">تایمرهای فوری:</span>
                   <button class="timer-chip-btn" onclick="createQuickTimer(5, 'تایمر ۵ دقیقه‌ای')">⏱️ ۵ دقیقه</button>
                   <button class="timer-chip-btn" onclick="createQuickTimer(10, 'تایمر ۱۰ دقیقه‌ای')">⏱️ ۱۰ دقیقه</button>
-                  <button class="timer-chip-btn" onclick="createQuickTimer(15, 'استراحت ۱۵ دقیقه‌ای')">⏱️ ۱۵ دقیقه</button>
-                  <button class="timer-chip-btn" onclick="createQuickTimer(30, 'جلسه ۳۰ دقیقه‌ای')">⏱️ ۳۰ دقیقه</button>
-                  <button class="timer-chip-btn" onclick="createQuickTimer(60, 'تمرکز عمیق ۱ ساعته')">⏱️ ۱ ساعت</button>
+                  <button class="timer-chip-btn" onclick="createQuickTimer(15, 'استراحت ۱۵ دقیقه')">⏱️ ۱۵ دقیقه</button>
+                  <button class="timer-chip-btn" onclick="createQuickTimer(30, 'جلسه ۳۰ دقیقه')">⏱️ ۳۰ دقیقه</button>
+                  <button class="timer-chip-btn" onclick="createQuickTimer(60, 'تمرکز ۱ ساعت')">⏱️ ۱ ساعت</button>
                 </div>
+                <div id="active-timers-container" class="active-timers-list"></div>
+              </div>
 
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                  <input type="text" id="quick-task-title" class="form-input" placeholder="عنوان وظیفه، رویداد یا مناسبت..." style="flex: 2; min-width: 200px;" />
-                  <select id="quick-task-type" class="form-input" style="flex: 1; min-width: 110px;">
-                    <option value="task">📋 وظیفه</option>
-                    <option value="occasion">🎉 مناسبت خاص</option>
-                    <option value="timer">⏱️ تایمر</option>
-                  </select>
-                  <input type="time" id="quick-task-time" class="form-input" value="10:00" style="flex: 0.8; min-width: 90px;" />
-                  <button class="btn-glass btn-glass-primary" onclick="submitQuickTask()" style="padding: 10px 18px;">
-                    <span>➕</span>
-                    <span>ثبت</span>
+              <!-- 3. Selected Day Note & Events -->
+              <div class="glass-panel selected-day-box">
+                <div class="card-mini-header" style="justify-content: space-between;">
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <span>📝</span>
+                    <span id="daily-note-selected-date-text">یادداشت روز: امروز</span>
+                  </div>
+                  <button class="node-btn-icon" id="btn-delete-daily-note" style="display: none; color: #f87171;" onclick="deleteCurrentDailyNote()" title="حذف یادداشت روز">🗑️</button>
+                </div>
+                <input type="text" id="daily-note-title" class="daily-note-title-input" placeholder="عنوان یادداشت روزانه..." />
+                <textarea id="daily-note-content" class="daily-note-textarea" placeholder="نکات، برنامه و چک‌لیست این روز..."></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                  <span id="daily-note-status-hint" style="font-size: 0.72rem; color: var(--text-muted);">آماده</span>
+                  <button class="btn-glass btn-glass-primary" onclick="saveCurrentDailyNote()" id="btn-save-daily-note" style="padding: 6px 14px; font-size: 0.8rem;">
+                    <span>💾</span> <span>ذخیره</span>
                   </button>
                 </div>
               </div>
 
-              <!-- Reminders and Tasks List Box -->
-              <div class="glass-panel reminders-box" style="padding: 18px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
-                  <div class="filter-tabs-pill">
-                    <button class="filter-tab-btn active" id="filter-all" onclick="setRemindersFilter('all')">همه</button>
-                    <button class="filter-tab-btn" id="filter-task" onclick="setRemindersFilter('task')">📋 وظایف</button>
-                    <button class="filter-tab-btn" id="filter-occasion" onclick="setRemindersFilter('occasion')">🎉 مناسبت‌ها</button>
-                    <button class="filter-tab-btn" id="filter-timer" onclick="setRemindersFilter('timer')">⏱️ تایمرها</button>
-                    <button class="filter-tab-btn" id="filter-notes" onclick="setRemindersFilter('notes')">📝 یادداشت‌های متفرقه</button>
+              <!-- Telegram Sync Hint -->
+              <div class="tg-sync-banner">
+                <span style="font-size: 1.3rem;">🤖</span>
+                <div style="font-size: 0.76rem; line-height: 1.4;">
+                  تمام یادداشت‌ها و وظایف این بخش به صورت زنده با ربات تلگرام همگام هستند و در زمان سررسید آلارم می‌زنند!
+                </div>
+              </div>
+
+            </div>
+
+            <!-- MAIN GOOGLE KEEP STUDIO (یادداشت‌های سبک گوگل کیپ) -->
+            <div class="keep-studio-col">
+
+              <!-- Google Keep "Take a Note..." Composer Box -->
+              <div class="keep-composer-box glass-panel keep-color-default" id="keep-composer-container">
+                
+                <!-- Collapsed State -->
+                <div class="keep-composer-collapsed" id="keep-composer-collapsed" onclick="expandKeepComposer(false)">
+                  <span class="keep-composer-placeholder">یک یادداشت بنویسید...</span>
+                  <div class="keep-composer-quick-actions">
+                    <button class="keep-icon-btn" onclick="event.stopPropagation(); expandKeepComposer(true);" title="چک‌لیست جدید">☑️</button>
+                    <button class="keep-icon-btn" onclick="event.stopPropagation(); expandKeepComposer(false); toggleKeepPalette(event);" title="رنگ یادداشت">🎨</button>
+                    <button class="keep-icon-btn" onclick="event.stopPropagation(); expandKeepComposer(false); openQuickTaskDialog();" title="ثبت سریع وظیفه">⚡</button>
                   </div>
-                  <span id="reminders-count-badge" class="liquid-badge" style="background: rgba(255,255,255,0.08); font-size: 0.72rem;">0 مورد</span>
                 </div>
 
-                <!-- Reminders List Container -->
-                <div id="reminders-list-container" style="display: flex; flex-direction: column; gap: 10px; max-height: 480px; overflow-y: auto; padding-inline-end: 4px;">
-                  <!-- Dynamically populated -->
+                <!-- Expanded State -->
+                <div class="keep-composer-expanded" id="keep-composer-expanded" style="display: none;">
+                  <div class="keep-composer-header">
+                    <input type="text" id="keep-new-title" class="keep-title-input" placeholder="عنوان" />
+                    <button class="keep-pin-btn" id="keep-new-pin-btn" onclick="toggleKeepNewPin()" title="سنجاق کردن به بالا">📌</button>
+                  </div>
+
+                  <!-- Text Note Body -->
+                  <div id="keep-new-text-body">
+                    <textarea id="keep-new-content" class="keep-content-textarea" placeholder="یادداشت خود را بنویسید..."></textarea>
+                  </div>
+
+                  <!-- Checklist Mode Body -->
+                  <div id="keep-new-checklist-body" style="display: none;">
+                    <div id="keep-new-checklist-items" class="keep-checklist-items-list"></div>
+                    <div class="keep-checklist-add-row">
+                      <span>➕</span>
+                      <input type="text" id="keep-new-checklist-input" placeholder="مورد جدید را بنویسید و اینتر بزنید..." onkeydown="handleChecklistEnter(event)" />
+                    </div>
+                  </div>
+
+                  <!-- Tags & Reminder Badges -->
+                  <div id="keep-new-meta-row" class="keep-meta-row">
+                    <div id="keep-new-badges-bar" class="keep-card-badges"></div>
+                  </div>
+
+                  <!-- Composer Footer Toolbar -->
+                  <div class="keep-composer-footer">
+                    <div class="keep-tools-group">
+                      <!-- Mode Toggle: Text vs Checklist -->
+                      <button class="keep-icon-btn" id="keep-new-btn-mode" onclick="toggleKeepMode()" title="تبدیل به چک‌لیست">☑️</button>
+
+                      <!-- Color Palette -->
+                      <div class="keep-palette-wrapper">
+                        <button class="keep-icon-btn" onclick="toggleKeepPalette(event)" title="تغییر رنگ">🎨</button>
+                        <div class="keep-palette-dropdown" id="keep-new-palette-dropdown" style="display: none;">
+                          <button class="keep-color-circle keep-color-default selected" onclick="selectKeepNewColor('default')" title="پیش‌فرض"></button>
+                          <button class="keep-color-circle keep-color-coral" onclick="selectKeepNewColor('coral')" title="مرجانی"></button>
+                          <button class="keep-color-circle keep-color-peach" onclick="selectKeepNewColor('peach')" title="هلویی"></button>
+                          <button class="keep-color-circle keep-color-sand" onclick="selectKeepNewColor('sand')" title="شنی"></button>
+                          <button class="keep-color-circle keep-color-mint" onclick="selectKeepNewColor('mint')" title="نعنایی"></button>
+                          <button class="keep-color-circle keep-color-teal" onclick="selectKeepNewColor('teal')" title="مریم‌گلی"></button>
+                          <button class="keep-color-circle keep-color-fog" onclick="selectKeepNewColor('fog')" title="اقیانوسی"></button>
+                          <button class="keep-color-circle keep-color-storm" onclick="selectKeepNewColor('storm')" title="طوفانی"></button>
+                          <button class="keep-color-circle keep-color-blossom" onclick="selectKeepNewColor('blossom')" title="شکوفه"></button>
+                          <button class="keep-color-circle keep-color-clay" onclick="selectKeepNewColor('clay')" title="خاکی"></button>
+                        </div>
+                      </div>
+
+                      <!-- Quick Reminder Picker -->
+                      <div class="keep-palette-wrapper">
+                        <button class="keep-icon-btn" onclick="toggleKeepReminderMenu(event)" title="تنظیم یادآور">⏰</button>
+                        <div class="keep-dropdown-menu" id="keep-new-reminder-menu" style="display: none;">
+                          <div class="keep-menu-item" onclick="setQuickKeepReminder('امروز عصر (۱۸:۰۰)')">⏰ امروز عصر (۱۸:۰۰)</div>
+                          <div class="keep-menu-item" onclick="setQuickKeepReminder('فردا صبح (۰۹:۰۰)')">⏰ فردا صبح (۰۹:۰۰)</div>
+                          <div class="keep-menu-item" onclick="setQuickKeepReminder('هفته آینده')">⏰ هفته آینده</div>
+                          <div class="keep-menu-item" onclick="setQuickKeepReminder('حذف یادآور')">✕ حذف یادآور</div>
+                        </div>
+                      </div>
+
+                      <!-- Labels / Tags -->
+                      <div class="keep-palette-wrapper">
+                        <button class="keep-icon-btn" onclick="toggleKeepTagsMenu(event)" title="برچسب‌ها">🏷️</button>
+                        <div class="keep-dropdown-menu" id="keep-new-tags-menu" style="display: none;">
+                          <div class="keep-menu-item" onclick="toggleKeepNewTag('کاری')">💼 کاری</div>
+                          <div class="keep-menu-item" onclick="toggleKeepNewTag('شخصی')">👤 شخصی</div>
+                          <div class="keep-menu-item" onclick="toggleKeepNewTag('ایده')">💡 ایده</div>
+                          <div class="keep-menu-item" onclick="toggleKeepNewTag('فوری')">🔥 فوری</div>
+                          <div class="keep-menu-item" onclick="toggleKeepNewTag('خرید')">🛒 خرید</div>
+                        </div>
+                      </div>
+
+                      <!-- Link Date to Selected Calendar Date -->
+                      <button class="keep-icon-btn" onclick="linkKeepNoteToSelectedDate()" id="btn-keep-link-date" title="لینک به تاریخ انتخابی تقویم">📅</button>
+                    </div>
+
+                    <div class="keep-composer-actions">
+                      <button class="btn-glass" onclick="collapseKeepComposer(false)" style="padding: 6px 14px; font-size: 0.82rem;">بستن</button>
+                      <button class="btn-glass btn-glass-primary" onclick="saveNewKeepNote()" style="padding: 6px 18px; font-size: 0.82rem; font-weight: 700;">ذخیره</button>
+                    </div>
+                  </div>
                 </div>
+
+              </div>
+
+              <!-- Google Keep Filter & Search Bar -->
+              <div class="keep-filter-bar glass-panel">
+                <div class="keep-search-box">
+                  <span>🔍</span>
+                  <input type="text" id="keep-search-input" placeholder="جستجو در متن، عنوان و برچسب‌های یادداشت..." oninput="filterKeepNotes()" />
+                </div>
+                <div class="keep-filter-chips">
+                  <button class="keep-chip active" id="chip-filter-all" onclick="setNotesFilter('all')">همه</button>
+                  <button class="keep-chip" id="chip-filter-pinned" onclick="setNotesFilter('pinned')">📌 سنجاق‌شده</button>
+                  <button class="keep-chip" id="chip-filter-checklist" onclick="setNotesFilter('checklist')">☑️ چک‌لیست‌ها</button>
+                  <button class="keep-chip" id="chip-filter-reminder" onclick="setNotesFilter('reminder')">⏰ یادآوردار</button>
+                  <button class="keep-chip" id="chip-filter-tasks" onclick="setNotesFilter('tasks')">📋 وظایف تلگرام</button>
+                </div>
+                <div class="keep-view-toggle">
+                  <button class="node-btn-icon active" id="btn-view-grid" onclick="setNotesViewMode('grid')" title="نمای شبکه‌ای">⊞</button>
+                  <button class="node-btn-icon" id="btn-view-list" onclick="setNotesViewMode('list')" title="نمای لیستی">☰</button>
+                </div>
+              </div>
+
+              <!-- Selected Date Filter Banner (Shown when user clicked a date on the calendar) -->
+              <div id="keep-date-filter-banner" class="glass-panel" style="display: none; padding: 10px 16px; border-radius: var(--radius-sm); align-items: center; justify-content: space-between; background: rgba(0, 198, 255, 0.1); border-color: rgba(0, 198, 255, 0.3);">
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 0.86rem;">
+                  <span>📅</span>
+                  <span>فیلتر تاریخ تقویم: <strong id="keep-date-filter-label"></strong></span>
+                </div>
+                <button class="btn-glass" onclick="clearCalendarDateFilter()" style="padding: 4px 12px; font-size: 0.78rem;">
+                  ✕ نمایش همه تاریخ‌ها
+                </button>
+              </div>
+
+              <!-- Google Keep Pinned Notes Section -->
+              <div id="keep-pinned-section" style="display: none; margin-bottom: 24px;">
+                <div class="keep-section-title">
+                  <span>📌</span> <span>سنجاق‌شده</span>
+                  <span class="keep-count-badge" id="keep-pinned-count">۰</span>
+                </div>
+                <div class="keep-cards-grid" id="keep-pinned-grid"></div>
+              </div>
+
+              <!-- Google Keep Others Section -->
+              <div id="keep-others-section">
+                <div class="keep-section-title" id="keep-others-title" style="display: none;">
+                  <span>سایر یادداشت‌ها</span>
+                  <span class="keep-count-badge" id="keep-others-count">۰</span>
+                </div>
+                <div class="keep-cards-grid" id="keep-others-grid"></div>
+              </div>
+
+              <!-- Empty State -->
+              <div id="keep-empty-state" class="glass-panel" style="display: none; text-align: center; padding: 48px 24px; border-radius: var(--radius-md);">
+                <div style="font-size: 3rem; margin-bottom: 12px;">💡</div>
+                <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 6px;">یادداشتی در این بخش یافت نشد</div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">یک یادداشت جدید یا چک‌لیست ایجاد کنید تا همواره در دسترس شما باشد.</div>
               </div>
 
             </div>
@@ -2102,6 +2804,119 @@
           <button class="modal-close-btn" onclick="closeGenericModal()">✕</button>
         </div>
         <div id="generic-modal-body"></div>
+      </div>
+    </div>
+
+    <!-- Google Keep Edit Note Modal -->
+    <div class="modal-overlay" id="keep-edit-modal">
+      <div class="modal-card keep-edit-card" id="keep-edit-card" style="max-width: 650px; border-radius: var(--radius-md); padding: 20px;">
+        <div class="keep-card-top-row" style="margin-bottom: 12px;">
+          <input type="text" id="keep-edit-title" class="keep-title-input" placeholder="عنوان یادداشت..." style="font-size: 1.25rem;" />
+          <button class="keep-pin-btn" id="keep-edit-pin-btn" onclick="toggleKeepEditPin()" title="سنجاق به بالا">📌</button>
+        </div>
+
+        <!-- Text body -->
+        <div id="keep-edit-text-body">
+          <textarea id="keep-edit-content" class="keep-content-textarea" placeholder="متن یادداشت..." rows="6" style="font-size: 0.96rem;"></textarea>
+        </div>
+
+        <!-- Checklist body -->
+        <div id="keep-edit-checklist-body" style="display: none;">
+          <div id="keep-edit-checklist-items" class="keep-checklist-items-list" style="max-height: 280px;"></div>
+          <div class="keep-checklist-add-row">
+            <span>➕</span>
+            <input type="text" id="keep-edit-checklist-input" placeholder="مورد جدید..." onkeydown="handleEditChecklistEnter(event)" />
+          </div>
+        </div>
+
+        <!-- Badges Bar -->
+        <div class="keep-meta-row" style="margin-top: 10px;">
+          <div id="keep-edit-badges-bar" class="keep-card-badges"></div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="keep-composer-footer" style="margin-top: 16px;">
+          <div class="keep-tools-group">
+            <button class="keep-icon-btn" id="keep-edit-btn-mode" onclick="toggleKeepEditMode()" title="تغییر به چک‌لیست / متن">☑️</button>
+            <div class="keep-palette-wrapper">
+              <button class="keep-icon-btn" onclick="toggleKeepEditPalette(event)" title="تغییر رنگ">🎨</button>
+              <div class="keep-palette-dropdown" id="keep-edit-palette-dropdown" style="display: none;">
+                <button class="keep-color-circle keep-color-default" onclick="selectKeepEditColor('default')" title="پیش‌فرض"></button>
+                <button class="keep-color-circle keep-color-coral" onclick="selectKeepEditColor('coral')" title="مرجانی"></button>
+                <button class="keep-color-circle keep-color-peach" onclick="selectKeepEditColor('peach')" title="هلویی"></button>
+                <button class="keep-color-circle keep-color-sand" onclick="selectKeepEditColor('sand')" title="شنی"></button>
+                <button class="keep-color-circle keep-color-mint" onclick="selectKeepEditColor('mint')" title="نعنایی"></button>
+                <button class="keep-color-circle keep-color-teal" onclick="selectKeepEditColor('teal')" title="مریم‌گلی"></button>
+                <button class="keep-color-circle keep-color-fog" onclick="selectKeepEditColor('fog')" title="اقیانوسی"></button>
+                <button class="keep-color-circle keep-color-storm" onclick="selectKeepEditColor('storm')" title="طوفانی"></button>
+                <button class="keep-color-circle keep-color-blossom" onclick="selectKeepEditColor('blossom')" title="شکوفه"></button>
+                <button class="keep-color-circle keep-color-clay" onclick="selectKeepEditColor('clay')" title="خاکی"></button>
+              </div>
+            </div>
+            <!-- Reminder -->
+            <div class="keep-palette-wrapper">
+              <button class="keep-icon-btn" onclick="toggleKeepEditReminderMenu(event)" title="یادآور">⏰</button>
+              <div class="keep-dropdown-menu" id="keep-edit-reminder-menu" style="display: none;">
+                <div class="keep-menu-item" onclick="setQuickKeepEditReminder('امروز عصر (۱۸:۰۰)')">⏰ امروز عصر (۱۸:۰۰)</div>
+                <div class="keep-menu-item" onclick="setQuickKeepEditReminder('فردا صبح (۰۹:۰۰)')">⏰ فردا صبح (۰۹:۰۰)</div>
+                <div class="keep-menu-item" onclick="setQuickKeepEditReminder('هفته آینده')">⏰ هفته آینده</div>
+                <div class="keep-menu-item" onclick="setQuickKeepEditReminder('حذف یادآور')">✕ حذف یادآور</div>
+              </div>
+            </div>
+            <!-- Tags -->
+            <div class="keep-palette-wrapper">
+              <button class="keep-icon-btn" onclick="toggleKeepEditTagsMenu(event)" title="برچسب‌ها">🏷️</button>
+              <div class="keep-dropdown-menu" id="keep-edit-tags-menu" style="display: none;">
+                <div class="keep-menu-item" onclick="toggleKeepEditTag('کاری')">💼 کاری</div>
+                <div class="keep-menu-item" onclick="toggleKeepEditTag('شخصی')">👤 شخصی</div>
+                <div class="keep-menu-item" onclick="toggleKeepEditTag('ایده')">💡 ایده</div>
+                <div class="keep-menu-item" onclick="toggleKeepEditTag('فوری')">🔥 فوری</div>
+                <div class="keep-menu-item" onclick="toggleKeepEditTag('خرید')">🛒 خرید</div>
+              </div>
+            </div>
+            <!-- Delete -->
+            <button class="keep-icon-btn" style="color: #f87171;" onclick="deleteCurrentEditingNote()" title="حذف یادداشت">🗑️</button>
+          </div>
+
+          <div class="keep-composer-actions">
+            <button class="btn-glass" onclick="closeKeepEditModal()" style="padding: 6px 14px; font-size: 0.85rem;">بستن</button>
+            <button class="btn-glass btn-glass-primary" onclick="saveEditedKeepNote()" style="padding: 6px 20px; font-size: 0.85rem; font-weight: 700;">ذخیره تغییرات</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Task / Occasion Modal -->
+    <div class="modal-overlay" id="quick-task-modal">
+      <div class="modal-card" style="max-width: 500px;">
+        <div class="modal-header">
+          <h3 class="modal-title">⚡ ثبت وظیفه، مناسبت یا تایمر</h3>
+          <button class="modal-close-btn" onclick="closeQuickTaskDialog()">✕</button>
+        </div>
+        <div class="form-group">
+          <label class="form-label">عنوان:</label>
+          <input type="text" id="dialog-task-title" class="form-input" placeholder="مثال: جلسه کاری با تیم یا تولد دوست" autofocus />
+        </div>
+        <div class="form-group">
+          <label class="form-label">نوع آیتم:</label>
+          <select id="dialog-task-type" class="form-input">
+            <option value="task">📋 وظیفه کاری (Task)</option>
+            <option value="occasion">🎉 مناسبت خاص یا رویداد (Occasion)</option>
+            <option value="timer">⏱️ تایمر شمارش معکوس (Timer)</option>
+          </select>
+        </div>
+        <div class="form-group" id="group-dialog-task-date">
+          <label class="form-label">تاریخ شمسی (YYYY/MM/DD):</label>
+          <input type="text" id="dialog-task-date" class="form-input" placeholder="1405/06/27" style="direction: ltr;" />
+        </div>
+        <div class="form-group" id="group-dialog-task-time">
+          <label class="form-label">ساعت سررسید (HH:MM):</label>
+          <input type="time" id="dialog-task-time" class="form-input" value="10:00" />
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;">
+          <button class="btn-glass" onclick="closeQuickTaskDialog()">انصراف</button>
+          <button class="btn-glass btn-glass-primary" onclick="submitQuickTaskFromDialog()">ثبت و فعال‌سازی هشدار</button>
+        </div>
       </div>
     </div>
 
@@ -2752,6 +3567,50 @@
       await renderTrash();
     }
 
+    /* ==========================================================================
+       GOOGLE KEEP & PERSIAN CALENDAR STUDIO ENGINE
+       ========================================================================== */
+
+    function toFaDigits(val) {
+      if (val === null || val === undefined) return '';
+      const fa = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+      return String(val).replace(/[0-9]/g, d => fa[parseInt(d, 10)]);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Studio State
+    let notesActiveFilter = 'all'; // 'all', 'pinned', 'checklist', 'reminder', 'tasks'
+    let notesSearchQuery = '';
+    let notesViewMode = 'grid'; // 'grid' or 'list'
+
+    // Composer State
+    let newKeepColor = 'default';
+    let newKeepIsPinned = false;
+    let newKeepIsChecklist = false;
+    let newKeepChecklistItems = []; // [{text: '', done: false}]
+    let newKeepTags = [];
+    let newKeepReminder = null;
+    let newKeepDateShamsi = null;
+
+    // Modal Edit State
+    let editingNoteId = null;
+    let editingNoteColor = 'default';
+    let editingNoteIsPinned = false;
+    let editingNoteIsChecklist = false;
+    let editingNoteChecklistItems = [];
+    let editingNoteTags = [];
+    let editingNoteReminder = null;
+    let editingNoteDateShamsi = null;
+
     async function switchToCalendarView() {
       updateStageVisibility('calendar');
       await loadCalendarTodayInfo();
@@ -2764,18 +3623,17 @@
         const resp = await apiRequest('/api/v1/calendar/today');
         if (!resp.ok) return;
         const data = await resp.json();
-        const bannerText = document.getElementById('calendar-today-full-text');
-        if (bannerText) bannerText.innerText = data.full_text || data.date_shamsi;
+
+        const bannerText = document.getElementById('cal-today-sub-text');
+        if (bannerText && data.full_text) {
+          bannerText.innerText = `${data.full_text} • همگام با بات تلگرام`;
+        }
 
         if (!selectedCalendarDate) {
           selectedCalendarDate = data.date_shamsi;
           calYear = data.year;
           calMonth = data.month;
         }
-
-        const taskCount = (data.reminders || []).length + (data.daily_notes || []).length;
-        const badge = document.getElementById('count-calendar-tasks');
-        if (badge) badge.innerText = taskCount;
       } catch (e) {
         console.warn('Error loading calendar today:', e);
       }
@@ -2794,7 +3652,7 @@
 
         const titleEl = document.getElementById('cal-month-name-year');
         if (titleEl) {
-          titleEl.innerText = `${currentMonthCalendarData.month_name} ${currentMonthCalendarData.year}`;
+          titleEl.innerText = `${currentMonthCalendarData.month_name} ${toFaDigits(currentMonthCalendarData.year)}`;
         }
 
         const grid = document.getElementById('calendar-days-grid');
@@ -2836,7 +3694,7 @@
             `;
           }
 
-          box.innerHTML = `<span>${d}</span>${dotsHtml}`;
+          box.innerHTML = `<span>${toFaDigits(d)}</span>${dotsHtml}`;
           box.onclick = () => selectCalendarDay(calYear, calMonth, d);
           grid.appendChild(box);
         }
@@ -2867,8 +3725,11 @@
 
     function goToTodayCalendar() {
       selectedCalendarDate = null;
+      const banner = document.getElementById('keep-date-filter-banner');
+      if (banner) banner.style.display = 'none';
       loadCurrentMonthCalendar();
       loadCalendarTodayInfo();
+      renderRemindersList();
     }
 
     async function selectCalendarDay(jy, jm, jd) {
@@ -2878,9 +3739,25 @@
       if (target) target.classList.add('selected');
 
       const dateLabel = document.getElementById('daily-note-selected-date-text');
-      if (dateLabel) dateLabel.innerText = `یادداشت روز: ${selectedCalendarDate}`;
+      if (dateLabel) dateLabel.innerText = `یادداشت روز: ${toFaDigits(selectedCalendarDate)}`;
+
+      const banner = document.getElementById('keep-date-filter-banner');
+      const bannerLabel = document.getElementById('keep-date-filter-label');
+      if (banner && bannerLabel) {
+        bannerLabel.innerText = toFaDigits(selectedCalendarDate);
+        banner.style.display = 'flex';
+      }
 
       await loadDailyNoteForDate(selectedCalendarDate);
+      renderRemindersList();
+    }
+
+    function clearCalendarDateFilter() {
+      selectedCalendarDate = null;
+      const banner = document.getElementById('keep-date-filter-banner');
+      if (banner) banner.style.display = 'none';
+      document.querySelectorAll('.calendar-day-box').forEach(el => el.classList.remove('selected'));
+      renderRemindersList();
     }
 
     async function loadDailyNoteForDate(dateStr) {
@@ -2896,16 +3773,19 @@
 
         if (notes && notes.length > 0) {
           currentDailyNote = notes[0];
-          if (titleInput) titleInput.value = currentDailyNote.title || `یادداشت روز ${dateStr}`;
+          if (titleInput) titleInput.value = currentDailyNote.title || `یادداشت روز ${toFaDigits(dateStr)}`;
           if (contentInput) contentInput.value = currentDailyNote.content || '';
           if (deleteBtn) deleteBtn.style.display = 'inline-flex';
-          if (hint) hint.innerText = `آخرین بروزرسانی: ${new Date(currentDailyNote.updated_at || currentDailyNote.created_at).toLocaleTimeString()}`;
+          if (hint) {
+            const timeStr = new Date(currentDailyNote.updated_at || currentDailyNote.created_at).toLocaleTimeString();
+            hint.innerText = `آخرین ذخیره: ${toFaDigits(timeStr)}`;
+          }
         } else {
           currentDailyNote = null;
-          if (titleInput) titleInput.value = `یادداشت روز ${dateStr}`;
+          if (titleInput) titleInput.value = `یادداشت روز ${toFaDigits(dateStr)}`;
           if (contentInput) contentInput.value = '';
           if (deleteBtn) deleteBtn.style.display = 'none';
-          if (hint) hint.innerText = 'یادداشتی برای این روز ثبت نشده است. متن خود را بنویسید و دکمه ذخیره را بزنید.';
+          if (hint) hint.innerText = 'یادداشتی برای این روز ثبت نشده است.';
         }
       } catch (e) {
         console.warn('Error loading daily note:', e);
@@ -2944,9 +3824,10 @@
         }
 
         showToast('یادداشت روز با موفقیت ذخیره شد!', 'success');
-        document.getElementById('daily-note-status-hint').innerText = `ذخیره شد در ${new Date().toLocaleTimeString()}`;
+        document.getElementById('daily-note-status-hint').innerText = `ذخیره شد در ${toFaDigits(new Date().toLocaleTimeString())}`;
         document.getElementById('btn-delete-daily-note').style.display = 'inline-flex';
         await loadCurrentMonthCalendar(calYear, calMonth);
+        await loadAllRemindersAndNotes();
       } catch (e) {
         showToast(e.message, 'error');
       } finally {
@@ -2963,12 +3844,13 @@
         if (!resp.ok) throw new Error('حذف یادداشت با خطا مواجه شد');
 
         currentDailyNote = null;
-        document.getElementById('daily-note-title').value = `یادداشت روز ${selectedCalendarDate}`;
+        document.getElementById('daily-note-title').value = `یادداشت روز ${selectedCalendarDate ? toFaDigits(selectedCalendarDate) : ''}`;
         document.getElementById('daily-note-content').value = '';
         document.getElementById('btn-delete-daily-note').style.display = 'none';
         document.getElementById('daily-note-status-hint').innerText = 'یادداشت حذف شد.';
         showToast('یادداشت روز با موفقیت حذف گردید', 'success');
         await loadCurrentMonthCalendar(calYear, calMonth);
+        await loadAllRemindersAndNotes();
       } catch (e) {
         showToast(e.message, 'error');
       }
@@ -2982,137 +3864,339 @@
         ]);
         if (remResp.ok) allUserReminders = await remResp.json();
         if (notesResp.ok) allUserNotes = await notesResp.json();
+        renderActiveTimersSidebar();
         renderRemindersList();
       } catch (e) {
         console.warn('Error loading reminders and notes:', e);
       }
     }
 
-    function setRemindersFilter(filter) {
-      activeRemindersFilter = filter;
-      document.querySelectorAll('.filter-tab-btn').forEach(btn => btn.classList.remove('active'));
-      const activeBtn = document.getElementById(`filter-${filter}`);
-      if (activeBtn) activeBtn.classList.add('active');
-      renderRemindersList();
+    function refreshCalendarData() {
+      loadCalendarTodayInfo();
+      loadCurrentMonthCalendar(calYear, calMonth);
+      loadAllRemindersAndNotes();
+      showToast('اطلاعات تقویم و یادداشت‌ها بروزرسانی شد', 'success');
     }
 
-    function renderRemindersList() {
-      const container = document.getElementById('reminders-list-container');
-      const countBadge = document.getElementById('reminders-count-badge');
+    function renderActiveTimersSidebar() {
+      const container = document.getElementById('active-timers-container');
       if (!container) return;
+      const timers = allUserReminders.filter(r => r.type === 'timer' && !r.is_completed);
+      if (timers.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+      container.innerHTML = timers.map(t => `
+        <div class="active-timer-pill">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span>⏱️</span>
+            <span style="font-weight: 700;">${escapeHtml(t.title)}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 0.72rem; color: var(--accent-cyan);">${toFaDigits(t.time_str || '')}</span>
+            <button class="node-btn-icon" style="width: 22px; height: 22px; font-size: 0.7rem; color: #34d399;" onclick="toggleReminderItem('${t.id}')" title="تکمیل">✓</button>
+            <button class="node-btn-icon" style="width: 22px; height: 22px; font-size: 0.7rem; color: #f87171;" onclick="deleteReminderItem('${t.id}')" title="حذف">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
 
-      container.innerHTML = '';
+    /* --------------------------------------------------------------------------
+       GOOGLE KEEP COMPOSER INTERACTION
+       -------------------------------------------------------------------------- */
+    function focusGoogleKeepComposer() {
+      expandKeepComposer(false);
+      const titleInput = document.getElementById('keep-new-title');
+      if (titleInput) titleInput.focus();
+    }
 
-      if (activeRemindersFilter === 'notes') {
-        // Show all general notes
-        countBadge.innerText = `${allUserNotes.length} یادداشت`;
-        if (allUserNotes.length === 0) {
-          container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 24px;">هیچ یادداشتی ثبت نشده است.</div>`;
-          return;
+    function expandKeepComposer(isChecklist = false) {
+      const collapsed = document.getElementById('keep-composer-collapsed');
+      const expanded = document.getElementById('keep-composer-expanded');
+      if (collapsed) collapsed.style.display = 'none';
+      if (expanded) expanded.style.display = 'block';
+
+      if (isChecklist) {
+        setNewKeepChecklistMode(true);
+        setTimeout(() => {
+          const inp = document.getElementById('keep-new-checklist-input');
+          if (inp) inp.focus();
+        }, 50);
+      } else {
+        setNewKeepChecklistMode(false);
+        setTimeout(() => {
+          const textarea = document.getElementById('keep-new-content');
+          if (textarea) textarea.focus();
+        }, 50);
+      }
+    }
+
+    function collapseKeepComposer(discard = false) {
+      const title = (document.getElementById('keep-new-title')?.value || '').trim();
+      const content = (document.getElementById('keep-new-content')?.value || '').trim();
+
+      if (!discard && (title || content || newKeepChecklistItems.length > 0)) {
+        saveNewKeepNote();
+        return;
+      }
+
+      resetNewKeepComposerState();
+    }
+
+    function resetNewKeepComposerState() {
+      const collapsed = document.getElementById('keep-composer-collapsed');
+      const expanded = document.getElementById('keep-composer-expanded');
+      if (collapsed) collapsed.style.display = 'flex';
+      if (expanded) expanded.style.display = 'none';
+
+      if (document.getElementById('keep-new-title')) document.getElementById('keep-new-title').value = '';
+      if (document.getElementById('keep-new-content')) document.getElementById('keep-new-content').value = '';
+      if (document.getElementById('keep-new-checklist-input')) document.getElementById('keep-new-checklist-input').value = '';
+
+      newKeepColor = 'default';
+      newKeepIsPinned = false;
+      newKeepIsChecklist = false;
+      newKeepChecklistItems = [];
+      newKeepTags = [];
+      newKeepReminder = null;
+      newKeepDateShamsi = null;
+
+      applyComposerColor('default');
+      updateNewPinBtn();
+      renderNewChecklistItems();
+      renderNewBadges();
+      closeAllKeepMenus();
+    }
+
+    function toggleKeepMode() {
+      setNewKeepChecklistMode(!newKeepIsChecklist);
+    }
+
+    function setNewKeepChecklistMode(asChecklist) {
+      newKeepIsChecklist = asChecklist;
+      const textBody = document.getElementById('keep-new-text-body');
+      const checkBody = document.getElementById('keep-new-checklist-body');
+      const modeBtn = document.getElementById('keep-new-btn-mode');
+
+      if (newKeepIsChecklist) {
+        if (textBody) textBody.style.display = 'none';
+        if (checkBody) checkBody.style.display = 'block';
+        if (modeBtn) modeBtn.innerHTML = '📝';
+        renderNewChecklistItems();
+      } else {
+        if (textBody) textBody.style.display = 'block';
+        if (checkBody) checkBody.style.display = 'none';
+        if (modeBtn) modeBtn.innerHTML = '☑️';
+      }
+    }
+
+    function handleChecklistEnter(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const input = document.getElementById('keep-new-checklist-input');
+        const text = input.value.trim();
+        if (text) {
+          newKeepChecklistItems.push({ text, done: false });
+          input.value = '';
+          renderNewChecklistItems();
         }
-
-        allUserNotes.forEach(n => {
-          const item = document.createElement('div');
-          item.className = 'reminder-card-item';
-          item.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-              <span class="glass-icon-badge glow-cyan" style="width: 32px; height: 32px; font-size: 1rem;">📝</span>
-              <div style="flex: 1; min-width: 0;">
-                <div style="font-weight: 700; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${n.title}</div>
-                <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; max-height: 2.8em; overflow: hidden; text-overflow: ellipsis;">${n.content || '(بدون متن)'}</div>
-              </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 6px;">
-              ${n.date_shamsi ? `<span class="reminder-type-tag" style="background: rgba(255,255,255,0.06);">${n.date_shamsi}</span>` : ''}
-              <button class="node-btn-icon" style="color: #f87171;" title="حذف" onclick="deleteGeneralNote('${n.id}')">🗑️</button>
-            </div>
-          `;
-          container.appendChild(item);
-        });
-        return;
       }
+    }
 
-      // Filter reminders
-      let items = allUserReminders;
-      if (activeRemindersFilter !== 'all') {
-        items = allUserReminders.filter(r => r.type === activeRemindersFilter);
-      }
-
-      // Sort: active items first, completed items last
-      items.sort((a, b) => {
-        if (a.is_completed === b.is_completed) return new Date(b.created_at || 0) - new Date(a.created_at || 0);
-        return a.is_completed ? 1 : -1;
-      });
-
-      countBadge.innerText = `${items.length} مورد`;
-      if (items.length === 0) {
-        container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 24px;">آیتمی در این دسته یافت نشد.</div>`;
-        return;
-      }
-
-      items.forEach(r => {
-        const item = document.createElement('div');
-        item.className = `reminder-card-item ${r.is_completed ? 'completed' : ''}`;
-
-        let typeClass = 'tag-task';
-        let typeName = 'وظیفه';
-        let typeIcon = '📋';
-        if (r.type === 'occasion') { typeClass = 'tag-occasion'; typeName = 'مناسبت'; typeIcon = '🎉'; }
-        if (r.type === 'timer') { typeClass = 'tag-timer'; typeName = 'تایمر'; typeIcon = '⏱️'; }
-
-        item.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
-            <button class="node-btn-icon" style="width: 28px; height: 28px; font-size: 0.9rem; ${r.is_completed ? 'color: #34d399; border-color: #34d399;' : ''}" title="${r.is_completed ? 'تکمیل شده' : 'انجام دادن'}" onclick="toggleReminderItem('${r.id}')">
-              ${r.is_completed ? '✓' : '○'}
-            </button>
-            <div style="flex: 1; min-width: 0;">
-              <div class="reminder-title-text" style="font-weight: 700; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.title}</div>
-              <div style="display: flex; align-items: center; gap: 8px; font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;">
-                <span class="reminder-type-tag ${typeClass}">${typeIcon} ${typeName}</span>
-                ${r.date_shamsi ? `<span>📅 ${r.date_shamsi}</span>` : ''}
-                ${r.time_str ? `<span>⏰ ${r.time_str}</span>` : ''}
-                ${r.is_notified ? `<span style="color: #34d399;" title="اعلان ارسال شده">🔔 ارسال شده</span>` : ''}
-              </div>
-            </div>
-          </div>
-          <div style="display: flex; align-items: center; gap: 4px;">
-            <button class="node-btn-icon" title="۱۰ دقیقه تعویق" onclick="snoozeReminderItem('${r.id}', 10)">⏳</button>
-            <button class="node-btn-icon" style="color: #f87171;" title="حذف" onclick="deleteReminderItem('${r.id}')">🗑️</button>
-          </div>
+    function renderNewChecklistItems() {
+      const container = document.getElementById('keep-new-checklist-items');
+      if (!container) return;
+      container.innerHTML = '';
+      newKeepChecklistItems.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'keep-checklist-item-row';
+        row.innerHTML = `
+          <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleNewCheckItem(${idx})" />
+          <span class="keep-checklist-item-text ${item.done ? 'checked' : ''}" style="flex: 1;">${escapeHtml(item.text)}</span>
+          <button class="node-btn-icon" style="width: 24px; height: 24px; font-size: 0.75rem;" onclick="removeNewCheckItem(${idx})">✕</button>
         `;
-        container.appendChild(item);
+        container.appendChild(row);
       });
     }
 
-    async function submitQuickTask() {
-      const titleInput = document.getElementById('quick-task-title');
-      const typeInput = document.getElementById('quick-task-type');
-      const timeInput = document.getElementById('quick-task-time');
+    function toggleNewCheckItem(idx) {
+      if (newKeepChecklistItems[idx]) {
+        newKeepChecklistItems[idx].done = !newKeepChecklistItems[idx].done;
+        renderNewChecklistItems();
+      }
+    }
 
-      const title = titleInput.value.trim();
-      if (!title) {
-        showToast('لطفاً عنوان وظیفه یا رویداد را وارد کنید', 'error');
-        return;
+    function removeNewCheckItem(idx) {
+      newKeepChecklistItems.splice(idx, 1);
+      renderNewChecklistItems();
+    }
+
+    function toggleKeepNewPin() {
+      newKeepIsPinned = !newKeepIsPinned;
+      updateNewPinBtn();
+    }
+
+    function updateNewPinBtn() {
+      const btn = document.getElementById('keep-new-pin-btn');
+      if (!btn) return;
+      if (newKeepIsPinned) {
+        btn.classList.add('pinned');
+        btn.title = 'حذف از سنجاق';
+      } else {
+        btn.classList.remove('pinned');
+        btn.title = 'سنجاق به بالا';
+      }
+    }
+
+    function toggleKeepPalette(e) {
+      if (e) e.stopPropagation();
+      const dropdown = document.getElementById('keep-new-palette-dropdown');
+      const isShown = dropdown && dropdown.style.display !== 'none';
+      closeAllKeepMenus();
+      if (!isShown && dropdown) dropdown.style.display = 'grid';
+    }
+
+    function selectKeepNewColor(colorKey) {
+      newKeepColor = colorKey;
+      applyComposerColor(colorKey);
+      const dropdown = document.getElementById('keep-new-palette-dropdown');
+      if (dropdown) dropdown.style.display = 'none';
+    }
+
+    function applyComposerColor(colorKey) {
+      const container = document.getElementById('keep-composer-container');
+      if (!container) return;
+      const colors = ['default', 'coral', 'peach', 'sand', 'mint', 'teal', 'fog', 'storm', 'blossom', 'clay'];
+      colors.forEach(c => container.classList.remove(`keep-color-${c}`));
+      container.classList.add(`keep-color-${colorKey}`);
+    }
+
+    function toggleKeepReminderMenu(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('keep-new-reminder-menu');
+      const isShown = menu && menu.style.display !== 'none';
+      closeAllKeepMenus();
+      if (!isShown && menu) menu.style.display = 'flex';
+    }
+
+    function setQuickKeepReminder(reminderText) {
+      if (reminderText === 'حذف یادآور') {
+        newKeepReminder = null;
+      } else {
+        newKeepReminder = reminderText;
+      }
+      closeAllKeepMenus();
+      renderNewBadges();
+    }
+
+    function toggleKeepTagsMenu(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('keep-new-tags-menu');
+      const isShown = menu && menu.style.display !== 'none';
+      closeAllKeepMenus();
+      if (!isShown && menu) menu.style.display = 'flex';
+    }
+
+    function toggleKeepNewTag(tagName) {
+      const idx = newKeepTags.indexOf(tagName);
+      if (idx >= 0) {
+        newKeepTags.splice(idx, 1);
+      } else {
+        newKeepTags.push(tagName);
+      }
+      closeAllKeepMenus();
+      renderNewBadges();
+    }
+
+    function linkKeepNoteToSelectedDate() {
+      if (newKeepDateShamsi) {
+        newKeepDateShamsi = null;
+        showToast('لینک تاریخ حذف شد', 'info');
+      } else if (selectedCalendarDate) {
+        newKeepDateShamsi = selectedCalendarDate;
+        showToast(`یادداشت به تاریخ ${toFaDigits(selectedCalendarDate)} پیوند داده شد`, 'info');
+      } else {
+        showToast('لطفاً ابتدا تاریخی را در تقویم انتخاب کنید', 'info');
+      }
+      renderNewBadges();
+    }
+
+    function renderNewBadges() {
+      const bar = document.getElementById('keep-new-badges-bar');
+      if (!bar) return;
+      bar.innerHTML = '';
+
+      if (newKeepReminder) {
+        const remBadge = document.createElement('span');
+        remBadge.className = 'keep-card-badge';
+        remBadge.innerHTML = `⏰ ${escapeHtml(newKeepReminder)} <span style="cursor: pointer; margin-right: 4px;" onclick="newKeepReminder = null; renderNewBadges();">✕</span>`;
+        bar.appendChild(remBadge);
       }
 
-      const type = typeInput.value;
-      const time_str = timeInput.value || '10:00';
+      if (newKeepDateShamsi) {
+        const dateBadge = document.createElement('span');
+        dateBadge.className = 'keep-card-badge';
+        dateBadge.innerHTML = `📅 ${toFaDigits(newKeepDateShamsi)} <span style="cursor: pointer; margin-right: 4px;" onclick="newKeepDateShamsi = null; renderNewBadges();">✕</span>`;
+        bar.appendChild(dateBadge);
+      }
+
+      newKeepTags.forEach(tag => {
+        const tagBadge = document.createElement('span');
+        tagBadge.className = 'keep-card-badge';
+        tagBadge.innerHTML = `#${escapeHtml(tag)} <span style="cursor: pointer; margin-right: 4px;" onclick="toggleKeepNewTag('${tag}')">✕</span>`;
+        bar.appendChild(tagBadge);
+      });
+    }
+
+    function closeAllKeepMenus() {
+      const ids = [
+        'keep-new-palette-dropdown', 'keep-new-reminder-menu', 'keep-new-tags-menu',
+        'keep-edit-palette-dropdown', 'keep-edit-reminder-menu', 'keep-edit-tags-menu'
+      ];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.keep-palette-wrapper') && !e.target.closest('.keep-composer-box') && !e.target.closest('.keep-edit-card')) {
+        closeAllKeepMenus();
+      }
+    });
+
+    async function saveNewKeepNote() {
+      const title = (document.getElementById('keep-new-title')?.value || '').trim();
+      const content = (document.getElementById('keep-new-content')?.value || '').trim();
+
+      if (!title && !content && newKeepChecklistItems.length === 0) {
+        resetNewKeepComposerState();
+        return;
+      }
 
       try {
-        const resp = await apiRequest('/api/v1/reminders', {
+        const payload = {
+          title: title || (newKeepChecklistItems.length > 0 ? 'چک‌لیست جدید' : 'یادداشت جدید'),
+          content: content,
+          color: newKeepColor || 'default',
+          is_pinned: newKeepIsPinned,
+          checklist: newKeepChecklistItems,
+          tags: newKeepTags,
+          reminder_at: newKeepReminder,
+          date_shamsi: newKeepDateShamsi || selectedCalendarDate,
+          is_daily: false
+        };
+
+        const resp = await apiRequest('/api/v1/notes', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title,
-            type,
-            date_shamsi: selectedCalendarDate,
-            time_str
-          })
+          body: JSON.stringify(payload)
         });
-        if (!resp.ok) throw new Error('ثبت وظیفه ناموفق بود');
 
-        titleInput.value = '';
-        showToast(`«${title}» با موفقیت ثبت شد و اعلان آن در تلگرام فعال گردید!`, 'success');
+        if (!resp.ok) throw new Error('خطا در ذخیره یادداشت در سرور');
+
+        showToast('یادداشت در گوگل کیپ ذخیره شد!', 'success');
+        resetNewKeepComposerState();
         await loadAllRemindersAndNotes();
         await loadCurrentMonthCalendar(calYear, calMonth);
       } catch (e) {
@@ -3120,9 +4204,742 @@
       }
     }
 
+    /* --------------------------------------------------------------------------
+       GOOGLE KEEP MAIN RENDERING (PINNED & OTHERS) & REMINDERS LIST
+       -------------------------------------------------------------------------- */
+    function setNotesFilter(filter) {
+      notesActiveFilter = filter;
+      document.querySelectorAll('.keep-chip').forEach(c => c.classList.remove('active'));
+      const chip = document.getElementById(`chip-filter-${filter}`);
+      if (chip) chip.classList.add('active');
+      renderRemindersList();
+    }
+
+    function filterKeepNotes() {
+      const input = document.getElementById('keep-search-input');
+      notesSearchQuery = input ? input.value.trim().toLowerCase() : '';
+      renderRemindersList();
+    }
+
+    function setNotesViewMode(mode) {
+      notesViewMode = mode;
+      const btnGrid = document.getElementById('btn-view-grid');
+      const btnList = document.getElementById('btn-view-list');
+      if (btnGrid && btnList) {
+        if (mode === 'grid') {
+          btnGrid.classList.add('active');
+          btnList.classList.remove('active');
+        } else {
+          btnList.classList.add('active');
+          btnGrid.classList.remove('active');
+        }
+      }
+
+      const grids = document.querySelectorAll('.keep-cards-grid');
+      grids.forEach(g => {
+        if (mode === 'list') g.classList.add('keep-cards-list-view');
+        else g.classList.remove('keep-cards-list-view');
+      });
+    }
+
+    function renderRemindersList() {
+      const pinnedSection = document.getElementById('keep-pinned-section');
+      const pinnedGrid = document.getElementById('keep-pinned-grid');
+      const pinnedCount = document.getElementById('keep-pinned-count');
+
+      const othersSection = document.getElementById('keep-others-section');
+      const othersGrid = document.getElementById('keep-others-grid');
+      const othersTitle = document.getElementById('keep-others-title');
+      const othersCount = document.getElementById('keep-others-count');
+
+      const emptyState = document.getElementById('keep-empty-state');
+
+      if (!pinnedGrid || !othersGrid) return;
+      pinnedGrid.innerHTML = '';
+      othersGrid.innerHTML = '';
+
+      // If user selected "📋 وظایف تلگرام" tab, render Reminders as Keep Cards
+      if (notesActiveFilter === 'tasks') {
+        let items = allUserReminders;
+        if (notesSearchQuery) {
+          items = items.filter(r => (r.title || '').toLowerCase().includes(notesSearchQuery));
+        }
+        if (selectedCalendarDate) {
+          items = items.filter(r => r.date_shamsi === selectedCalendarDate);
+        }
+
+        if (pinnedSection) pinnedSection.style.display = 'none';
+        if (othersTitle) othersTitle.style.display = 'none';
+
+        if (items.length === 0) {
+          if (emptyState) emptyState.style.display = 'block';
+          return;
+        }
+        if (emptyState) emptyState.style.display = 'none';
+
+        items.forEach(r => {
+          const card = renderReminderAsKeepCard(r);
+          othersGrid.appendChild(card);
+        });
+        return;
+      }
+
+      // Filter general notes
+      let notes = allUserNotes.filter(n => !n.is_daily);
+
+      // 1. Search Query
+      if (notesSearchQuery) {
+        notes = notes.filter(n => {
+          const inTitle = (n.title || '').toLowerCase().includes(notesSearchQuery);
+          const inContent = (n.content || '').toLowerCase().includes(notesSearchQuery);
+          const inTags = (n.tags || []).some(t => t.toLowerCase().includes(notesSearchQuery));
+          const inChecklist = (n.checklist || []).some(c => (c.text || '').toLowerCase().includes(notesSearchQuery));
+          return inTitle || inContent || inTags || inChecklist;
+        });
+      }
+
+      // 2. Selected Calendar Date filter (if set)
+      if (selectedCalendarDate) {
+        notes = notes.filter(n => n.date_shamsi === selectedCalendarDate);
+      }
+
+      // 3. Category Filter
+      if (notesActiveFilter === 'pinned') {
+        notes = notes.filter(n => n.is_pinned);
+      } else if (notesActiveFilter === 'checklist') {
+        notes = notes.filter(n => n.checklist && n.checklist.length > 0);
+      } else if (notesActiveFilter === 'reminder') {
+        notes = notes.filter(n => !!n.reminder_at);
+      }
+
+      const pinnedNotes = notes.filter(n => n.is_pinned);
+      const otherNotes = notes.filter(n => !n.is_pinned);
+
+      if (pinnedNotes.length > 0) {
+        pinnedSection.style.display = 'block';
+        pinnedCount.innerText = toFaDigits(pinnedNotes.length);
+        pinnedNotes.forEach(n => {
+          pinnedGrid.appendChild(createKeepCardElement(n));
+        });
+      } else {
+        pinnedSection.style.display = 'none';
+      }
+
+      if (otherNotes.length > 0) {
+        othersSection.style.display = 'block';
+        if (pinnedNotes.length > 0) {
+          othersTitle.style.display = 'flex';
+          othersCount.innerText = toFaDigits(otherNotes.length);
+        } else {
+          othersTitle.style.display = 'none';
+        }
+        otherNotes.forEach(n => {
+          othersGrid.appendChild(createKeepCardElement(n));
+        });
+      } else {
+        if (pinnedNotes.length === 0) {
+          othersSection.style.display = 'none';
+        } else {
+          othersSection.style.display = 'none';
+        }
+      }
+
+      if (pinnedNotes.length === 0 && otherNotes.length === 0) {
+        if (emptyState) emptyState.style.display = 'block';
+      } else {
+        if (emptyState) emptyState.style.display = 'none';
+      }
+
+      // Sync view mode class
+      setNotesViewMode(notesViewMode);
+    }
+
+    function createKeepCardElement(note) {
+      const card = document.createElement('div');
+      card.className = `keep-card keep-color-${note.color || 'default'} ${note.is_pinned ? 'is-pinned' : ''}`;
+      card.id = `keep-card-${note.id}`;
+
+      // Open edit modal on card click
+      card.onclick = (e) => {
+        if (e.target.closest('.keep-card-toolbar') || e.target.closest('.keep-pin-btn') || e.target.closest('input[type="checkbox"]')) {
+          return;
+        }
+        openKeepEditModal(note.id);
+      };
+
+      // Header row with title & pin button
+      const topRow = document.createElement('div');
+      topRow.className = 'keep-card-top-row';
+
+      const titleEl = document.createElement('div');
+      titleEl.className = 'keep-card-title';
+      titleEl.innerText = note.title || '';
+      topRow.appendChild(titleEl);
+
+      const pinBtn = document.createElement('button');
+      pinBtn.className = `keep-pin-btn ${note.is_pinned ? 'pinned' : ''}`;
+      pinBtn.title = note.is_pinned ? 'حذف از سنجاق' : 'سنجاق به بالا';
+      pinBtn.innerText = '📌';
+      pinBtn.onclick = (e) => {
+        e.stopPropagation();
+        toggleNotePin(note.id);
+      };
+      topRow.appendChild(pinBtn);
+
+      card.appendChild(topRow);
+
+      // Body (Text or Checklist)
+      const body = document.createElement('div');
+      body.className = 'keep-card-body';
+
+      if (note.checklist && note.checklist.length > 0) {
+        const checkContainer = document.createElement('div');
+        checkContainer.className = 'keep-card-checklist';
+
+        const visibleItems = note.checklist.slice(0, 8);
+        visibleItems.forEach((c, idx) => {
+          const itemRow = document.createElement('div');
+          itemRow.className = 'keep-card-check-item';
+          itemRow.innerHTML = `
+            <input type="checkbox" ${c.done ? 'checked' : ''} onclick="event.stopPropagation(); toggleCardChecklistItem('${note.id}', ${idx})" />
+            <span class="${c.done ? 'checked' : ''}">${escapeHtml(c.text)}</span>
+          `;
+          checkContainer.appendChild(itemRow);
+        });
+
+        if (note.checklist.length > 8) {
+          const more = document.createElement('div');
+          more.style.fontSize = '0.75rem';
+          more.style.color = 'var(--text-muted)';
+          more.style.marginTop = '4px';
+          more.innerText = `+ ${toFaDigits(note.checklist.length - 8)} مورد دیگر...`;
+          checkContainer.appendChild(more);
+        }
+
+        body.appendChild(checkContainer);
+      } else if (note.content) {
+        const contentEl = document.createElement('div');
+        contentEl.className = 'keep-card-content';
+        contentEl.innerText = note.content;
+        body.appendChild(contentEl);
+      }
+
+      card.appendChild(body);
+
+      // Badges Bar (Reminders, Date, Tags)
+      const badgesBar = document.createElement('div');
+      badgesBar.className = 'keep-card-badges';
+
+      if (note.reminder_at) {
+        const b = document.createElement('span');
+        b.className = 'keep-card-badge';
+        b.innerText = `⏰ ${note.reminder_at}`;
+        badgesBar.appendChild(b);
+      }
+      if (note.date_shamsi) {
+        const b = document.createElement('span');
+        b.className = 'keep-card-badge';
+        b.innerText = `📅 ${toFaDigits(note.date_shamsi)}`;
+        badgesBar.appendChild(b);
+      }
+      if (note.tags && note.tags.length > 0) {
+        note.tags.forEach(t => {
+          const b = document.createElement('span');
+          b.className = 'keep-card-badge';
+          b.innerText = `#${t}`;
+          badgesBar.appendChild(b);
+        });
+      }
+
+      if (badgesBar.children.length > 0) {
+        card.appendChild(badgesBar);
+      }
+
+      // Toolbar Footer
+      const toolbar = document.createElement('div');
+      toolbar.className = 'keep-card-toolbar';
+
+      // Palette Button with Quick Color Dropdown
+      const palWrapper = document.createElement('div');
+      palWrapper.className = 'keep-palette-wrapper';
+
+      const palBtn = document.createElement('button');
+      palBtn.className = 'keep-tool-btn';
+      palBtn.title = 'تغییر رنگ';
+      palBtn.innerText = '🎨';
+      palBtn.onclick = (e) => {
+        e.stopPropagation();
+        cycleCardColor(note.id);
+      };
+      palWrapper.appendChild(palBtn);
+      toolbar.appendChild(palWrapper);
+
+      // Copy Button
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'keep-tool-btn';
+      copyBtn.title = 'کپی متن یادداشت';
+      copyBtn.innerText = '📋';
+      copyBtn.onclick = (e) => {
+        e.stopPropagation();
+        copyNoteText(note.id);
+      };
+      toolbar.appendChild(copyBtn);
+
+      // Delete Button
+      const delBtn = document.createElement('button');
+      delBtn.className = 'keep-tool-btn';
+      delBtn.title = 'حذف یادداشت';
+      delBtn.style.color = '#f87171';
+      delBtn.innerText = '🗑️';
+      delBtn.onclick = (e) => {
+        e.stopPropagation();
+        deleteNote(note.id);
+      };
+      toolbar.appendChild(delBtn);
+
+      card.appendChild(toolbar);
+
+      return card;
+    }
+
+    function renderReminderAsKeepCard(rem) {
+      const card = document.createElement('div');
+      card.className = `keep-card keep-color-${rem.type === 'timer' ? 'fog' : rem.type === 'occasion' ? 'blossom' : 'mint'} ${rem.is_completed ? 'completed-card' : ''}`;
+      card.style.opacity = rem.is_completed ? '0.6' : '1';
+
+      const topRow = document.createElement('div');
+      topRow.className = 'keep-card-top-row';
+      topRow.innerHTML = `
+        <div class="keep-card-title" style="display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" ${rem.is_completed ? 'checked' : ''} onclick="event.stopPropagation(); toggleReminderItem('${rem.id}')" />
+          <span style="${rem.is_completed ? 'text-decoration: line-through;' : ''}">${escapeHtml(rem.title)}</span>
+        </div>
+        <span style="font-size: 0.8rem;">${rem.type === 'occasion' ? '🎉' : rem.type === 'timer' ? '⏱️' : '📋'}</span>
+      `;
+      card.appendChild(topRow);
+
+      const badgesBar = document.createElement('div');
+      badgesBar.className = 'keep-card-badges';
+      if (rem.date_shamsi) badgesBar.innerHTML += `<span class="keep-card-badge">📅 ${toFaDigits(rem.date_shamsi)}</span>`;
+      if (rem.time_str) badgesBar.innerHTML += `<span class="keep-card-badge">⏰ ${toFaDigits(rem.time_str)}</span>`;
+      if (rem.is_notified) badgesBar.innerHTML += `<span class="keep-card-badge" style="color: #34d399;">🔔 ارسال شده</span>`;
+      card.appendChild(badgesBar);
+
+      const toolbar = document.createElement('div');
+      toolbar.className = 'keep-card-toolbar';
+      toolbar.innerHTML = `
+        <button class="keep-tool-btn" title="۱۰ دقیقه تعویق" onclick="event.stopPropagation(); snoozeReminderItem('${rem.id}', 10)">⏳</button>
+        <button class="keep-tool-btn" style="color: #f87171;" title="حذف" onclick="event.stopPropagation(); deleteReminderItem('${rem.id}')">🗑️</button>
+      `;
+      card.appendChild(toolbar);
+
+      return card;
+    }
+
+    /* --------------------------------------------------------------------------
+       CARD ACTIONS (PIN, COLOR CYCLE, CHECKLIST TOGGLE, COPY, DELETE)
+       -------------------------------------------------------------------------- */
+    async function toggleNotePin(noteId) {
+      const note = allUserNotes.find(n => n.id === noteId);
+      if (!note) return;
+      const newPinned = !note.is_pinned;
+      note.is_pinned = newPinned;
+      renderRemindersList();
+
+      try {
+        await apiRequest(`/api/v1/notes/${noteId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ is_pinned: newPinned })
+        });
+      } catch (e) {
+        console.warn('Error patching pin state:', e);
+      }
+    }
+
+    async function cycleCardColor(noteId) {
+      const colors = ['default', 'coral', 'peach', 'sand', 'mint', 'teal', 'fog', 'storm', 'blossom', 'clay'];
+      const note = allUserNotes.find(n => n.id === noteId);
+      if (!note) return;
+
+      const currentIdx = colors.indexOf(note.color || 'default');
+      const nextColor = colors[(currentIdx + 1) % colors.length];
+      note.color = nextColor;
+      renderRemindersList();
+
+      try {
+        await apiRequest(`/api/v1/notes/${noteId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ color: nextColor })
+        });
+      } catch (e) {
+        console.warn('Error updating color:', e);
+      }
+    }
+
+    async function toggleCardChecklistItem(noteId, itemIndex) {
+      const note = allUserNotes.find(n => n.id === noteId);
+      if (!note || !note.checklist || !note.checklist[itemIndex]) return;
+
+      note.checklist[itemIndex].done = !note.checklist[itemIndex].done;
+      renderRemindersList();
+
+      try {
+        await apiRequest(`/api/v1/notes/${noteId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ checklist: note.checklist })
+        });
+      } catch (e) {
+        console.warn('Error updating checklist item:', e);
+      }
+    }
+
+    function copyNoteText(noteId) {
+      const note = allUserNotes.find(n => n.id === noteId);
+      if (!note) return;
+
+      let text = note.title ? `${note.title}\n\n` : '';
+      if (note.checklist && note.checklist.length > 0) {
+        text += note.checklist.map(c => `[${c.done ? 'x' : ' '}] ${c.text}`).join('\n');
+      } else {
+        text += note.content || '';
+      }
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('متن یادداشت در کلیپ‌بورد کپی شد', 'info');
+      }).catch(() => {
+        showToast('خطا در دسترسی به کلیپ‌بورد', 'error');
+      });
+    }
+
+    async function deleteNote(noteId) {
+      if (!confirm('آیا از حذف این یادداشت اطمینان دارید؟')) return;
+
+      allUserNotes = allUserNotes.filter(n => n.id !== noteId);
+      renderRemindersList();
+
+      try {
+        const resp = await apiRequest(`/api/v1/notes/${noteId}`, { method: 'DELETE' });
+        if (!resp.ok) throw new Error('حذف ناموفق بود');
+        showToast('یادداشت با موفقیت حذف گردید', 'success');
+        await loadCurrentMonthCalendar(calYear, calMonth);
+      } catch (e) {
+        showToast(e.message, 'error');
+        await loadAllRemindersAndNotes();
+      }
+    }
+
+    /* --------------------------------------------------------------------------
+       GOOGLE KEEP EDIT MODAL
+       -------------------------------------------------------------------------- */
+    function openKeepEditModal(noteId) {
+      const note = allUserNotes.find(n => n.id === noteId);
+      if (!note) return;
+
+      editingNoteId = noteId;
+      editingNoteColor = note.color || 'default';
+      editingNoteIsPinned = !!note.is_pinned;
+      editingNoteIsChecklist = !!(note.checklist && note.checklist.length > 0);
+      editingNoteChecklistItems = JSON.parse(JSON.stringify(note.checklist || []));
+      editingNoteTags = JSON.parse(JSON.stringify(note.tags || []));
+      editingNoteReminder = note.reminder_at || null;
+      editingNoteDateShamsi = note.date_shamsi || null;
+
+      const titleInput = document.getElementById('keep-edit-title');
+      const contentInput = document.getElementById('keep-edit-content');
+      if (titleInput) titleInput.value = note.title || '';
+      if (contentInput) contentInput.value = note.content || '';
+
+      applyEditModalColor(editingNoteColor);
+      updateEditPinBtn();
+      setEditChecklistMode(editingNoteIsChecklist);
+      renderEditBadges();
+
+      const modal = document.getElementById('keep-edit-modal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeKeepEditModal() {
+      const modal = document.getElementById('keep-edit-modal');
+      if (modal) modal.style.display = 'none';
+      editingNoteId = null;
+    }
+
+    function applyEditModalColor(colorKey) {
+      const card = document.getElementById('keep-edit-card');
+      if (!card) return;
+      const colors = ['default', 'coral', 'peach', 'sand', 'mint', 'teal', 'fog', 'storm', 'blossom', 'clay'];
+      colors.forEach(c => card.classList.remove(`keep-color-${c}`));
+      card.classList.add(`keep-color-${colorKey}`);
+    }
+
+    function toggleKeepEditPin() {
+      editingNoteIsPinned = !editingNoteIsPinned;
+      updateEditPinBtn();
+    }
+
+    function updateEditPinBtn() {
+      const btn = document.getElementById('keep-edit-pin-btn');
+      if (!btn) return;
+      if (editingNoteIsPinned) {
+        btn.classList.add('pinned');
+        btn.title = 'حذف از سنجاق';
+      } else {
+        btn.classList.remove('pinned');
+        btn.title = 'سنجاق به بالا';
+      }
+    }
+
+    function toggleKeepEditMode() {
+      setEditChecklistMode(!editingNoteIsChecklist);
+    }
+
+    function setEditChecklistMode(asChecklist) {
+      editingNoteIsChecklist = asChecklist;
+      const textBody = document.getElementById('keep-edit-text-body');
+      const checkBody = document.getElementById('keep-edit-checklist-body');
+      const modeBtn = document.getElementById('keep-edit-btn-mode');
+
+      if (editingNoteIsChecklist) {
+        if (textBody) textBody.style.display = 'none';
+        if (checkBody) checkBody.style.display = 'block';
+        if (modeBtn) modeBtn.innerHTML = '📝';
+        renderEditChecklistItems();
+      } else {
+        if (textBody) textBody.style.display = 'block';
+        if (checkBody) checkBody.style.display = 'none';
+        if (modeBtn) modeBtn.innerHTML = '☑️';
+      }
+    }
+
+    function handleEditChecklistEnter(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const input = document.getElementById('keep-edit-checklist-input');
+        const text = input.value.trim();
+        if (text) {
+          editingNoteChecklistItems.push({ text, done: false });
+          input.value = '';
+          renderEditChecklistItems();
+        }
+      }
+    }
+
+    function renderEditChecklistItems() {
+      const container = document.getElementById('keep-edit-checklist-items');
+      if (!container) return;
+      container.innerHTML = '';
+      editingNoteChecklistItems.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'keep-checklist-item-row';
+        row.innerHTML = `
+          <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleEditCheckItem(${idx})" />
+          <span class="keep-checklist-item-text ${item.done ? 'checked' : ''}" style="flex: 1;">${escapeHtml(item.text)}</span>
+          <button class="node-btn-icon" style="width: 24px; height: 24px; font-size: 0.75rem;" onclick="removeEditCheckItem(${idx})">✕</button>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function toggleEditCheckItem(idx) {
+      if (editingNoteChecklistItems[idx]) {
+        editingNoteChecklistItems[idx].done = !editingNoteChecklistItems[idx].done;
+        renderEditChecklistItems();
+      }
+    }
+
+    function removeEditCheckItem(idx) {
+      editingNoteChecklistItems.splice(idx, 1);
+      renderEditChecklistItems();
+    }
+
+    function toggleKeepEditPalette(e) {
+      if (e) e.stopPropagation();
+      const dropdown = document.getElementById('keep-edit-palette-dropdown');
+      const isShown = dropdown && dropdown.style.display !== 'none';
+      closeAllKeepMenus();
+      if (!isShown && dropdown) dropdown.style.display = 'grid';
+    }
+
+    function selectKeepEditColor(colorKey) {
+      editingNoteColor = colorKey;
+      applyEditModalColor(colorKey);
+      const dropdown = document.getElementById('keep-edit-palette-dropdown');
+      if (dropdown) dropdown.style.display = 'none';
+    }
+
+    function toggleKeepEditReminderMenu(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('keep-edit-reminder-menu');
+      const isShown = menu && menu.style.display !== 'none';
+      closeAllKeepMenus();
+      if (!isShown && menu) menu.style.display = 'flex';
+    }
+
+    function setQuickKeepEditReminder(reminderText) {
+      if (reminderText === 'حذف یادآور') {
+        editingNoteReminder = null;
+      } else {
+        editingNoteReminder = reminderText;
+      }
+      closeAllKeepMenus();
+      renderEditBadges();
+    }
+
+    function toggleKeepEditTagsMenu(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('keep-edit-tags-menu');
+      const isShown = menu && menu.style.display !== 'none';
+      closeAllKeepMenus();
+      if (!isShown && menu) menu.style.display = 'flex';
+    }
+
+    function toggleKeepEditTag(tagName) {
+      const idx = editingNoteTags.indexOf(tagName);
+      if (idx >= 0) {
+        editingNoteTags.splice(idx, 1);
+      } else {
+        editingNoteTags.push(tagName);
+      }
+      closeAllKeepMenus();
+      renderEditBadges();
+    }
+
+    function renderEditBadges() {
+      const bar = document.getElementById('keep-edit-badges-bar');
+      if (!bar) return;
+      bar.innerHTML = '';
+
+      if (editingNoteReminder) {
+        const b = document.createElement('span');
+        b.className = 'keep-card-badge';
+        b.innerHTML = `⏰ ${escapeHtml(editingNoteReminder)} <span style="cursor: pointer; margin-right: 4px;" onclick="editingNoteReminder = null; renderEditBadges();">✕</span>`;
+        bar.appendChild(b);
+      }
+      if (editingNoteDateShamsi) {
+        const b = document.createElement('span');
+        b.className = 'keep-card-badge';
+        b.innerHTML = `📅 ${toFaDigits(editingNoteDateShamsi)}`;
+        bar.appendChild(b);
+      }
+      editingNoteTags.forEach(t => {
+        const b = document.createElement('span');
+        b.className = 'keep-card-badge';
+        b.innerHTML = `#${escapeHtml(t)} <span style="cursor: pointer; margin-right: 4px;" onclick="toggleKeepEditTag('${t}')">✕</span>`;
+        bar.appendChild(b);
+      });
+    }
+
+    async function saveEditedKeepNote() {
+      if (!editingNoteId) return;
+
+      const title = (document.getElementById('keep-edit-title')?.value || '').trim();
+      const content = (document.getElementById('keep-edit-content')?.value || '').trim();
+
+      const payload = {
+        title: title || (editingNoteChecklistItems.length > 0 ? 'چک‌لیست' : 'یادداشت'),
+        content: content,
+        color: editingNoteColor || 'default',
+        is_pinned: editingNoteIsPinned,
+        checklist: editingNoteIsChecklist ? editingNoteChecklistItems : [],
+        tags: editingNoteTags,
+        reminder_at: editingNoteReminder
+      };
+
+      try {
+        const resp = await apiRequest(`/api/v1/notes/${editingNoteId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!resp.ok) throw new Error('بروزرسانی یادداشت با خطا مواجه شد');
+
+        closeKeepEditModal();
+        showToast('تغییرات یادداشت با موفقیت ذخیره شد!', 'success');
+        await loadAllRemindersAndNotes();
+        await loadCurrentMonthCalendar(calYear, calMonth);
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    async function deleteCurrentEditingNote() {
+      if (!editingNoteId) return;
+      if (!confirm('آیا از حذف این یادداشت اطمینان دارید؟')) return;
+
+      try {
+        const resp = await apiRequest(`/api/v1/notes/${editingNoteId}`, { method: 'DELETE' });
+        if (!resp.ok) throw new Error('حذف یادداشت با خطا مواجه شد');
+
+        closeKeepEditModal();
+        showToast('یادداشت حذف شد', 'success');
+        await loadAllRemindersAndNotes();
+        await loadCurrentMonthCalendar(calYear, calMonth);
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    /* --------------------------------------------------------------------------
+       QUICK TASK / OCCASION MODAL DIALOG
+       -------------------------------------------------------------------------- */
+    function openQuickTaskDialog() {
+      const modal = document.getElementById('quick-task-modal');
+      const dateInp = document.getElementById('dialog-task-date');
+      if (dateInp) dateInp.value = selectedCalendarDate || (currentMonthCalendarData ? currentMonthCalendarData.today_shamsi : '');
+      if (modal) modal.style.display = 'flex';
+      const titleInp = document.getElementById('dialog-task-title');
+      if (titleInp) titleInp.focus();
+    }
+
+    function closeQuickTaskDialog() {
+      const modal = document.getElementById('quick-task-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function submitQuickTaskFromDialog() {
+      const titleInp = document.getElementById('dialog-task-title');
+      const typeInp = document.getElementById('dialog-task-type');
+      const dateInp = document.getElementById('dialog-task-date');
+      const timeInp = document.getElementById('dialog-task-time');
+
+      const title = titleInp ? titleInp.value.trim() : '';
+      if (!title) {
+        showToast('لطفاً عنوان وظیفه یا مناسبت را وارد کنید', 'error');
+        return;
+      }
+
+      const type = typeInp ? typeInp.value : 'task';
+      const date_shamsi = dateInp ? dateInp.value.trim() : null;
+      const time_str = timeInp ? timeInp.value : '10:00';
+
+      try {
+        const resp = await apiRequest('/api/v1/reminders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, type, date_shamsi, time_str })
+        });
+        if (!resp.ok) throw new Error('ثبت آیتم با خطا مواجه شد');
+
+        closeQuickTaskDialog();
+        if (titleInp) titleInp.value = '';
+        showToast(`«${title}» ثبت شد و هشدار تلگرام فعال گردید!`, 'success');
+        await loadAllRemindersAndNotes();
+        await loadCurrentMonthCalendar(calYear, calMonth);
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    /* --------------------------------------------------------------------------
+       REMINDERS, TIMERS & TELEGRAM ACTIONS
+       -------------------------------------------------------------------------- */
     async function createQuickTimer(minutes, title) {
       try {
-        showToast(`در حال فعال‌سازی تایمر ${minutes} دقیقه‌ای...`);
+        showToast(`در حال فعال‌سازی تایمر ${toFaDigits(minutes)} دقیقه‌ای...`);
         const resp = await apiRequest('/api/v1/reminders', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -3134,7 +4951,7 @@
         });
         if (!resp.ok) throw new Error('فعال‌سازی تایمر با خطا مواجه شد');
 
-        showToast(`⏱️ تایمر ${minutes} دقیقه‌ای فعال شد! هشدار در تلگرام ارسال خواهد شد.`, 'success');
+        showToast(`⏱️ تایمر ${toFaDigits(minutes)} دقیقه‌ای فعال شد! هشدار در تلگرام ارسال خواهد شد.`, 'success');
         await loadAllRemindersAndNotes();
         await loadCurrentMonthCalendar(calYear, calMonth);
       } catch (e) {
@@ -3156,7 +4973,7 @@
       try {
         const resp = await apiRequest(`/api/v1/reminders/${id}/snooze?minutes=${minutes}`, { method: 'POST' });
         if (!resp.ok) throw new Error('به تعویق انداختن ناموفق بود');
-        showToast(`⏰ یادآور ${minutes} دقیقه به تعویق افتاد`, 'info');
+        showToast(`⏰ یادآور ${toFaDigits(minutes)} دقیقه به تعویق افتاد`, 'info');
         await loadAllRemindersAndNotes();
       } catch (e) {
         showToast(e.message, 'error');
@@ -3168,129 +4985,6 @@
         const resp = await apiRequest(`/api/v1/reminders/${id}`, { method: 'DELETE' });
         if (!resp.ok) throw new Error('حذف یادآور ناموفق بود');
         showToast('آیتم حذف شد', 'success');
-        await loadAllRemindersAndNotes();
-        await loadCurrentMonthCalendar(calYear, calMonth);
-      } catch (e) {
-        showToast(e.message, 'error');
-      }
-    }
-
-    async function deleteGeneralNote(id) {
-      if (!confirm('آیا از حذف این یادداشت اطمینان دارید؟')) return;
-      try {
-        const resp = await apiRequest(`/api/v1/notes/${id}`, { method: 'DELETE' });
-        if (!resp.ok) throw new Error('حذف یادداشت ناموفق بود');
-        showToast('یادداشت با موفقیت حذف شد', 'success');
-        await loadAllRemindersAndNotes();
-        await loadCurrentMonthCalendar(calYear, calMonth);
-      } catch (e) {
-        showToast(e.message, 'error');
-      }
-    }
-
-    function refreshCalendarData() {
-      loadCalendarTodayInfo();
-      loadCurrentMonthCalendar(calYear, calMonth);
-      loadAllRemindersAndNotes();
-      showToast('اطلاعات تقویم و یادداشت‌ها بروزرسانی شد', 'success');
-    }
-
-    function openNewNoteModal() {
-      openGenericModal('📝 یادداشت جدید', `
-        <div class="form-group">
-          <label class="form-label">عنوان یادداشت:</label>
-          <input type="text" id="modal-note-title" class="form-input" placeholder="عنوان یادداشت..." autofocus />
-        </div>
-        <div class="form-group">
-          <label class="form-label">متن یادداشت:</label>
-          <textarea id="modal-note-content" class="form-input" rows="5" placeholder="یادداشت‌های خود را بنویسید..."></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">تاریخ شمسی (اختیاری):</label>
-          <input type="text" id="modal-note-date" class="form-input" value="${selectedCalendarDate || ''}" placeholder="1405/06/27" style="direction: ltr;" />
-        </div>
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
-          <button class="btn-glass" onclick="closeGenericModal()">انصراف</button>
-          <button class="btn-glass btn-glass-primary" onclick="submitModalCreateNote()">ایجاد یادداشت</button>
-        </div>
-      `);
-    }
-
-    async function submitModalCreateNote() {
-      const title = document.getElementById('modal-note-title').value.trim();
-      const content = document.getElementById('modal-note-content').value.trim();
-      const date_shamsi = document.getElementById('modal-note-date').value.trim() || null;
-
-      if (!title && !content) {
-        showToast('لطفاً عنوان یا متن یادداشت را وارد کنید', 'error');
-        return;
-      }
-
-      try {
-        const resp = await apiRequest('/api/v1/notes', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title: title || 'یادداشت جدید', content, date_shamsi, is_daily: false })
-        });
-        if (!resp.ok) throw new Error('ایجاد یادداشت ناموفق بود');
-        closeGenericModal();
-        showToast('یادداشت با موفقیت ایجاد شد', 'success');
-        await loadAllRemindersAndNotes();
-        await loadCurrentMonthCalendar(calYear, calMonth);
-      } catch (e) {
-        showToast(e.message, 'error');
-      }
-    }
-
-    function openNewReminderModal() {
-      openGenericModal('⏰ وظیفه یا مناسبت جدید', `
-        <div class="form-group">
-          <label class="form-label">عنوان:</label>
-          <input type="text" id="modal-rem-title" class="form-input" placeholder="مثال: جلسه کاری با تیم" autofocus />
-        </div>
-        <div class="form-group">
-          <label class="form-label">نوع رویداد:</label>
-          <select id="modal-rem-type" class="form-input">
-            <option value="task">📋 وظیفه کاری / تسک</option>
-            <option value="occasion">🎉 مناسبت خاص / جشن / تولد</option>
-            <option value="timer">⏱️ تایمر یا آلارم</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">تاریخ شمسی (YYYY/MM/DD):</label>
-          <input type="text" id="modal-rem-date" class="form-input" value="${selectedCalendarDate || ''}" placeholder="1405/06/27" style="direction: ltr;" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">ساعت هشدار (HH:MM):</label>
-          <input type="time" id="modal-rem-time" class="form-input" value="10:00" />
-        </div>
-        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
-          <button class="btn-glass" onclick="closeGenericModal()">انصراف</button>
-          <button class="btn-glass btn-glass-primary" onclick="submitModalCreateReminder()">ثبت و فعال‌سازی آلارم</button>
-        </div>
-      `);
-    }
-
-    async function submitModalCreateReminder() {
-      const title = document.getElementById('modal-rem-title').value.trim();
-      const type = document.getElementById('modal-rem-type').value;
-      const date_shamsi = document.getElementById('modal-rem-date').value.trim() || null;
-      const time_str = document.getElementById('modal-rem-time').value || '10:00';
-
-      if (!title) {
-        showToast('لطفاً عنوان را وارد کنید', 'error');
-        return;
-      }
-
-      try {
-        const resp = await apiRequest('/api/v1/reminders', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, type, date_shamsi, time_str })
-        });
-        if (!resp.ok) throw new Error('ثبت یادآور با خطا مواجه شد');
-        closeGenericModal();
-        showToast('یادآور ثبت شد و در زمان مقرر به تلگرام پیام ارسال می‌شود!', 'success');
         await loadAllRemindersAndNotes();
         await loadCurrentMonthCalendar(calYear, calMonth);
       } catch (e) {
@@ -3333,6 +5027,7 @@
       closeGenericModal();
       await createQuickTimer(mins, title);
     }
+
 
     function refreshDrive() {
       fetchStorageStats();
