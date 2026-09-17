@@ -38,6 +38,8 @@ from app.api.routes import nodes as node_routes
 from app.api.routes import system as system_routes
 from app.api.routes import uploads as upload_routes
 from app.api.routes import telegram as telegram_routes
+from app.api.routes import notes_routes
+from app.api.routes import reminders_routes
 from app.emulator import router as emulator_routes
 from app.core.config import Settings, get_settings
 from app.core.errors import install_error_handlers
@@ -349,6 +351,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(upload_routes.router, prefix="/api/v1")
     app.include_router(file_routes.router, prefix="/api/v1")
     app.include_router(telegram_routes.router, prefix="/api/v1")
+    app.include_router(notes_routes.router, prefix="/api/v1")
+    app.include_router(reminders_routes.router, prefix="/api/v1")
+    app.include_router(reminders_routes.calendar_router, prefix="/api/v1")
 
     return app
 

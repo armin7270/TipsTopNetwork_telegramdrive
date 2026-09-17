@@ -20,10 +20,18 @@ import math
 import mimetypes
 import os
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import httpx
+
+from app.core.jalali import (
+    format_full_jalali,
+    format_jalali_date,
+    get_current_jalali,
+    jalali_to_datetime,
+    parse_jalali_string,
+)
 
 log = logging.getLogger(__name__)
 
@@ -62,6 +70,7 @@ class TelegramBotService:
         )
 
         self._task: asyncio.Task[None] | None = None
+        self._reminder_task: asyncio.Task[None] | None = None
         self._running = False
         self._bot_info: dict[str, Any] | None = None
         self._client: httpx.AsyncClient | None = None
@@ -146,6 +155,9 @@ class TelegramBotService:
                     commands = [
                         {"command": "start", "description": "منوی اصلی و ورود"},
                         {"command": "files", "description": "مدیریت و مشاهده فایل‌های من"},
+                        {"command": "notes", "description": "یادداشت‌ها و یادداشت روزانه"},
+                        {"command": "remind", "description": "تنظیم یادآور، مناسبت و تایمر"},
+                        {"command": "calendar", "description": "تقویم شمسی و رویدادهای امروز"},
                         {"command": "usage", "description": "سهمیه باقی‌مانده و میزان مصرف"},
                         {"command": "search", "description": "جستجوی فایل در درایو"},
                         {"command": "link", "description": "اتصال به حساب وب درایو"},
@@ -162,8 +174,9 @@ class TelegramBotService:
         except Exception as e:
             log.warning("TelegramBotService start check failed: %s", e)
 
-        # Launch polling loop in background
+        # Launch polling loop and reminder dispatcher in background
         self._task = asyncio.create_task(self._poll_loop())
+        self._reminder_task = asyncio.create_task(self._reminder_dispatcher_loop())
 
     async def stop(self) -> None:
         """Stop polling loop and close HTTP client."""
@@ -172,6 +185,12 @@ class TelegramBotService:
             self._task.cancel()
             try:
                 await self._task
+            except asyncio.CancelledError:
+                pass
+        if self._reminder_task and not self._reminder_task.done():
+            self._reminder_task.cancel()
+            try:
+                await self._reminder_task
             except asyncio.CancelledError:
                 pass
         if self._client:
@@ -346,16 +365,29 @@ class TelegramBotService:
         if not text:
             return
 
-        # Check if user is in an interactive state (e.g. renaming a file)
+        # Check if user is in an interactive state
         state = self._user_state.get(user_id)
-        if state and state.get("action") == "rename":
-            await self._handle_rename_input(chat_id, user_id, text, state)
-            return
+        if state:
+            action = state.get("action")
+            if action == "rename":
+                await self._handle_rename_input(chat_id, user_id, text, state)
+                return
+            elif action in ("add_note", "add_daily", "add_reminder", "add_timer"):
+                await self._handle_interactive_text_input(chat_id, user_id, text, state)
+                return
 
         if text.startswith("/start"):
             await self._send_welcome(chat_id, from_user)
         elif text.startswith("/files") or text in ("📂 فایل‌های من", "فایل‌های من", "فایل های من"):
             await self._send_file_list(chat_id, user_id, page=0)
+        elif text.startswith("/notes") or text in ("📝 یادداشت‌ها", "یادداشت‌ها", "یادداشت ها"):
+            await self._send_notes_list(chat_id, user_id, page=0)
+        elif text.startswith("/daily") or text in ("📅 یادداشت امروز", "یادداشت امروز"):
+            await self._send_today_note(chat_id, user_id)
+        elif text.startswith("/calendar") or text in ("📅 تقویم شمسی", "تقویم", "تقویم شمسی"):
+            await self._send_calendar(chat_id, user_id)
+        elif text.startswith("/remind") or text.startswith("/tasks") or text in ("⏰ یادآورها و تایمر", "یادآورها", "تسک‌ها", "مناسبت‌ها"):
+            await self._handle_remind_command(chat_id, user_id, text)
         elif text.startswith("/usage") or text.startswith("/stats") or text in ("📊 وضعیت سهمیه", "📊 وضعیت فضای ابری", "سهمیه"):
             await self._send_usage_stats(chat_id, user_id)
         elif text.startswith("/link"):
@@ -513,17 +545,20 @@ class TelegramBotService:
     async def _send_welcome(self, chat_id: int, from_user: dict[str, Any]) -> None:
         name = from_user.get("first_name", "کاربر عزیز")
         web_url = f"{self.public_base_url}/"
+        today_fa = format_full_jalali()
 
         welcome_text = (
             f"👋 سلام *{name}*!\n\n"
-            "☁️ *به درایو ابری نامحدود TeleDrive خوش آمدید!*\n\n"
-            "با این ربات می‌توانید به سادگی و با نهایت سرعت:\n"
-            "• هر نوع فایلی را ارسال کرده و نامحدود در تلگرام ذخیره کنید.\n"
-            "• ویدیوها و آهنگ‌ها را آنلاین بدون دانلود استریم کنید.\n"
-            "• لینک دانلود مستقیم فایل‌ها را دریافت نمایید.\n"
-            "• فایل‌های خود را ویرایش و مدیریت کرده یا تغییر نام دهید.\n"
-            "• فایل‌های خود را به صورت همگام با وب و اپلیکیشن اندروید مدیریت کنید.\n\n"
-            "👇 یکی از گزینه‌های زیر را انتخاب کنید یا همین الان یک فایل بفرستید:"
+            f"📅 امروز: *{today_fa}*\n"
+            "☁️ *به درایو ابری و دستیار هوشمند TeleDrive خوش آمدید!*\n\n"
+            "امکانات در دسترس شما:\n"
+            "• آپلود نامحدود و امن فایل‌ها بر بستر تلگرام\n"
+            "• استریم آنلاین ویدیو و آهنگ + لینک دانلود مستقیم\n"
+            "• مدیریت کامل فایل‌ها (دانلود در تلگرام، تغییر نام و حذف)\n"
+            "• 📝 **ثبت یادداشت‌های روزانه و عمومی**\n"
+            "• 📅 **تقویم شمسی و رویدادهای روز**\n"
+            "• ⏰ **تنظیم تایمر، هشدار وظایف و مناسبت‌های خاص با اعلان در تلگرام**\n\n"
+            "👇 یکی از گزینه‌های زیر را انتخاب کنید یا دستور دلخواه را ارسال نمایید:"
         )
 
         keyboard = {
@@ -533,11 +568,16 @@ class TelegramBotService:
                     {"text": "📊 سهمیه باقی‌مانده", "callback_data": "usage"},
                 ],
                 [
-                    {"text": "🔍 جستجوی فایل", "callback_data": "search_prompt"},
-                    {"text": "ℹ️ راهنما و امکانات", "callback_data": "help"},
+                    {"text": "📝 یادداشت‌ها", "callback_data": "notes_0"},
+                    {"text": "📅 تقویم شمسی", "callback_data": "cal_today"},
                 ],
                 [
-                    {"text": "🌐 ورود به وب‌درایو (Web App)", "url": web_url}
+                    {"text": "⏰ یادآورها و تایمر", "callback_data": "reminders_menu"},
+                    {"text": "🔍 جستجوی فایل", "callback_data": "search_prompt"},
+                ],
+                [
+                    {"text": "ℹ️ راهنما و امکانات", "callback_data": "help"},
+                    {"text": "🌐 ورود به وب‌درایو", "url": web_url},
                 ],
             ]
         }
@@ -1164,6 +1204,148 @@ class TelegramBotService:
                 json={"chat_id": chat_id, "text": "❌ عملیات تغییر نام لغو شد."},
             )
             await self._send_file_list(chat_id, user_id, page=0)
+        elif data.startswith("notes_"):
+            page = int(data.split("_")[1])
+            await self._send_notes_list(chat_id, user_id, page=page)
+        elif data == "addnote_prompt":
+            self._user_state[user_id] = {"action": "add_note"}
+            keyboard = {"inline_keyboard": [[{"text": "❌ انصراف", "callback_data": "notes_0"}]]}
+            await self._client.post(
+                f"{self.api_base}/sendMessage",
+                json={
+                    "chat_id": chat_id,
+                    "text": "📝 *افزودن یادداشت جدید:*\n\nلطفاً متن یادداشت خود را در پیام بعدی تایپ و ارسال نمایید:",
+                    "parse_mode": "Markdown",
+                    "reply_markup": keyboard,
+                },
+            )
+        elif data.startswith("viewnote_"):
+            note_prefix = data.split("_")[1]
+            await self._send_single_note(chat_id, user_id, note_prefix)
+        elif data.startswith("delnote_"):
+            note_prefix = data.split("_")[1]
+            note = self._find_note_by_prefix(note_prefix)
+            if note:
+                await self.repo.delete_note(note["id"])
+                await self._client.post(
+                    f"{self.api_base}/sendMessage",
+                    json={"chat_id": chat_id, "text": f"🗑️ یادداشت *«{note.get('title')}»* حذف گردید.", "parse_mode": "Markdown"},
+                )
+            await self._send_notes_list(chat_id, user_id, page=0)
+        elif data == "cal_today":
+            await self._send_calendar(chat_id, user_id)
+        elif data == "daily_prompt":
+            self._user_state[user_id] = {"action": "add_daily"}
+            keyboard = {"inline_keyboard": [[{"text": "❌ انصراف", "callback_data": "cal_today"}]]}
+            today_fa = format_full_jalali()
+            await self._client.post(
+                f"{self.api_base}/sendMessage",
+                json={
+                    "chat_id": chat_id,
+                    "text": f"📅 *ثبت یادداشت روز ({today_fa}):*\n\nلطفاً متن یا برنامه امروز خود را بنویسید:",
+                    "parse_mode": "Markdown",
+                    "reply_markup": keyboard,
+                },
+            )
+        elif data == "reminders_menu":
+            await self._send_reminders_menu(chat_id, user_id)
+        elif data == "addtask_prompt":
+            self._user_state[user_id] = {"action": "add_reminder", "type": "task"}
+            keyboard = {"inline_keyboard": [[{"text": "❌ انصراف", "callback_data": "reminders_menu"}]]}
+            await self._client.post(
+                f"{self.api_base}/sendMessage",
+                json={
+                    "chat_id": chat_id,
+                    "text": (
+                        "📌 *ثبت وظیفه / تسک جدید:*\n\n"
+                        "لطفاً عنوان کار، و در صورت نیاز تاریخ شمسی و ساعت را بفرستید.\n\n"
+                        "مثال‌ها:\n"
+                        "• `جلسه هماهنگی پروژه`\n"
+                        "• `1405/06/28 17:00 بررسی گزارش کار`"
+                    ),
+                    "parse_mode": "Markdown",
+                    "reply_markup": keyboard,
+                },
+            )
+        elif data == "addocc_prompt":
+            self._user_state[user_id] = {"action": "add_reminder", "type": "occasion"}
+            keyboard = {"inline_keyboard": [[{"text": "❌ انصراف", "callback_data": "reminders_menu"}]]}
+            await self._client.post(
+                f"{self.api_base}/sendMessage",
+                json={
+                    "chat_id": chat_id,
+                    "text": (
+                        "🎉 *ثبت مناسبت خاص روی تقویم شمسی:*\n\n"
+                        "لطفاً عنوان مناسبت و تاریخ شمسی را ارسال کنید.\n\n"
+                        "مثال:\n"
+                        "`1405/07/15 سالگرد ازدواج`\n"
+                        "`1405/08/10 جشن تولد آرمین`"
+                    ),
+                    "parse_mode": "Markdown",
+                    "reply_markup": keyboard,
+                },
+            )
+        elif data == "addtimer_prompt":
+            keyboard = {
+                "inline_keyboard": [
+                    [
+                        {"text": "⏱️ ۵ دقیقه", "callback_data": "timer_5"},
+                        {"text": "⏱️ ۱۰ دقیقه", "callback_data": "timer_10"},
+                    ],
+                    [
+                        {"text": "⏱️ ۱۵ دقیقه", "callback_data": "timer_15"},
+                        {"text": "⏱️ ۳۰ دقیقه", "callback_data": "timer_30"},
+                    ],
+                    [
+                        {"text": "⏱️ ۱ ساعت", "callback_data": "timer_60"},
+                        {"text": "⏱️ ۲ ساعت", "callback_data": "timer_120"},
+                    ],
+                    [{"text": "🔙 بازگشت به منو", "callback_data": "reminders_menu"}],
+                ]
+            }
+            await self._client.post(
+                f"{self.api_base}/sendMessage",
+                json={
+                    "chat_id": chat_id,
+                    "text": "⏳ *تنظیم سریع تایمر شمارش معکوس:*\n\nمدت زمان مورد نظر را انتخاب کنید:",
+                    "parse_mode": "Markdown",
+                    "reply_markup": keyboard,
+                },
+            )
+        elif data.startswith("timer_"):
+            mins = int(data.split("_")[1])
+            await self._create_quick_timer(chat_id, user_id, mins)
+        elif data.startswith("donerem_"):
+            rem_prefix = data.split("_")[1]
+            rem = self._find_reminder_by_prefix(rem_prefix)
+            if rem:
+                await self.repo.toggle_reminder(rem["id"])
+                new_state = not rem.get("is_completed", False)
+                status_txt = "✅ انجام شد" if new_state else "🔄 به وضعیت فعال بازگشت"
+                await self._client.post(
+                    f"{self.api_base}/sendMessage",
+                    json={"chat_id": chat_id, "text": f"{status_txt}: *«{rem.get('title')}»*", "parse_mode": "Markdown"},
+                )
+            await self._send_reminders_menu(chat_id, user_id)
+        elif data.startswith("snooze_"):
+            rem_prefix = data.split("_")[1]
+            rem = self._find_reminder_by_prefix(rem_prefix)
+            if rem:
+                await self.repo.snooze_reminder(rem["id"], minutes=10)
+                await self._client.post(
+                    f"{self.api_base}/sendMessage",
+                    json={"chat_id": chat_id, "text": f"⏳ یادآور *«{rem.get('title')}»* برای ۱۰ دقیقه به تعویق افتاد.", "parse_mode": "Markdown"},
+                )
+        elif data.startswith("delrem_"):
+            rem_prefix = data.split("_")[1]
+            rem = self._find_reminder_by_prefix(rem_prefix)
+            if rem:
+                await self.repo.delete_reminder(rem["id"])
+                await self._client.post(
+                    f"{self.api_base}/sendMessage",
+                    json={"chat_id": chat_id, "text": f"🗑️ یادآور «{rem.get('title')}» حذف شد."},
+                )
+            await self._send_reminders_menu(chat_id, user_id)
 
     # --- Helpers --------------------------------------------------------------
 
@@ -1413,3 +1595,542 @@ class TelegramBotService:
         if ext in ("apk", "exe", "msi"):
             return "🤖"
         return "📄"
+
+    # --- Background Reminder Dispatcher ---------------------------------------
+
+    async def _reminder_dispatcher_loop(self) -> None:
+        """Periodic background loop checking due tasks/reminders and sending alerts."""
+        log.info("TelegramBotService: Reminder dispatcher loop started.")
+        while self._running:
+            try:
+                if self.bot_token and self._client and hasattr(self.repo, "list_due_reminders"):
+                    now = datetime.now(timezone.utc)
+                    due_items = await self.repo.list_due_reminders(now)
+                    for item in due_items:
+                        await self._dispatch_reminder_alert(item)
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                log.debug("Reminder dispatcher check exception: %s", e)
+
+            await asyncio.sleep(15)
+
+    async def _dispatch_reminder_alert(self, item: dict[str, Any]) -> None:
+        """Send a rich alarm notification to Telegram when a reminder/timer is due."""
+        rem_id = item["id"]
+        title = item.get("title", "وظیفه / رویداد")
+        rem_type = item.get("type", "task")
+        date_shamsi = item.get("date_shamsi") or ""
+        time_str = item.get("time_str") or ""
+
+        type_names = {
+            "task": "📌 وظیفه / کار شخصی",
+            "occasion": "🎉 مناسبت خاص / رویداد تقویم",
+            "timer": "⏳ تایمر شمارش معکوس",
+        }
+        type_str = type_names.get(rem_type, "⏰ یادآور")
+
+        chat_id = item.get("telegram_chat_id")
+        if not chat_id and hasattr(self.repo, "users"):
+            owner_id = str(item.get("owner_id"))
+            for u in self.repo.users.values():
+                if str(u.get("id")) == owner_id and u.get("telegram_user_id"):
+                    chat_id = u["telegram_user_id"]
+                    break
+            if not chat_id:
+                for u in self.repo.users.values():
+                    if u.get("telegram_user_id"):
+                        chat_id = u["telegram_user_id"]
+                        break
+
+        if not chat_id:
+            return
+
+        hex_id = rem_id.replace("-", "")[:12]
+        text = (
+            f"⏰ *هشدار و اعلان TeleDrive!*\n\n"
+            f"📌 *عنوان:* `{title}`\n"
+            f"🏷️ *نوع:* {type_str}\n"
+        )
+        if date_shamsi:
+            text += f"📅 *تاریخ شمسی:* `{date_shamsi}`\n"
+        if time_str:
+            text += f"🕒 *زمان:* `{time_str}`\n"
+
+        keyboard = {
+            "inline_keyboard": [
+                [
+                    {"text": "✅ انجام شد", "callback_data": f"donerem_{hex_id}"},
+                    {"text": "⏳ ۱۰ دقیقه بعد", "callback_data": f"snooze_{hex_id}"},
+                ],
+                [
+                    {"text": "🗑️ حذف", "callback_data": f"delrem_{hex_id}"},
+                    {"text": "📅 تقویم و رویدادها", "callback_data": "cal_today"},
+                ],
+            ]
+        }
+
+        try:
+            await self._client.post(
+                f"{self.api_base}/sendMessage",
+                json={
+                    "chat_id": chat_id,
+                    "text": text,
+                    "parse_mode": "Markdown",
+                    "reply_markup": keyboard,
+                },
+            )
+            repeat = item.get("repeat", "none")
+            if repeat == "daily" and item.get("remind_at_utc"):
+                item["remind_at_utc"] = item["remind_at_utc"] + timedelta(days=1)
+                item["notified"] = False
+                if hasattr(self.repo, "_save_state"):
+                    self.repo._save_state()
+            elif repeat == "weekly" and item.get("remind_at_utc"):
+                item["remind_at_utc"] = item["remind_at_utc"] + timedelta(weeks=1)
+                item["notified"] = False
+                if hasattr(self.repo, "_save_state"):
+                    self.repo._save_state()
+            else:
+                await self.repo.mark_reminder_notified(rem_id)
+        except Exception as e:
+            log.warning("Failed to dispatch reminder %s: %s", rem_id, e)
+
+    # --- Notes & Daily Notes Helpers ------------------------------------------
+
+    async def _send_notes_list(self, chat_id: int, user_id: int, page: int = 0) -> None:
+        user = await self._get_or_create_user(user_id)
+        owner_id = user["id"]
+        notes = await self.repo.list_notes(owner_id=owner_id)
+
+        if not notes:
+            keyboard = {
+                "inline_keyboard": [
+                    [{"text": "➕ ثبت یادداشت جدید", "callback_data": "addnote_prompt"}],
+                    [{"text": "📅 یادداشت امروز", "callback_data": "daily_prompt"}],
+                    [{"text": "🔙 بازگشت به منو", "callback_data": "start"}],
+                ]
+            }
+            await self._client.post(
+                f"{self.api_base}/sendMessage",
+                json={
+                    "chat_id": chat_id,
+                    "text": "📝 *هنوز یادداشتی ثبت نشده است.*\n\nمی‌توانید همین الان با دکمه زیر یادداشت یا برنامه روزانه خود را ثبت کنید:",
+                    "parse_mode": "Markdown",
+                    "reply_markup": keyboard,
+                },
+            )
+            return
+
+        PAGE_SIZE = 5
+        total_pages = max(1, math.ceil(len(notes) / PAGE_SIZE))
+        page = max(0, min(page, total_pages - 1))
+        page_items = notes[page * PAGE_SIZE : (page + 1) * PAGE_SIZE]
+
+        text = (
+            f"📝 *یادداشت‌های من در TeleDrive*\n"
+            f"📄 صفحه {page + 1} از {total_pages} (کل: {len(notes)} عدد)\n\n"
+        )
+        keyboard_rows = [
+            [
+                {"text": "➕ یادداشت جدید", "callback_data": "addnote_prompt"},
+                {"text": "📅 یادداشت روزانه", "callback_data": "daily_prompt"},
+            ]
+        ]
+
+        for idx, n in enumerate(page_items, start=page * PAGE_SIZE + 1):
+            hex_id = n["id"].replace("-", "")[:12]
+            title = n.get("title", "یادداشت")
+            preview = (n.get("content", "").strip()[:40] or "...")
+            date_info = f" ({n.get('date_shamsi')})" if n.get("date_shamsi") else ""
+            badge = "📅 " if n.get("is_daily") else "📌 "
+
+            text += f"{idx}. {badge}*{title}*{date_info}\n   _{preview}_\n\n"
+            keyboard_rows.append([
+                {"text": f"👁️ مشاهده: {title[:20]}", "callback_data": f"viewnote_{hex_id}"},
+                {"text": "🗑️ حذف", "callback_data": f"delnote_{hex_id}"},
+            ])
+
+        nav_row = []
+        if page > 0:
+            nav_row.append({"text": "⬅️ قبلی", "callback_data": f"notes_{page - 1}"})
+        if page < total_pages - 1:
+            nav_row.append({"text": "بعدی ➡️", "callback_data": f"notes_{page + 1}"})
+        if nav_row:
+            keyboard_rows.append(nav_row)
+
+        keyboard_rows.append([{"text": "🔙 بازگشت به منو", "callback_data": "start"}])
+
+        await self._client.post(
+            f"{self.api_base}/sendMessage",
+            json={
+                "chat_id": chat_id,
+                "text": text,
+                "parse_mode": "Markdown",
+                "reply_markup": {"inline_keyboard": keyboard_rows},
+            },
+        )
+
+    async def _send_single_note(self, chat_id: int, user_id: int, note_prefix: str) -> None:
+        note = self._find_note_by_prefix(note_prefix)
+        if not note:
+            await self._client.post(
+                f"{self.api_base}/sendMessage",
+                json={"chat_id": chat_id, "text": "❌ یادداشت مورد نظر یافت نشد."},
+            )
+            return
+
+        title = note.get("title", "یادداشت")
+        content = note.get("content", "")
+        date_shamsi = note.get("date_shamsi", "")
+        hex_id = note["id"].replace("-", "")[:12]
+
+        text = (
+            f"📝 *{title}*\n"
+            f"{('📅 تاریخ: `' + date_shamsi + '`\\n') if date_shamsi else ''}\n"
+            f"━━━━━━━━━━━━━━━━━━━\n"
+            f"{content}\n"
+            f"━━━━━━━━━━━━━━━━━━━\n"
+        )
+        keyboard = {
+            "inline_keyboard": [
+                [{"text": "🗑️ حذف یادداشت", "callback_data": f"delnote_{hex_id}"}],
+                [{"text": "🔙 بازگشت به لیست", "callback_data": "notes_0"}],
+            ]
+        }
+        await self._client.post(
+            f"{self.api_base}/sendMessage",
+            json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown", "reply_markup": keyboard},
+        )
+
+    async def _send_today_note(self, chat_id: int, user_id: int) -> None:
+        user = await self._get_or_create_user(user_id)
+        owner_id = user["id"]
+        today_shamsi = format_jalali_date(*get_current_jalali())
+        notes = await self.repo.list_notes(owner_id=owner_id, date_shamsi=today_shamsi)
+
+        if notes:
+            n = notes[0]
+            hex_id = n["id"].replace("-", "")[:12]
+            text = (
+                f"📅 *یادداشت امروز ({format_full_jalali()}):*\n\n"
+                f"*{n.get('title')}*\n\n"
+                f"{n.get('content')}\n"
+            )
+            keyboard = {
+                "inline_keyboard": [
+                    [{"text": "➕ افزودن یادداشت دیگر", "callback_data": "daily_prompt"}],
+                    [{"text": "🗑️ حذف این یادداشت", "callback_data": f"delnote_{hex_id}"}],
+                    [{"text": "🔙 بازگشت", "callback_data": "cal_today"}],
+                ]
+            }
+        else:
+            text = (
+                f"📅 *یادداشت امروز ({format_full_jalali()}):*\n\n"
+                "برای امروز هنوز یادداشتی ثبت نکرده‌اید. با دکمه زیر می‌توانید متن یا برنامه روزانه خود را اضافه کنید:"
+            )
+            keyboard = {
+                "inline_keyboard": [
+                    [{"text": "➕ ثبت یادداشت امروز", "callback_data": "daily_prompt"}],
+                    [{"text": "🔙 بازگشت", "callback_data": "cal_today"}],
+                ]
+            }
+
+        await self._client.post(
+            f"{self.api_base}/sendMessage",
+            json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown", "reply_markup": keyboard},
+        )
+
+    # --- Calendar & Reminders Helpers -----------------------------------------
+
+    async def _send_calendar(self, chat_id: int, user_id: int) -> None:
+        user = await self._get_or_create_user(user_id)
+        owner_id = user["id"]
+        today_fa = format_full_jalali()
+        today_shamsi = format_jalali_date(*get_current_jalali())
+
+        today_notes = await self.repo.list_notes(owner_id=owner_id, date_shamsi=today_shamsi)
+        today_reminders = await self.repo.list_reminders(owner_id=owner_id, date_shamsi=today_shamsi)
+
+        text = (
+            f"📅 *تقویم شمسی و رویدادهای روز*\n\n"
+            f"✨ *امروز:* `{today_fa}`\n"
+            f"📆 *تاریخ:* `{today_shamsi}`\n\n"
+        )
+
+        if today_notes:
+            text += "📝 *یادداشت‌های امروز:*\n"
+            for n in today_notes:
+                text += f"• *{n.get('title')}*: _{n.get('content')[:40]}_\n"
+            text += "\n"
+
+        if today_reminders:
+            text += "⏰ *وظایف و رویدادهای امروز:*\n"
+            for r in today_reminders:
+                status_icon = "✅" if r.get("is_completed") else "⏳"
+                time_str = f" ({r.get('time_str')})" if r.get("time_str") else ""
+                text += f"{status_icon} *{r.get('title')}*{time_str}\n"
+            text += "\n"
+        elif not today_notes:
+            text += "📭 هیچ رویداد یا یادداشتی برای امروز ثبت نشده است.\n\n"
+
+        keyboard = {
+            "inline_keyboard": [
+                [
+                    {"text": "📝 یادداشت امروز", "callback_data": "daily_prompt"},
+                    {"text": "📌 وظیفه جدید", "callback_data": "addtask_prompt"},
+                ],
+                [
+                    {"text": "🎉 مناسبت جدید", "callback_data": "addocc_prompt"},
+                    {"text": "⏳ تایمر معکوس", "callback_data": "addtimer_prompt"},
+                ],
+                [
+                    {"text": "⏰ لیست همه یادآورها", "callback_data": "reminders_menu"},
+                    {"text": "🔙 بازگشت به منو", "callback_data": "start"},
+                ],
+            ]
+        }
+
+        await self._client.post(
+            f"{self.api_base}/sendMessage",
+            json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown", "reply_markup": keyboard},
+        )
+
+    async def _send_reminders_menu(self, chat_id: int, user_id: int) -> None:
+        user = await self._get_or_create_user(user_id)
+        owner_id = user["id"]
+        reminders = await self.repo.list_reminders(owner_id=owner_id, include_completed=True)
+
+        text = "⏰ *مدیریت وظایف، مناسبت‌ها و یادآورها*\n\n"
+        keyboard_rows = [
+            [
+                {"text": "📌 افزودن وظیفه", "callback_data": "addtask_prompt"},
+                {"text": "🎉 ثبت مناسبت", "callback_data": "addocc_prompt"},
+            ],
+            [
+                {"text": "⏳ تایمر سریع", "callback_data": "addtimer_prompt"},
+                {"text": "📅 تقویم امروز", "callback_data": "cal_today"},
+            ],
+        ]
+
+        if not reminders:
+            text += "📭 در حال حاضر هیچ وظیفه یا یادآوری ثبت نشده است."
+        else:
+            text += "لیست کارهای فعال و مناسبت‌های پیش‌رو:\n\n"
+            for r in reminders[:8]:
+                hex_id = r["id"].replace("-", "")[:12]
+                is_done = r.get("is_completed", False)
+                icon = "✅" if is_done else ("🎉" if r.get("type") == "occasion" else "📌")
+                date_str = f" [{r.get('date_shamsi')}]" if r.get("date_shamsi") else ""
+                time_str = f" {r.get('time_str')}" if r.get("time_str") else ""
+                strike = "~" if is_done else "*"
+
+                text += f"{icon} {strike}{r.get('title')}{strike}{date_str}{time_str}\n"
+
+                btn_toggle_text = "🔄 فعال‌سازی" if is_done else "✅ انجام شد"
+                keyboard_rows.append([
+                    {"text": btn_toggle_text, "callback_data": f"donerem_{hex_id}"},
+                    {"text": "🗑️ حذف", "callback_data": f"delrem_{hex_id}"},
+                ])
+
+        keyboard_rows.append([{"text": "🔙 بازگشت به منو", "callback_data": "start"}])
+
+        await self._client.post(
+            f"{self.api_base}/sendMessage",
+            json={
+                "chat_id": chat_id,
+                "text": text,
+                "parse_mode": "Markdown",
+                "reply_markup": {"inline_keyboard": keyboard_rows},
+            },
+        )
+
+    async def _handle_remind_command(self, chat_id: int, user_id: int, text: str) -> None:
+        parts = text.replace("/remind", "").replace("/tasks", "").strip()
+        if not parts:
+            await self._send_reminders_menu(chat_id, user_id)
+            return
+
+        user = await self._get_or_create_user(user_id)
+        owner_id = user["id"]
+
+        # 1. Quick relative timer e.g. "10m تماس با شرکت" or "2h استراحت"
+        words = parts.split(maxsplit=1)
+        first_token = words[0].lower()
+        timer_mins = None
+        if first_token.endswith("m") and first_token[:-1].isdigit():
+            timer_mins = int(first_token[:-1])
+        elif first_token.endswith("h") and first_token[:-1].isdigit():
+            timer_mins = int(first_token[:-1]) * 60
+
+        if timer_mins and timer_mins > 0:
+            title = words[1] if len(words) > 1 else "تایمر"
+            remind_at_utc = datetime.now(timezone.utc) + timedelta(minutes=timer_mins)
+            await self.repo.create_reminder(
+                owner_id=owner_id,
+                title=title,
+                type="timer",
+                remind_at_utc=remind_at_utc,
+                telegram_chat_id=chat_id,
+            )
+            await self._client.post(
+                f"{self.api_base}/sendMessage",
+                json={
+                    "chat_id": chat_id,
+                    "text": f"⏳ تایمر برای *{timer_mins} دقیقه دیگر* با عنوان *«{title}»* تنظیم شد.\nدر سررسید زمان اعلان برای شما ارسال خواهد شد.",
+                    "parse_mode": "Markdown",
+                },
+            )
+            return
+
+        # 2. Date + time + title e.g. "1405/06/27 15:30 جلسه کاری"
+        parsed_date = parse_jalali_string(first_token)
+        if parsed_date and len(words) > 1:
+            rest = words[1].split(maxsplit=1)
+            time_str = "09:00"
+            title = words[1]
+            if len(rest) == 2 and ":" in rest[0]:
+                time_str = rest[0]
+                title = rest[1]
+
+            jy, jm, jd = parsed_date
+            hour, minute = 9, 0
+            if ":" in time_str:
+                try:
+                    p = time_str.split(":")
+                    hour, minute = int(p[0]), int(p[1])
+                except Exception:
+                    pass
+            remind_at_utc = jalali_to_datetime(jy, jm, jd, hour=hour, minute=minute)
+            date_shamsi = format_jalali_date(jy, jm, jd)
+
+            await self.repo.create_reminder(
+                owner_id=owner_id,
+                title=title,
+                type="task",
+                date_shamsi=date_shamsi,
+                time_str=time_str,
+                remind_at_utc=remind_at_utc,
+                telegram_chat_id=chat_id,
+            )
+            await self._client.post(
+                f"{self.api_base}/sendMessage",
+                json={
+                    "chat_id": chat_id,
+                    "text": f"✅ وظیفه *«{title}»* برای تاریخ *{date_shamsi}* ساعت *{time_str}* ثبت شد.",
+                    "parse_mode": "Markdown",
+                },
+            )
+            return
+
+        # 3. Simple text title -> add as today's task
+        today_shamsi = format_jalali_date(*get_current_jalali())
+        await self.repo.create_reminder(
+            owner_id=owner_id,
+            title=parts,
+            type="task",
+            date_shamsi=today_shamsi,
+            telegram_chat_id=chat_id,
+        )
+        await self._client.post(
+            f"{self.api_base}/sendMessage",
+            json={
+                "chat_id": chat_id,
+                "text": f"✅ وظیفه *«{parts}»* با موفقیت ثبت شد.",
+                "parse_mode": "Markdown",
+            },
+        )
+
+    async def _create_quick_timer(self, chat_id: int, user_id: int, minutes: int) -> None:
+        user = await self._get_or_create_user(user_id)
+        owner_id = user["id"]
+        remind_at_utc = datetime.now(timezone.utc) + timedelta(minutes=minutes)
+        await self.repo.create_reminder(
+            owner_id=owner_id,
+            title=f"تایمر {minutes} دقیقه‌ای",
+            type="timer",
+            remind_at_utc=remind_at_utc,
+            telegram_chat_id=chat_id,
+        )
+        await self._client.post(
+            f"{self.api_base}/sendMessage",
+            json={
+                "chat_id": chat_id,
+                "text": f"⏱️ تایمر *{minutes} دقیقه‌ای* فعال شد. سر موعد به شما پیام داده خواهد شد.",
+                "parse_mode": "Markdown",
+            },
+        )
+        await self._send_reminders_menu(chat_id, user_id)
+
+    async def _handle_interactive_text_input(
+        self, chat_id: int, user_id: int, text: str, state: dict[str, Any]
+    ) -> None:
+        clean = text.strip()
+        if clean in ("/cancel", "انصراف", "لغو"):
+            self._user_state.pop(user_id, None)
+            await self._client.post(
+                f"{self.api_base}/sendMessage",
+                json={"chat_id": chat_id, "text": "❌ عملیات لغو شد."},
+            )
+            return
+
+        action = state.get("action")
+        user = await self._get_or_create_user(user_id)
+        owner_id = user["id"]
+
+        if action == "add_note":
+            self._user_state.pop(user_id, None)
+            lines = clean.split("\n", 1)
+            title = lines[0][:80]
+            content = lines[1] if len(lines) > 1 else clean
+            await self.repo.create_note(
+                owner_id=owner_id,
+                title=title,
+                content=content,
+                is_daily=False,
+            )
+            await self._client.post(
+                f"{self.api_base}/sendMessage",
+                json={"chat_id": chat_id, "text": f"✅ یادداشت *«{title}»* با موفقیت ذخیره شد.", "parse_mode": "Markdown"},
+            )
+            await self._send_notes_list(chat_id, user_id, page=0)
+
+        elif action == "add_daily":
+            self._user_state.pop(user_id, None)
+            today_shamsi = format_jalali_date(*get_current_jalali())
+            lines = clean.split("\n", 1)
+            title = f"یادداشت روز {today_shamsi}"
+            content = clean
+            await self.repo.create_note(
+                owner_id=owner_id,
+                title=title,
+                content=content,
+                date_shamsi=today_shamsi,
+                is_daily=True,
+            )
+            await self._client.post(
+                f"{self.api_base}/sendMessage",
+                json={"chat_id": chat_id, "text": f"✅ یادداشت روزانه برای *{today_shamsi}* با موفقیت ثبت شد.", "parse_mode": "Markdown"},
+            )
+            await self._send_calendar(chat_id, user_id)
+
+        elif action == "add_reminder":
+            self._user_state.pop(user_id, None)
+            rem_type = state.get("type", "task")
+            await self._handle_remind_command(chat_id, user_id, clean)
+
+    def _find_note_by_prefix(self, prefix: str) -> dict[str, Any] | None:
+        clean = prefix.replace("-", "").lower()
+        for n in getattr(self.repo, "notes", {}).values():
+            n_id = str(n.get("id", "")).replace("-", "").lower()
+            if n_id.startswith(clean):
+                return n
+        return None
+
+    def _find_reminder_by_prefix(self, prefix: str) -> dict[str, Any] | None:
+        clean = prefix.replace("-", "").lower()
+        for r in getattr(self.repo, "reminders", {}).values():
+            r_id = str(r.get("id", "")).replace("-", "").lower()
+            if r_id.startswith(clean):
+                return r
+        return None

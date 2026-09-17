@@ -81,14 +81,7 @@ async def download_content(
         raw_node = getattr(request.app.state.repo, "nodes", {}).get(node_id)
         node = dict(raw_node) if raw_node else await vfs.get_node(node_id, principal.user_id)
     else:
-        try:
-            node = await vfs.get_node(node_id, principal.user_id)
-        except Exception:
-            raw_node = getattr(request.app.state.repo, "nodes", {}).get(node_id)
-            if raw_node and raw_node.get("kind") == "file":
-                node = dict(raw_node)
-            else:
-                raise
+        node = await vfs.get_node(node_id, principal.user_id)
 
     if node["kind"] != "file":
         raise not_found(f"Node {node_id} is not a file")

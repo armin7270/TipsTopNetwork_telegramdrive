@@ -246,15 +246,7 @@ class VFSService:
         purge: bool = False,
     ) -> None:
         """Delete a node: to the trash by default, or permanently with ``purge``."""
-        try:
-            node = await self.get_node(node_id, owner_id)
-        except Exception:
-            raw_node = getattr(self.repo, "nodes", {}).get(node_id)
-            if raw_node:
-                node = dict(raw_node)
-                owner_id = node.get("owner_id", owner_id)
-            else:
-                raise
+        node = await self.get_node(node_id, owner_id)
 
         if node["parent_id"] is None:
             raise root_immutable()

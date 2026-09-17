@@ -1303,6 +1303,294 @@
       bottom: 0;
       border-radius: 0 0 36px 36px;
     }
+
+    /* ==========================================================================
+       9. PERSIAN CALENDAR, NOTES & REMINDERS STYLING
+       ========================================================================== */
+    .calendar-dashboard {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 20px;
+      width: 100%;
+    }
+
+    @media (max-width: 960px) {
+      .calendar-dashboard {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .calendar-card {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .calendar-header-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .calendar-month-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .calendar-nav-buttons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .calendar-grid-table {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      width: 100%;
+    }
+
+    .calendar-weekday-cell {
+      text-align: center;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      padding: 8px 0;
+    }
+
+    .calendar-weekday-cell.friday-head {
+      color: #f87171;
+    }
+
+    .calendar-day-box {
+      aspect-ratio: 1;
+      border-radius: var(--radius-sm);
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      user-select: none;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 4px;
+    }
+
+    .calendar-day-box:hover {
+      background: var(--glass-card-hover);
+      border-color: var(--glass-border-light);
+      transform: translateY(-2px) scale(1.04);
+    }
+
+    .calendar-day-box.empty {
+      background: transparent;
+      border: none;
+      pointer-events: none;
+    }
+
+    .calendar-day-box.today {
+      background: var(--grad-primary);
+      color: #ffffff !important;
+      border-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 4px 18px rgba(0, 198, 255, 0.5);
+    }
+
+    .calendar-day-box.selected:not(.today) {
+      border: 2px solid var(--accent-cyan);
+      background: rgba(0, 198, 255, 0.18);
+      box-shadow: 0 0 16px rgba(0, 198, 255, 0.35);
+    }
+
+    .calendar-day-box.friday:not(.today) {
+      color: #fca5a5;
+    }
+
+    .calendar-dots-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      margin-top: 3px;
+      height: 6px;
+    }
+
+    .cal-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+    }
+
+    .cal-dot-note { background: #38bdf8; box-shadow: 0 0 4px #38bdf8; }
+    .cal-dot-task { background: #fbbf24; box-shadow: 0 0 4px #fbbf24; }
+    .cal-dot-occasion { background: #f472b6; box-shadow: 0 0 4px #f472b6; }
+
+    /* Daily Note Card */
+    .daily-note-box {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .daily-note-title-input {
+      font-size: 1.05rem;
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .daily-note-title-input:focus {
+      border-color: var(--accent-cyan);
+    }
+
+    .daily-note-textarea {
+      width: 100%;
+      min-height: 140px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      resize: vertical;
+      outline: none;
+    }
+
+    .daily-note-textarea:focus {
+      border-color: var(--accent-cyan);
+    }
+
+    /* Tasks and Reminders Box */
+    .reminders-box {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .filter-tabs-pill {
+      display: flex;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      overflow-x: auto;
+    }
+
+    .filter-tab-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .filter-tab-btn.active {
+      background: var(--glass-surface);
+      color: var(--text-main);
+      border: 1px solid var(--glass-border-light);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .reminder-card-item {
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: all 0.25s;
+    }
+
+    .reminder-card-item:hover {
+      background: var(--glass-card-hover);
+      border-color: var(--glass-border-light);
+      transform: translateY(-2px);
+    }
+
+    .reminder-card-item.completed {
+      opacity: 0.55;
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .reminder-card-item.completed .reminder-title-text {
+      text-decoration: line-through;
+    }
+
+    .reminder-type-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      white-space: nowrap;
+    }
+
+    .tag-task { background: rgba(0, 198, 255, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); }
+    .tag-occasion { background: rgba(236, 72, 153, 0.15); color: #f472b6; border-color: rgba(244, 114, 182, 0.4); }
+    .tag-timer { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(251, 191, 36, 0.4); }
+
+    .quick-timer-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .timer-chip-btn {
+      padding: 5px 10px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      font-size: 0.76rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .timer-chip-btn:hover {
+      background: var(--grad-primary);
+      border-color: rgba(255, 255, 255, 0.4);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .tg-sync-banner {
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      background: rgba(0, 198, 255, 0.08);
+      border: 1px solid rgba(0, 198, 255, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.8rem;
+      color: #bae6fd;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body class="rtl">
@@ -1406,6 +1694,14 @@
             <span class="nav-tab-badge" id="count-files">0</span>
           </button>
 
+          <button class="nav-tab-item" id="tab-calendar" onclick="switchToCalendarView()">
+            <div class="nav-tab-label">
+              <span class="glass-icon-badge glow-emerald" style="width: 32px; height: 32px; font-size: 1rem;">📅</span>
+              <span data-i18n="calendarNotesTab">تقویم و یادداشت‌ها</span>
+            </div>
+            <span class="nav-tab-badge" id="count-calendar-tasks">0</span>
+          </button>
+
           <button class="nav-tab-item" id="tab-trash" onclick="switchToTrashView()">
             <div class="nav-tab-label">
               <span class="glass-icon-badge glow-magenta" style="width: 32px; height: 32px; font-size: 1rem;">🗑️</span>
@@ -1443,13 +1739,19 @@
 
         <!-- Stage Toolbar & Actions -->
         <div class="glass-panel stage-toolbar">
-          <!-- Breadcrumb Trail -->
+          <!-- Breadcrumb Trail (Files & Trash views) -->
           <div class="breadcrumb-trail" id="breadcrumb-container">
             <span class="breadcrumb-node" onclick="navigateToFolder(rootNodeId)">درایو اصلی</span>
           </div>
 
-          <!-- Actions -->
-          <div class="toolbar-actions">
+          <!-- Calendar Header Banner (Calendar view) -->
+          <div class="breadcrumb-trail handwriting-font" id="calendar-header-banner" style="display: none; align-items: center; gap: 8px;">
+            <span class="glass-icon-badge glow-emerald" style="width: 28px; height: 28px; font-size: 0.95rem;">📅</span>
+            <span id="calendar-today-full-text">تقویم شمسی و یادداشت‌ها</span>
+          </div>
+
+          <!-- Actions for Files & Trash View -->
+          <div class="toolbar-actions" id="toolbar-file-actions">
             <input type="file" id="file-input-element" style="display: none;" onchange="handleFileSelect(event)" />
             <button class="btn-glass btn-glass-primary" onclick="document.getElementById('file-input-element').click()">
               <span>☁️</span>
@@ -1464,6 +1766,25 @@
               <span data-i18n="sampleFilesBtn">فایل‌های نمونه</span>
             </button>
             <button class="btn-glass" onclick="refreshDrive()" title="بروزرسانی">
+              <span>🔄</span>
+            </button>
+          </div>
+
+          <!-- Actions for Calendar View -->
+          <div class="toolbar-actions" id="toolbar-calendar-actions" style="display: none;">
+            <button class="btn-glass btn-glass-primary" onclick="openNewNoteModal()">
+              <span>📝</span>
+              <span data-i18n="newNoteBtn">یادداشت جدید</span>
+            </button>
+            <button class="btn-glass" onclick="openNewReminderModal()">
+              <span>⏰</span>
+              <span data-i18n="newTaskBtn">وظیفه / رویداد</span>
+            </button>
+            <button class="btn-glass" onclick="openQuickTimerModal()">
+              <span>⏱️</span>
+              <span data-i18n="quickTimerBtn">تایمر سریع</span>
+            </button>
+            <button class="btn-glass" onclick="refreshCalendarData()" title="بروزرسانی">
               <span>🔄</span>
             </button>
           </div>
@@ -1503,21 +1824,160 @@
           </div>
         </div>
 
+        <!-- Calendar & Notes Dashboard (shown when currentView === 'calendar') -->
+        <div id="calendar-notes-view" style="display: none; width: 100%;">
+          <div class="calendar-dashboard">
+
+            <!-- LEFT COLUMN: Persian Calendar & Selected Day Daily Note -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+
+              <!-- Persian Calendar Glass Card -->
+              <div class="glass-panel calendar-card">
+                <div class="calendar-header-nav">
+                  <div class="calendar-month-title">
+                    <span class="glass-icon-badge glow-emerald" style="width: 38px; height: 38px; font-size: 1.15rem;">📅</span>
+                    <span id="cal-month-name-year" class="handwriting-font">شهریور ۱۴۰۵</span>
+                  </div>
+                  <div class="calendar-nav-buttons">
+                    <button class="btn-glass" onclick="goToTodayCalendar()" style="padding: 6px 12px; font-size: 0.8rem;">امروز</button>
+                    <button class="node-btn-icon" onclick="changeCalendarMonth(-1)" title="ماه قبل">❮</button>
+                    <button class="node-btn-icon" onclick="changeCalendarMonth(1)" title="ماه بعد">❯</button>
+                  </div>
+                </div>
+
+                <!-- Calendar Weekdays Header -->
+                <div class="calendar-grid-table" style="gap: 4px; margin-bottom: -6px;">
+                  <div class="calendar-weekday-cell">ش</div>
+                  <div class="calendar-weekday-cell">ی</div>
+                  <div class="calendar-weekday-cell">د</div>
+                  <div class="calendar-weekday-cell">س</div>
+                  <div class="calendar-weekday-cell">چ</div>
+                  <div class="calendar-weekday-cell">پ</div>
+                  <div class="calendar-weekday-cell friday-head">ج</div>
+                </div>
+
+                <!-- Calendar Days Grid -->
+                <div class="calendar-grid-table" id="calendar-days-grid">
+                  <!-- Dynamically rendered -->
+                </div>
+
+                <!-- Legend / Status Hint -->
+                <div style="display: flex; align-items: center; justify-content: center; gap: 16px; font-size: 0.76rem; color: var(--text-muted); margin-top: 6px; flex-wrap: wrap;">
+                  <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="cal-dot cal-dot-note"></span> یادداشت روزانه</span>
+                  <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="cal-dot cal-dot-task"></span> وظیفه / کار</span>
+                  <span style="display: inline-flex; align-items: center; gap: 5px;"><span class="cal-dot cal-dot-occasion"></span> مناسبت خاص</span>
+                </div>
+              </div>
+
+              <!-- Daily Note Editor for Selected Day -->
+              <div class="glass-panel daily-note-box">
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="glass-icon-badge glow-cyan" style="width: 32px; height: 32px; font-size: 1rem;">📝</span>
+                    <span id="daily-note-selected-date-text" style="font-weight: 700; font-size: 0.95rem;">یادداشت روز: امروز</span>
+                  </div>
+                  <div style="display: flex; gap: 6px;">
+                    <button class="node-btn-icon" id="btn-delete-daily-note" style="display: none; color: #f87171;" onclick="deleteCurrentDailyNote()" title="حذف یادداشت روز">🗑️</button>
+                    <button class="btn-glass btn-glass-primary" style="padding: 6px 14px; font-size: 0.82rem;" onclick="saveCurrentDailyNote()" id="btn-save-daily-note">
+                      <span>💾</span>
+                      <span>ذخیره یادداشت</span>
+                    </button>
+                  </div>
+                </div>
+
+                <input type="text" id="daily-note-title" class="daily-note-title-input" placeholder="عنوان یادداشت روزانه..." />
+                <textarea id="daily-note-content" class="daily-note-textarea" placeholder="یادداشت‌های این روز، نکات، چک‌لیست و برنامه‌ها..."></textarea>
+                <div id="daily-note-status-hint" style="font-size: 0.75rem; color: var(--text-muted); text-align: left; direction: ltr;">Ready</div>
+              </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: Tasks, Occasions, Timers & General Notes -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+
+              <!-- Telegram Bot Sync Info Card -->
+              <div class="tg-sync-banner">
+                <span style="font-size: 1.4rem;">🤖</span>
+                <div>
+                  <strong>همگام‌سازی بلادرنگ با ربات تلگرام:</strong>
+                  تمام یادداشت‌ها و وظایف این بخش هم در وب و هم در ربات تلگرام در دسترستان است. در زمان تعیین‌شده، ربات تلگرام زنگ هشدار ارسال می‌کند!
+                </div>
+              </div>
+
+              <!-- Quick Task / Reminder Form Card -->
+              <div class="glass-panel" style="padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+                <div style="font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                  <span>⚡</span> <span>ثبت سریع وظیفه یا رویداد</span>
+                </div>
+
+                <!-- Quick Timer Chips -->
+                <div class="quick-timer-chips">
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">تایمرهای فوری:</span>
+                  <button class="timer-chip-btn" onclick="createQuickTimer(5, 'تایمر ۵ دقیقه‌ای')">⏱️ ۵ دقیقه</button>
+                  <button class="timer-chip-btn" onclick="createQuickTimer(10, 'تایمر ۱۰ دقیقه‌ای')">⏱️ ۱۰ دقیقه</button>
+                  <button class="timer-chip-btn" onclick="createQuickTimer(15, 'استراحت ۱۵ دقیقه‌ای')">⏱️ ۱۵ دقیقه</button>
+                  <button class="timer-chip-btn" onclick="createQuickTimer(30, 'جلسه ۳۰ دقیقه‌ای')">⏱️ ۳۰ دقیقه</button>
+                  <button class="timer-chip-btn" onclick="createQuickTimer(60, 'تمرکز عمیق ۱ ساعته')">⏱️ ۱ ساعت</button>
+                </div>
+
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <input type="text" id="quick-task-title" class="form-input" placeholder="عنوان وظیفه، رویداد یا مناسبت..." style="flex: 2; min-width: 200px;" />
+                  <select id="quick-task-type" class="form-input" style="flex: 1; min-width: 110px;">
+                    <option value="task">📋 وظیفه</option>
+                    <option value="occasion">🎉 مناسبت خاص</option>
+                    <option value="timer">⏱️ تایمر</option>
+                  </select>
+                  <input type="time" id="quick-task-time" class="form-input" value="10:00" style="flex: 0.8; min-width: 90px;" />
+                  <button class="btn-glass btn-glass-primary" onclick="submitQuickTask()" style="padding: 10px 18px;">
+                    <span>➕</span>
+                    <span>ثبت</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Reminders and Tasks List Box -->
+              <div class="glass-panel reminders-box" style="padding: 18px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                  <div class="filter-tabs-pill">
+                    <button class="filter-tab-btn active" id="filter-all" onclick="setRemindersFilter('all')">همه</button>
+                    <button class="filter-tab-btn" id="filter-task" onclick="setRemindersFilter('task')">📋 وظایف</button>
+                    <button class="filter-tab-btn" id="filter-occasion" onclick="setRemindersFilter('occasion')">🎉 مناسبت‌ها</button>
+                    <button class="filter-tab-btn" id="filter-timer" onclick="setRemindersFilter('timer')">⏱️ تایمرها</button>
+                    <button class="filter-tab-btn" id="filter-notes" onclick="setRemindersFilter('notes')">📝 یادداشت‌های متفرقه</button>
+                  </div>
+                  <span id="reminders-count-badge" class="liquid-badge" style="background: rgba(255,255,255,0.08); font-size: 0.72rem;">0 مورد</span>
+                </div>
+
+                <!-- Reminders List Container -->
+                <div id="reminders-list-container" style="display: flex; flex-direction: column; gap: 10px; max-height: 480px; overflow-y: auto; padding-inline-end: 4px;">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
       </section>
 
     </main>
 
     <!-- MOBILE BOTTOM NAVIGATION -->
     <nav class="mobile-bottom-nav">
-      <button class="mobile-nav-item active" onclick="switchToFilesView()">
+      <button class="mobile-nav-item active" id="mob-tab-files" onclick="switchToFilesView()">
         <span style="font-size: 1.3rem;">📂</span>
         <span>فایل‌ها</span>
+      </button>
+      <button class="mobile-nav-item" id="mob-tab-calendar" onclick="switchToCalendarView()">
+        <span style="font-size: 1.3rem;">📅</span>
+        <span>تقویم و یادداشت</span>
       </button>
       <button class="mobile-nav-item" onclick="document.getElementById('file-input-element').click()">
         <span style="font-size: 1.3rem;">☁️</span>
         <span>آپلود</span>
       </button>
-      <button class="mobile-nav-item" onclick="switchToTrashView()">
+      <button class="mobile-nav-item" id="mob-tab-trash" onclick="switchToTrashView()">
         <span style="font-size: 1.3rem;">🗑️</span>
         <span>زباله‌دان</span>
       </button>
@@ -1656,7 +2116,15 @@
     let rootNodeId = null;
     let currentFolderId = null;
     let currentPath = [];
-    let currentView = 'files'; // 'files' or 'trash'
+    let currentView = 'files'; // 'files', 'trash', or 'calendar'
+    let calYear = null;
+    let calMonth = null;
+    let selectedCalendarDate = null;
+    let currentDailyNote = null;
+    let activeRemindersFilter = 'all';
+    let currentMonthCalendarData = null;
+    let allUserReminders = [];
+    let allUserNotes = [];
     let currentPhoneCodeHash = null;
     let storedLang = localStorage.getItem('teledrive_lang');
     let currentLang = (storedLang === 'en') ? 'en' : 'fa'; // Persian by default
@@ -1717,6 +2185,10 @@
         mobileMockup: 'شبیه‌ساز موبایل',
         desktopView: 'نمای کامل دسکتاپ',
         welcomeGuest: 'کاربر تله‌درایو',
+        calendarNotesTab: 'تقویم و یادداشت‌ها',
+        newNoteBtn: 'یادداشت جدید',
+        newTaskBtn: 'وظیفه / رویداد',
+        quickTimerBtn: 'تایمر سریع',
       },
       en: {
         appTitle: 'TeleDrive — Cloud Drive',
@@ -1769,6 +2241,10 @@
         mobileMockup: 'Mobile Mockup',
         desktopView: 'Desktop View',
         welcomeGuest: 'TeleDrive User',
+        calendarNotesTab: 'Calendar & Notes',
+        newNoteBtn: 'New Note',
+        newTaskBtn: 'Task / Event',
+        quickTimerBtn: 'Quick Timer',
       }
     };
 
@@ -2224,18 +2700,645 @@
       }
     }
 
-    function switchToFilesView() {
-      renderCurrentFolder();
+    function updateStageVisibility(view) {
+      currentView = view;
+      const filesGrid = document.getElementById('files-grid');
+      const breadcrumb = document.getElementById('breadcrumb-container');
+      const calBanner = document.getElementById('calendar-header-banner');
+      const fileToolbar = document.getElementById('toolbar-file-actions');
+      const calToolbar = document.getElementById('toolbar-calendar-actions');
+      const calStage = document.getElementById('calendar-notes-view');
+
+      const tabFiles = document.getElementById('tab-my-files');
+      const tabTrash = document.getElementById('tab-trash');
+      const tabCal = document.getElementById('tab-calendar');
+
+      const mobFiles = document.getElementById('mob-tab-files');
+      const mobTrash = document.getElementById('mob-tab-trash');
+      const mobCal = document.getElementById('mob-tab-calendar');
+
+      if (tabFiles) tabFiles.classList.toggle('active', view === 'files');
+      if (tabTrash) tabTrash.classList.toggle('active', view === 'trash');
+      if (tabCal) tabCal.classList.toggle('active', view === 'calendar');
+
+      if (mobFiles) mobFiles.classList.toggle('active', view === 'files');
+      if (mobTrash) mobTrash.classList.toggle('active', view === 'trash');
+      if (mobCal) mobCal.classList.toggle('active', view === 'calendar');
+
+      if (view === 'calendar') {
+        if (filesGrid) filesGrid.style.display = 'none';
+        if (breadcrumb) breadcrumb.style.display = 'none';
+        if (fileToolbar) fileToolbar.style.display = 'none';
+        if (calBanner) calBanner.style.display = 'inline-flex';
+        if (calToolbar) calToolbar.style.display = 'flex';
+        if (calStage) calStage.style.display = 'block';
+      } else {
+        if (filesGrid) filesGrid.style.display = 'grid';
+        if (breadcrumb) breadcrumb.style.display = 'inline-flex';
+        if (fileToolbar) fileToolbar.style.display = 'flex';
+        if (calBanner) calBanner.style.display = 'none';
+        if (calToolbar) calToolbar.style.display = 'none';
+        if (calStage) calStage.style.display = 'none';
+      }
     }
 
-    function switchToTrashView() {
-      renderTrash();
+    async function switchToFilesView() {
+      updateStageVisibility('files');
+      await renderCurrentFolder();
+    }
+
+    async function switchToTrashView() {
+      updateStageVisibility('trash');
+      await renderTrash();
+    }
+
+    async function switchToCalendarView() {
+      updateStageVisibility('calendar');
+      await loadCalendarTodayInfo();
+      await loadCurrentMonthCalendar(calYear, calMonth);
+      await loadAllRemindersAndNotes();
+    }
+
+    async function loadCalendarTodayInfo() {
+      try {
+        const resp = await apiRequest('/api/v1/calendar/today');
+        if (!resp.ok) return;
+        const data = await resp.json();
+        const bannerText = document.getElementById('calendar-today-full-text');
+        if (bannerText) bannerText.innerText = data.full_text || data.date_shamsi;
+
+        if (!selectedCalendarDate) {
+          selectedCalendarDate = data.date_shamsi;
+          calYear = data.year;
+          calMonth = data.month;
+        }
+
+        const taskCount = (data.reminders || []).length + (data.daily_notes || []).length;
+        const badge = document.getElementById('count-calendar-tasks');
+        if (badge) badge.innerText = taskCount;
+      } catch (e) {
+        console.warn('Error loading calendar today:', e);
+      }
+    }
+
+    async function loadCurrentMonthCalendar(year, month) {
+      try {
+        let url = '/api/v1/calendar/month';
+        if (year && month) url += `?year=${year}&month=${month}`;
+        const resp = await apiRequest(url);
+        if (!resp.ok) return;
+        currentMonthCalendarData = await resp.json();
+
+        calYear = currentMonthCalendarData.year;
+        calMonth = currentMonthCalendarData.month;
+
+        const titleEl = document.getElementById('cal-month-name-year');
+        if (titleEl) {
+          titleEl.innerText = `${currentMonthCalendarData.month_name} ${currentMonthCalendarData.year}`;
+        }
+
+        const grid = document.getElementById('calendar-days-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        // Empty cells before first day
+        for (let i = 0; i < currentMonthCalendarData.first_day_weekday; i++) {
+          const empty = document.createElement('div');
+          empty.className = 'calendar-day-box empty';
+          grid.appendChild(empty);
+        }
+
+        // Days in month
+        for (let d = 1; d <= currentMonthCalendarData.days_in_month; d++) {
+          const dateStr = `${calYear}/${String(calMonth).padStart(2, '0')}/${String(d).padStart(2, '0')}`;
+          const isToday = dateStr === currentMonthCalendarData.today_shamsi;
+          const isSelected = dateStr === selectedCalendarDate;
+          const isFriday = (currentMonthCalendarData.first_day_weekday + d - 1) % 7 === 6;
+
+          const dayNotes = (currentMonthCalendarData.notes || []).filter(n => n.date_shamsi === dateStr);
+          const dayReminders = (currentMonthCalendarData.reminders || []).filter(r => r.date_shamsi === dateStr);
+          const hasTasks = dayReminders.some(r => r.type === 'task' || !r.type);
+          const hasOccasions = dayReminders.some(r => r.type === 'occasion');
+          const hasTimers = dayReminders.some(r => r.type === 'timer');
+
+          const box = document.createElement('div');
+          box.className = `calendar-day-box ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${isFriday ? 'friday' : ''}`;
+          box.id = `cal-day-${d}`;
+
+          let dotsHtml = '';
+          if (dayNotes.length > 0 || hasTasks || hasOccasions || hasTimers) {
+            dotsHtml = `
+              <div class="calendar-dots-bar">
+                ${dayNotes.length > 0 ? '<span class="cal-dot cal-dot-note" title="یادداشت"></span>' : ''}
+                ${hasTasks ? '<span class="cal-dot cal-dot-task" title="وظیفه"></span>' : ''}
+                ${hasOccasions ? '<span class="cal-dot cal-dot-occasion" title="مناسبت"></span>' : ''}
+              </div>
+            `;
+          }
+
+          box.innerHTML = `<span>${d}</span>${dotsHtml}`;
+          box.onclick = () => selectCalendarDay(calYear, calMonth, d);
+          grid.appendChild(box);
+        }
+
+        if (selectedCalendarDate) {
+          await loadDailyNoteForDate(selectedCalendarDate);
+        }
+      } catch (e) {
+        console.error('Error loading month calendar:', e);
+      }
+    }
+
+    function changeCalendarMonth(delta) {
+      if (!calMonth) {
+        calMonth = 6;
+        calYear = 1405;
+      }
+      calMonth += delta;
+      if (calMonth < 1) {
+        calMonth = 12;
+        calYear -= 1;
+      } else if (calMonth > 12) {
+        calMonth = 1;
+        calYear += 1;
+      }
+      loadCurrentMonthCalendar(calYear, calMonth);
+    }
+
+    function goToTodayCalendar() {
+      selectedCalendarDate = null;
+      loadCurrentMonthCalendar();
+      loadCalendarTodayInfo();
+    }
+
+    async function selectCalendarDay(jy, jm, jd) {
+      selectedCalendarDate = `${jy}/${String(jm).padStart(2, '0')}/${String(jd).padStart(2, '0')}`;
+      document.querySelectorAll('.calendar-day-box').forEach(el => el.classList.remove('selected'));
+      const target = document.getElementById(`cal-day-${jd}`);
+      if (target) target.classList.add('selected');
+
+      const dateLabel = document.getElementById('daily-note-selected-date-text');
+      if (dateLabel) dateLabel.innerText = `یادداشت روز: ${selectedCalendarDate}`;
+
+      await loadDailyNoteForDate(selectedCalendarDate);
+    }
+
+    async function loadDailyNoteForDate(dateStr) {
+      const titleInput = document.getElementById('daily-note-title');
+      const contentInput = document.getElementById('daily-note-content');
+      const deleteBtn = document.getElementById('btn-delete-daily-note');
+      const hint = document.getElementById('daily-note-status-hint');
+
+      try {
+        const resp = await apiRequest(`/api/v1/notes?date_shamsi=${encodeURIComponent(dateStr)}&is_daily=true`);
+        if (!resp.ok) return;
+        const notes = await resp.json();
+
+        if (notes && notes.length > 0) {
+          currentDailyNote = notes[0];
+          if (titleInput) titleInput.value = currentDailyNote.title || `یادداشت روز ${dateStr}`;
+          if (contentInput) contentInput.value = currentDailyNote.content || '';
+          if (deleteBtn) deleteBtn.style.display = 'inline-flex';
+          if (hint) hint.innerText = `آخرین بروزرسانی: ${new Date(currentDailyNote.updated_at || currentDailyNote.created_at).toLocaleTimeString()}`;
+        } else {
+          currentDailyNote = null;
+          if (titleInput) titleInput.value = `یادداشت روز ${dateStr}`;
+          if (contentInput) contentInput.value = '';
+          if (deleteBtn) deleteBtn.style.display = 'none';
+          if (hint) hint.innerText = 'یادداشتی برای این روز ثبت نشده است. متن خود را بنویسید و دکمه ذخیره را بزنید.';
+        }
+      } catch (e) {
+        console.warn('Error loading daily note:', e);
+      }
+    }
+
+    async function saveCurrentDailyNote() {
+      const title = document.getElementById('daily-note-title').value.trim();
+      const content = document.getElementById('daily-note-content').value.trim();
+      const btn = document.getElementById('btn-save-daily-note');
+      const originalText = btn ? btn.innerHTML : '';
+      if (btn) { btn.innerHTML = '<span>⏳</span><span>در حال ذخیره...</span>'; btn.disabled = true; }
+
+      try {
+        if (currentDailyNote) {
+          const resp = await apiRequest(`/api/v1/notes/${currentDailyNote.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, content })
+          });
+          if (!resp.ok) throw new Error('خطا در بروزرسانی یادداشت روزانه');
+          currentDailyNote = await resp.json();
+        } else {
+          const resp = await apiRequest('/api/v1/notes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              title: title || `یادداشت روز ${selectedCalendarDate}`,
+              content,
+              date_shamsi: selectedCalendarDate,
+              is_daily: true
+            })
+          });
+          if (!resp.ok) throw new Error('خطا در ذخیره یادداشت روزانه');
+          currentDailyNote = await resp.json();
+        }
+
+        showToast('یادداشت روز با موفقیت ذخیره شد!', 'success');
+        document.getElementById('daily-note-status-hint').innerText = `ذخیره شد در ${new Date().toLocaleTimeString()}`;
+        document.getElementById('btn-delete-daily-note').style.display = 'inline-flex';
+        await loadCurrentMonthCalendar(calYear, calMonth);
+      } catch (e) {
+        showToast(e.message, 'error');
+      } finally {
+        if (btn) { btn.innerHTML = originalText; btn.disabled = false; }
+      }
+    }
+
+    async function deleteCurrentDailyNote() {
+      if (!currentDailyNote) return;
+      if (!confirm('آیا از حذف یادداشت این روز اطمینان دارید؟')) return;
+
+      try {
+        const resp = await apiRequest(`/api/v1/notes/${currentDailyNote.id}`, { method: 'DELETE' });
+        if (!resp.ok) throw new Error('حذف یادداشت با خطا مواجه شد');
+
+        currentDailyNote = null;
+        document.getElementById('daily-note-title').value = `یادداشت روز ${selectedCalendarDate}`;
+        document.getElementById('daily-note-content').value = '';
+        document.getElementById('btn-delete-daily-note').style.display = 'none';
+        document.getElementById('daily-note-status-hint').innerText = 'یادداشت حذف شد.';
+        showToast('یادداشت روز با موفقیت حذف گردید', 'success');
+        await loadCurrentMonthCalendar(calYear, calMonth);
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    async function loadAllRemindersAndNotes() {
+      try {
+        const [remResp, notesResp] = await Promise.all([
+          apiRequest('/api/v1/reminders'),
+          apiRequest('/api/v1/notes')
+        ]);
+        if (remResp.ok) allUserReminders = await remResp.json();
+        if (notesResp.ok) allUserNotes = await notesResp.json();
+        renderRemindersList();
+      } catch (e) {
+        console.warn('Error loading reminders and notes:', e);
+      }
+    }
+
+    function setRemindersFilter(filter) {
+      activeRemindersFilter = filter;
+      document.querySelectorAll('.filter-tab-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`filter-${filter}`);
+      if (activeBtn) activeBtn.classList.add('active');
+      renderRemindersList();
+    }
+
+    function renderRemindersList() {
+      const container = document.getElementById('reminders-list-container');
+      const countBadge = document.getElementById('reminders-count-badge');
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      if (activeRemindersFilter === 'notes') {
+        // Show all general notes
+        countBadge.innerText = `${allUserNotes.length} یادداشت`;
+        if (allUserNotes.length === 0) {
+          container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 24px;">هیچ یادداشتی ثبت نشده است.</div>`;
+          return;
+        }
+
+        allUserNotes.forEach(n => {
+          const item = document.createElement('div');
+          item.className = 'reminder-card-item';
+          item.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+              <span class="glass-icon-badge glow-cyan" style="width: 32px; height: 32px; font-size: 1rem;">📝</span>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-weight: 700; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${n.title}</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; max-height: 2.8em; overflow: hidden; text-overflow: ellipsis;">${n.content || '(بدون متن)'}</div>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              ${n.date_shamsi ? `<span class="reminder-type-tag" style="background: rgba(255,255,255,0.06);">${n.date_shamsi}</span>` : ''}
+              <button class="node-btn-icon" style="color: #f87171;" title="حذف" onclick="deleteGeneralNote('${n.id}')">🗑️</button>
+            </div>
+          `;
+          container.appendChild(item);
+        });
+        return;
+      }
+
+      // Filter reminders
+      let items = allUserReminders;
+      if (activeRemindersFilter !== 'all') {
+        items = allUserReminders.filter(r => r.type === activeRemindersFilter);
+      }
+
+      // Sort: active items first, completed items last
+      items.sort((a, b) => {
+        if (a.is_completed === b.is_completed) return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+        return a.is_completed ? 1 : -1;
+      });
+
+      countBadge.innerText = `${items.length} مورد`;
+      if (items.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 24px;">آیتمی در این دسته یافت نشد.</div>`;
+        return;
+      }
+
+      items.forEach(r => {
+        const item = document.createElement('div');
+        item.className = `reminder-card-item ${r.is_completed ? 'completed' : ''}`;
+
+        let typeClass = 'tag-task';
+        let typeName = 'وظیفه';
+        let typeIcon = '📋';
+        if (r.type === 'occasion') { typeClass = 'tag-occasion'; typeName = 'مناسبت'; typeIcon = '🎉'; }
+        if (r.type === 'timer') { typeClass = 'tag-timer'; typeName = 'تایمر'; typeIcon = '⏱️'; }
+
+        item.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+            <button class="node-btn-icon" style="width: 28px; height: 28px; font-size: 0.9rem; ${r.is_completed ? 'color: #34d399; border-color: #34d399;' : ''}" title="${r.is_completed ? 'تکمیل شده' : 'انجام دادن'}" onclick="toggleReminderItem('${r.id}')">
+              ${r.is_completed ? '✓' : '○'}
+            </button>
+            <div style="flex: 1; min-width: 0;">
+              <div class="reminder-title-text" style="font-weight: 700; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${r.title}</div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;">
+                <span class="reminder-type-tag ${typeClass}">${typeIcon} ${typeName}</span>
+                ${r.date_shamsi ? `<span>📅 ${r.date_shamsi}</span>` : ''}
+                ${r.time_str ? `<span>⏰ ${r.time_str}</span>` : ''}
+                ${r.is_notified ? `<span style="color: #34d399;" title="اعلان ارسال شده">🔔 ارسال شده</span>` : ''}
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <button class="node-btn-icon" title="۱۰ دقیقه تعویق" onclick="snoozeReminderItem('${r.id}', 10)">⏳</button>
+            <button class="node-btn-icon" style="color: #f87171;" title="حذف" onclick="deleteReminderItem('${r.id}')">🗑️</button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    async function submitQuickTask() {
+      const titleInput = document.getElementById('quick-task-title');
+      const typeInput = document.getElementById('quick-task-type');
+      const timeInput = document.getElementById('quick-task-time');
+
+      const title = titleInput.value.trim();
+      if (!title) {
+        showToast('لطفاً عنوان وظیفه یا رویداد را وارد کنید', 'error');
+        return;
+      }
+
+      const type = typeInput.value;
+      const time_str = timeInput.value || '10:00';
+
+      try {
+        const resp = await apiRequest('/api/v1/reminders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title,
+            type,
+            date_shamsi: selectedCalendarDate,
+            time_str
+          })
+        });
+        if (!resp.ok) throw new Error('ثبت وظیفه ناموفق بود');
+
+        titleInput.value = '';
+        showToast(`«${title}» با موفقیت ثبت شد و اعلان آن در تلگرام فعال گردید!`, 'success');
+        await loadAllRemindersAndNotes();
+        await loadCurrentMonthCalendar(calYear, calMonth);
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    async function createQuickTimer(minutes, title) {
+      try {
+        showToast(`در حال فعال‌سازی تایمر ${minutes} دقیقه‌ای...`);
+        const resp = await apiRequest('/api/v1/reminders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: title || `تایمر ${minutes} دقیقه‌ای`,
+            type: 'timer',
+            timer_minutes: minutes
+          })
+        });
+        if (!resp.ok) throw new Error('فعال‌سازی تایمر با خطا مواجه شد');
+
+        showToast(`⏱️ تایمر ${minutes} دقیقه‌ای فعال شد! هشدار در تلگرام ارسال خواهد شد.`, 'success');
+        await loadAllRemindersAndNotes();
+        await loadCurrentMonthCalendar(calYear, calMonth);
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    async function toggleReminderItem(id) {
+      try {
+        const resp = await apiRequest(`/api/v1/reminders/${id}/toggle`, { method: 'POST' });
+        if (!resp.ok) throw new Error('تغییر وضعیت ناموفق بود');
+        await loadAllRemindersAndNotes();
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    async function snoozeReminderItem(id, minutes = 10) {
+      try {
+        const resp = await apiRequest(`/api/v1/reminders/${id}/snooze?minutes=${minutes}`, { method: 'POST' });
+        if (!resp.ok) throw new Error('به تعویق انداختن ناموفق بود');
+        showToast(`⏰ یادآور ${minutes} دقیقه به تعویق افتاد`, 'info');
+        await loadAllRemindersAndNotes();
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    async function deleteReminderItem(id) {
+      try {
+        const resp = await apiRequest(`/api/v1/reminders/${id}`, { method: 'DELETE' });
+        if (!resp.ok) throw new Error('حذف یادآور ناموفق بود');
+        showToast('آیتم حذف شد', 'success');
+        await loadAllRemindersAndNotes();
+        await loadCurrentMonthCalendar(calYear, calMonth);
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    async function deleteGeneralNote(id) {
+      if (!confirm('آیا از حذف این یادداشت اطمینان دارید؟')) return;
+      try {
+        const resp = await apiRequest(`/api/v1/notes/${id}`, { method: 'DELETE' });
+        if (!resp.ok) throw new Error('حذف یادداشت ناموفق بود');
+        showToast('یادداشت با موفقیت حذف شد', 'success');
+        await loadAllRemindersAndNotes();
+        await loadCurrentMonthCalendar(calYear, calMonth);
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    function refreshCalendarData() {
+      loadCalendarTodayInfo();
+      loadCurrentMonthCalendar(calYear, calMonth);
+      loadAllRemindersAndNotes();
+      showToast('اطلاعات تقویم و یادداشت‌ها بروزرسانی شد', 'success');
+    }
+
+    function openNewNoteModal() {
+      openGenericModal('📝 یادداشت جدید', `
+        <div class="form-group">
+          <label class="form-label">عنوان یادداشت:</label>
+          <input type="text" id="modal-note-title" class="form-input" placeholder="عنوان یادداشت..." autofocus />
+        </div>
+        <div class="form-group">
+          <label class="form-label">متن یادداشت:</label>
+          <textarea id="modal-note-content" class="form-input" rows="5" placeholder="یادداشت‌های خود را بنویسید..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">تاریخ شمسی (اختیاری):</label>
+          <input type="text" id="modal-note-date" class="form-input" value="${selectedCalendarDate || ''}" placeholder="1405/06/27" style="direction: ltr;" />
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
+          <button class="btn-glass" onclick="closeGenericModal()">انصراف</button>
+          <button class="btn-glass btn-glass-primary" onclick="submitModalCreateNote()">ایجاد یادداشت</button>
+        </div>
+      `);
+    }
+
+    async function submitModalCreateNote() {
+      const title = document.getElementById('modal-note-title').value.trim();
+      const content = document.getElementById('modal-note-content').value.trim();
+      const date_shamsi = document.getElementById('modal-note-date').value.trim() || null;
+
+      if (!title && !content) {
+        showToast('لطفاً عنوان یا متن یادداشت را وارد کنید', 'error');
+        return;
+      }
+
+      try {
+        const resp = await apiRequest('/api/v1/notes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: title || 'یادداشت جدید', content, date_shamsi, is_daily: false })
+        });
+        if (!resp.ok) throw new Error('ایجاد یادداشت ناموفق بود');
+        closeGenericModal();
+        showToast('یادداشت با موفقیت ایجاد شد', 'success');
+        await loadAllRemindersAndNotes();
+        await loadCurrentMonthCalendar(calYear, calMonth);
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    function openNewReminderModal() {
+      openGenericModal('⏰ وظیفه یا مناسبت جدید', `
+        <div class="form-group">
+          <label class="form-label">عنوان:</label>
+          <input type="text" id="modal-rem-title" class="form-input" placeholder="مثال: جلسه کاری با تیم" autofocus />
+        </div>
+        <div class="form-group">
+          <label class="form-label">نوع رویداد:</label>
+          <select id="modal-rem-type" class="form-input">
+            <option value="task">📋 وظیفه کاری / تسک</option>
+            <option value="occasion">🎉 مناسبت خاص / جشن / تولد</option>
+            <option value="timer">⏱️ تایمر یا آلارم</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">تاریخ شمسی (YYYY/MM/DD):</label>
+          <input type="text" id="modal-rem-date" class="form-input" value="${selectedCalendarDate || ''}" placeholder="1405/06/27" style="direction: ltr;" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">ساعت هشدار (HH:MM):</label>
+          <input type="time" id="modal-rem-time" class="form-input" value="10:00" />
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
+          <button class="btn-glass" onclick="closeGenericModal()">انصراف</button>
+          <button class="btn-glass btn-glass-primary" onclick="submitModalCreateReminder()">ثبت و فعال‌سازی آلارم</button>
+        </div>
+      `);
+    }
+
+    async function submitModalCreateReminder() {
+      const title = document.getElementById('modal-rem-title').value.trim();
+      const type = document.getElementById('modal-rem-type').value;
+      const date_shamsi = document.getElementById('modal-rem-date').value.trim() || null;
+      const time_str = document.getElementById('modal-rem-time').value || '10:00';
+
+      if (!title) {
+        showToast('لطفاً عنوان را وارد کنید', 'error');
+        return;
+      }
+
+      try {
+        const resp = await apiRequest('/api/v1/reminders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, type, date_shamsi, time_str })
+        });
+        if (!resp.ok) throw new Error('ثبت یادآور با خطا مواجه شد');
+        closeGenericModal();
+        showToast('یادآور ثبت شد و در زمان مقرر به تلگرام پیام ارسال می‌شود!', 'success');
+        await loadAllRemindersAndNotes();
+        await loadCurrentMonthCalendar(calYear, calMonth);
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+
+    function openQuickTimerModal() {
+      openGenericModal('⏱️ تایمر شمارش معکوس', `
+        <div style="text-align: center; margin-bottom: 14px;">
+          <div class="glass-icon-badge glow-cyan" style="width: 60px; height: 60px; font-size: 2rem; margin: 0 auto 10px;">⏱️</div>
+          <div style="font-weight: 700;">تنظیم تایمر فوری با هشدار تلگرام</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">عنوان تایمر:</label>
+          <input type="text" id="modal-timer-title" class="form-input" placeholder="تایمر استراحت / کار..." value="تایمر سریع" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">مدت زمان (دقیقه):</label>
+          <input type="number" id="modal-timer-mins" class="form-input" value="15" min="1" max="1440" style="direction: ltr;" />
+        </div>
+        <div class="quick-timer-chips" style="justify-content: center; margin: 10px 0;">
+          <button class="timer-chip-btn" onclick="document.getElementById('modal-timer-mins').value = 5">۵ د</button>
+          <button class="timer-chip-btn" onclick="document.getElementById('modal-timer-mins').value = 10">۱۰ د</button>
+          <button class="timer-chip-btn" onclick="document.getElementById('modal-timer-mins').value = 15">۱۵ د</button>
+          <button class="timer-chip-btn" onclick="document.getElementById('modal-timer-mins').value = 25">۲۵ د (پومودورو)</button>
+          <button class="timer-chip-btn" onclick="document.getElementById('modal-timer-mins').value = 30">۳۰ د</button>
+          <button class="timer-chip-btn" onclick="document.getElementById('modal-timer-mins').value = 60">۶۰ د</button>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
+          <button class="btn-glass" onclick="closeGenericModal()">انصراف</button>
+          <button class="btn-glass btn-glass-primary" onclick="submitModalQuickTimer()">آغاز تایمر 🚀</button>
+        </div>
+      `);
+    }
+
+    async function submitModalQuickTimer() {
+      const title = document.getElementById('modal-timer-title').value.trim() || 'تایمر سریع';
+      const mins = parseInt(document.getElementById('modal-timer-mins').value) || 10;
+      closeGenericModal();
+      await createQuickTimer(mins, title);
     }
 
     function refreshDrive() {
       fetchStorageStats();
       if (currentView === 'files') renderCurrentFolder();
-      else renderTrash();
+      else if (currentView === 'trash') renderTrash();
+      else refreshCalendarData();
       showToast(t('driveRefreshed'), 'success');
     }
 
@@ -2987,6 +4090,7 @@
 
       await checkSystemHealth();
       await ensureUserSession();
+      await loadCalendarTodayInfo();
     });
 
     function applyLanguage() {

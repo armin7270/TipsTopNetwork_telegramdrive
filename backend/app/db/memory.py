@@ -89,6 +89,8 @@ class InMemoryRepository:
         self.refresh_tokens: dict[bytes, dict[str, Any]] = {}
         self.storage_pools: dict[str, dict[str, Any]] = {}
         self.telegram_sessions: dict[str, dict[str, Any]] = {}
+        self.notes: dict[str, dict[str, Any]] = {}
+        self.reminders: dict[str, dict[str, Any]] = {}
         self.jobs: list[dict[str, Any]] = []
         self.audit_log: list[dict[str, Any]] = []
 
@@ -126,6 +128,8 @@ class InMemoryRepository:
                 "chunks": self.chunks,
                 "storage_pools": self.storage_pools,
                 "telegram_sessions": self.telegram_sessions,
+                "notes": self.notes,
+                "reminders": self.reminders,
                 "pool_channel_bytes": {str(k): v for k, v in self.pool_channel_bytes.items()},
                 "pool_channel_messages": {str(k): v for k, v in self.pool_channel_messages.items()},
             }
@@ -153,6 +157,8 @@ class InMemoryRepository:
             self.chunks.update(data.get("chunks", {}))
             self.storage_pools.update(data.get("storage_pools", {}))
             self.telegram_sessions.update(data.get("telegram_sessions", {}))
+            self.notes.update(data.get("notes", {}))
+            self.reminders.update(data.get("reminders", {}))
             if "pool_channel_bytes" in data:
                 self.pool_channel_bytes.update({int(k): v for k, v in data["pool_channel_bytes"].items()})
             if "pool_channel_messages" in data:
@@ -1182,6 +1188,214 @@ class InMemoryRepository:
         self.telegram_sessions[sid] = item
         self._save_state()
         return item
+
+    # --- notes & daily notes --------------------------------------------
+
+    async def create_note(
+        self,
+        *,
+        owner_id: str,
+        title: str,
+        content: str,
+        date_shamsi: str | None = None,
+        is_daily: bool = False,
+        color: str | None = None,
+    ) -> dict[str, Any]:
+        note_id = new_id()
+        when = utcnow()
+        item = {
+            "id": note_id,
+            "owner_id": str(owner_id),
+            "title": title.strip() or "یادداشت جدید",
+            "content": content,
+            "date_shamsi": date_shamsi,
+            "is_daily": is_daily,
+            "color": color or "#38bdf8",
+            "created_at": when,
+            "updated_at": when,
+        }
+        self.notes[note_id] = item
+        self._save_state()
+        return dict(item)
+
+    async def get_note(self, note_id: str, owner_id: str | None = None) -> dict[str, Any] | None:
+        item = self.notes.get(note_id)
+        if not item:
+            return None
+        if owner_id and str(item.get("owner_id")) != str(owner_id):
+            return None
+        return dict(item)
+
+    async def list_notes(
+        self,
+        owner_id: str,
+        date_shamsi: str | None = None,
+        is_daily: bool | None = None,
+    ) -> list[dict[str, Any]]:
+        results = []
+        for n in self.notes.values():
+            if str(n.get("owner_id")) != str(owner_id):
+                continue
+            if date_shamsi is not None and n.get("date_shamsi") != date_shamsi:
+                continue
+            if is_daily is not None and n.get("is_daily") != is_daily:
+                continue
+            results.append(dict(n))
+        results.sort(key=lambda x: str(x.get("updated_at") or ""), reverse=True)
+        return results
+
+    async def update_note(
+        self,
+        note_id: str,
+        owner_id: str,
+        *,
+        title: str | None = None,
+        content: str | None = None,
+        date_shamsi: str | None = None,
+        color: str | None = None,
+    ) -> dict[str, Any] | None:
+        item = self.notes.get(note_id)
+        if not item or str(item.get("owner_id")) != str(owner_id):
+            return None
+        if title is not None:
+            item["title"] = title
+        if content is not None:
+            item["content"] = content
+        if date_shamsi is not None:
+            item["date_shamsi"] = date_shamsi
+        if color is not None:
+            item["color"] = color
+        item["updated_at"] = utcnow()
+        self._save_state()
+        return dict(item)
+
+    async def delete_note(self, note_id: str, owner_id: str | None = None) -> bool:
+        item = self.notes.get(note_id)
+        if not item:
+            return False
+        if owner_id and str(item.get("owner_id")) != str(owner_id):
+            return False
+        self.notes.pop(note_id, None)
+        self._save_state()
+        return True
+
+    # --- reminders, tasks, occasions & timers ---------------------------
+
+    async def create_reminder(
+        self,
+        *,
+        owner_id: str,
+        title: str,
+        type: str = "task",
+        date_shamsi: str | None = None,
+        time_str: str | None = None,
+        remind_at_utc: datetime | None = None,
+        repeat: str = "none",
+        telegram_chat_id: int | None = None,
+    ) -> dict[str, Any]:
+        rem_id = new_id()
+        when = utcnow()
+        item = {
+            "id": rem_id,
+            "owner_id": str(owner_id),
+            "title": title.strip() or "یادآور جدید",
+            "type": type,
+            "date_shamsi": date_shamsi,
+            "time_str": time_str,
+            "remind_at_utc": remind_at_utc,
+            "repeat": repeat,
+            "is_completed": False,
+            "notified": False,
+            "is_notified": False,
+            "telegram_chat_id": telegram_chat_id,
+            "created_at": when,
+            "updated_at": when,
+        }
+        self.reminders[rem_id] = item
+        self._save_state()
+        return dict(item)
+
+    async def get_reminder(self, reminder_id: str, owner_id: str | None = None) -> dict[str, Any] | None:
+        item = self.reminders.get(reminder_id)
+        if not item:
+            return None
+        if owner_id and str(item.get("owner_id")) != str(owner_id):
+            return None
+        return dict(item)
+
+    async def list_reminders(
+        self,
+        owner_id: str,
+        date_shamsi: str | None = None,
+        type: str | None = None,
+        include_completed: bool = True,
+    ) -> list[dict[str, Any]]:
+        results = []
+        for r in self.reminders.values():
+            if str(r.get("owner_id")) != str(owner_id):
+                continue
+            if date_shamsi is not None and r.get("date_shamsi") != date_shamsi:
+                continue
+            if type is not None and r.get("type") != type:
+                continue
+            if not include_completed and r.get("is_completed"):
+                continue
+            results.append(dict(r))
+        results.sort(key=lambda x: str(x.get("remind_at_utc") or x.get("created_at") or ""))
+        return results
+
+    async def toggle_reminder(self, reminder_id: str, owner_id: str | None = None) -> dict[str, Any] | None:
+        item = self.reminders.get(reminder_id)
+        if not item:
+            return None
+        if owner_id and str(item.get("owner_id")) != str(owner_id):
+            return None
+        item["is_completed"] = not item.get("is_completed", False)
+        item["updated_at"] = utcnow()
+        self._save_state()
+        return dict(item)
+
+    async def snooze_reminder(self, reminder_id: str, minutes: int = 10) -> dict[str, Any] | None:
+        item = self.reminders.get(reminder_id)
+        if not item:
+            return None
+        item["remind_at_utc"] = utcnow() + timedelta(minutes=minutes)
+        item["notified"] = False
+        item["is_notified"] = False
+        item["updated_at"] = utcnow()
+        self._save_state()
+        return dict(item)
+
+    async def delete_reminder(self, reminder_id: str, owner_id: str | None = None) -> bool:
+        item = self.reminders.get(reminder_id)
+        if not item:
+            return False
+        if owner_id and str(item.get("owner_id")) != str(owner_id):
+            return False
+        self.reminders.pop(reminder_id, None)
+        self._save_state()
+        return True
+
+    async def list_due_reminders(self, now: datetime | None = None) -> list[dict[str, Any]]:
+        target_now = now or utcnow()
+        due = []
+        for r in self.reminders.values():
+            if r.get("is_completed") or r.get("notified"):
+                continue
+            remind_at = r.get("remind_at_utc")
+            if remind_at and remind_at <= target_now:
+                due.append(dict(r))
+        return due
+
+    async def mark_reminder_notified(self, reminder_id: str) -> bool:
+        item = self.reminders.get(reminder_id)
+        if not item:
+            return False
+        item["notified"] = True
+        item["is_notified"] = True
+        item["updated_at"] = utcnow()
+        self._save_state()
+        return True
 
     # --- helpers --------------------------------------------------------
 
