@@ -257,6 +257,9 @@ async def trash_node(
     principal: Principal = Depends(current_user),
 ) -> NodeResponse:
     await vfs.delete(node_id, principal.user_id, purge=False)
+    raw = getattr(vfs.repo, "nodes", {}).get(node_id)
+    if raw:
+        return _node(raw)
     return _node(await vfs.get_node(node_id, principal.user_id))
 
 

@@ -2553,7 +2553,14 @@
         if (!resp.ok) {
           resp = await apiRequest(`/api/v1/nodes/${nodeId}`, { method: 'DELETE' });
         }
-        if (!resp.ok) throw new Error('انتقال به زباله‌دان ناموفق بود');
+        if (!resp.ok) {
+          let errDetail = 'انتقال به زباله‌دان ناموفق بود';
+          try {
+            const errData = await resp.json();
+            if (errData.detail) errDetail += `: ${errData.detail}`;
+          } catch (e) {}
+          throw new Error(errDetail);
+        }
         showToast(t('fileMovedToTrash'), 'success');
         fetchStorageStats();
         renderCurrentFolder();
@@ -2565,7 +2572,14 @@
     async function restoreNode(nodeId) {
       try {
         const resp = await apiRequest(`/api/v1/nodes/${nodeId}/restore`, { method: 'POST' });
-        if (!resp.ok) throw new Error('بازیابی فایل ناموفق بود');
+        if (!resp.ok) {
+          let errDetail = 'بازیابی فایل ناموفق بود';
+          try {
+            const errData = await resp.json();
+            if (errData.detail) errDetail += `: ${errData.detail}`;
+          } catch (e) {}
+          throw new Error(errDetail);
+        }
         showToast(t('fileRestored'), 'success');
         fetchStorageStats();
         renderTrash();
@@ -2578,7 +2592,14 @@
       if (!confirm(t('promptDeletePermanent'))) return;
       try {
         const resp = await apiRequest(`/api/v1/nodes/${nodeId}?purge=true&recursive=true`, { method: 'DELETE' });
-        if (!resp.ok) throw new Error('حذف دائمی ناموفق بود');
+        if (!resp.ok) {
+          let errDetail = 'حذف دائمی ناموفق بود';
+          try {
+            const errData = await resp.json();
+            if (errData.detail) errDetail += `: ${errData.detail}`;
+          } catch (e) {}
+          throw new Error(errDetail);
+        }
         showToast(t('filePurged'), 'success');
         fetchStorageStats();
         renderTrash();

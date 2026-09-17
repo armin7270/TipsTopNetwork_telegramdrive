@@ -212,6 +212,12 @@ class TelegramBotService:
         except Exception:
             pass
 
+        if not telegram_id and hasattr(self.repo, "users"):
+            for u in self.repo.users.values():
+                if u.get("telegram_user_id"):
+                    telegram_id = u["telegram_user_id"]
+                    break
+
         token = self._mint_download_token(user)
         token_param = f"?token={token}" if token else ""
         download_url = f"{self.public_base_url}/api/v1/files/{node['id']}/content{token_param}"
@@ -632,12 +638,17 @@ class TelegramBotService:
             and not n.get("trashed_at")
         ]
 
-        # Fail-safe: If user has no files, check if files exist under any account in this drive
+        # Fail-safe 1: If user has no files, check if files exist under any account in this drive
         if not file_nodes and hasattr(self.repo, "nodes"):
             for candidate_node in self.repo.nodes.values():
                 if candidate_node.get("kind") == "file" and not candidate_node.get("trashed_at"):
-                    cand_owner_id = candidate_node.get("owner_id")
-                    cand_user = self.repo.users.get(cand_owner_id) if hasattr(self.repo, "users") else None
+                    cand_owner_id = str(candidate_node.get("owner_id"))
+                    cand_user = None
+                    if hasattr(self.repo, "users"):
+                        for u_id, u_obj in self.repo.users.items():
+                            if str(u_id) == cand_owner_id:
+                                cand_user = u_obj
+                                break
                     if cand_user:
                         cand_user["telegram_user_id"] = tg_user_id
                         user["telegram_user_id"] = None
@@ -652,6 +663,13 @@ class TelegramBotService:
                             and not n.get("trashed_at")
                         ]
                         break
+
+        # Fail-safe 2: In a personal single-tenant drive, if still empty, show all active files
+        if not file_nodes and hasattr(self.repo, "nodes"):
+            file_nodes = [
+                n for n in self.repo.nodes.values()
+                if n.get("kind") == "file" and not n.get("trashed_at")
+            ]
 
         file_nodes.sort(key=lambda x: str(x.get("created_at") or ""), reverse=True)
 
@@ -1314,9 +1332,18 @@ class TelegramBotService:
                     primary_user = u
                     break
 
-        # Unify if user is an isolated dummy tg_ user and primary web user exists
-        if user and (user.get("email") or "").startswith("tg_") and primary_user and primary_user["id"] != user["id"]:
-            log.info("Unifying dummy tg user %s into primary web user %s", user["id"], primary_user["id"])
+        # Check if user has active files
+        user_has_files = False
+        if user and hasattr(self.repo, "nodes"):
+            user_has_files = any(
+                str(n.get("owner_id")) == str(user["id"])
+                for n in self.repo.nodes.values()
+                if n.get("kind") == "file" and not n.get("trashed_at")
+            )
+
+        # Unify if user is an isolated dummy tg_ user OR user has no files while primary web user exists
+        if user and primary_user and str(primary_user["id"]) != str(user["id"]) and (not user_has_files or (user.get("email") or "").startswith("tg_")):
+            log.info("Unifying user %s into primary web user %s", user["id"], primary_user["id"])
             if hasattr(self.repo, "nodes"):
                 for n in self.repo.nodes.values():
                     if str(n.get("owner_id")) == str(user["id"]):

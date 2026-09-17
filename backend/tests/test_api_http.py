@@ -1047,3 +1047,41 @@ class TestUsageEndpoint:
         await repo.trash_node(node_id, user["id"], purge_after_days=30)
         assert svc._find_node_by_hex(node_id) is None
         assert svc._find_node_by_hex(hex_id) is None
+
+    @pytest.mark.asyncio
+    async def test_bot_service_unify_when_user_has_no_files(self, settings):
+        """Verify bot unifies an existing user who has no files with the user who owns files."""
+        from app.db.memory import InMemoryRepository
+        from app.telegram.bot_service import TelegramBotService
+
+        repo = InMemoryRepository()
+        web_user = await repo.create_user(
+            email="webmaster@teledrive.dev",
+            password_hash="hash",
+            display_name="Web Master",
+        )
+        root = await repo.get_root_node(web_user["id"])
+        await repo.create_file_node(
+            owner_id=web_user["id"],
+            parent_id=root["id"],
+            name="photo.jpg",
+            size_bytes=2048,
+            mime_type="image/jpeg",
+            chunk_size=2048,
+            total_chunks=1,
+            encryption_mode="server_side",
+            upload_state="ready",
+        )
+        empty_user = await repo.create_user(
+            email="empty@teledrive.dev",
+            password_hash=None,
+            display_name="Empty User",
+            telegram_user_id=55555,
+        )
+
+        svc = TelegramBotService(settings=settings, repo=repo)
+        unified = await svc._get_or_create_user(telegram_user_id=55555)
+
+        assert unified["id"] == web_user["id"]
+        stored_web = await repo.get_user(web_user["id"])
+        assert stored_web["telegram_user_id"] == 55555
